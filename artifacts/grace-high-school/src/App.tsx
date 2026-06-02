@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import schoolLogo from "@assets/download_1780399508014.jpg";
+import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
@@ -53,6 +54,7 @@ export default function App() {
   };
 
   const galleryItems = [
+    { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_assembly1, label: "School Assembly — Students Gathered", cat: "campus", wide: true },
     { src: img_lab,       label: "Chemistry Lab — Practical Session",   cat: "academics" },
     { src: img_sewing,    label: "Vocational Skills — Tailoring Class", cat: "vocational" },
