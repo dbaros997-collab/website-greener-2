@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import schoolLogo from "@assets/download_1780399508014.jpg";
 import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
+import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
@@ -57,6 +58,7 @@ export default function App() {
   const galleryItems = [
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
+    { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
     { src: img_assembly1, label: "School Assembly — Students Gathered", cat: "campus", wide: true },
     { src: img_lab,       label: "Chemistry Lab — Practical Session",   cat: "academics" },
     { src: img_sewing,    label: "Vocational Skills — Tailoring Class", cat: "vocational" },
@@ -191,7 +193,7 @@ export default function App() {
           position: "absolute", inset: 0,
           backgroundImage: `url(${img_assembly1})`,
           backgroundSize: "cover", backgroundPosition: "center",
-          opacity: 0.18,
+          opacity: 0.32,
         }} />
         <div style={{
           position: "absolute", inset: 0,
@@ -657,6 +659,87 @@ export default function App() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{v.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== STAFF ===== */}
+      <section id="staff" style={{ background: WHITE, padding: "80px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Our Team
+          </div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>
+            Meet Our Dedicated Staff
+          </h2>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 580, marginBottom: 40 }}>
+            Grace High School is powered by a committed team of qualified teachers and support staff who pour heart and knowledge into every student's journey.
+          </p>
+
+          {/* Staff group photo */}
+          <div style={{ borderRadius: 14, overflow: "hidden", marginBottom: 40, position: "relative" }}>
+            <img
+              src={img_staff}
+              alt="Grace High School Staff"
+              style={{ width: "100%", height: 420, objectFit: "cover", objectPosition: "center top", display: "block" }}
+            />
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0,
+              background: `linear-gradient(transparent, rgba(10,64,32,0.88))`,
+              padding: "48px 32px 28px",
+              display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
+            }}>
+              <div>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE, marginBottom: 4 }}>
+                  Our Teaching Team
+                </h3>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.75)" }}>
+                  Qualified, passionate educators — Gayaza campus
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 20 }}>
+                {[
+                  { num: "12+", label: "Teaching Staff" },
+                  { num: "100%", label: "Qualified" },
+                  { num: "S1–S6", label: "All Levels" },
+                ].map((s, i) => (
+                  <div key={i} style={{ textAlign: "center" }}>
+                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#8EEDC0", display: "block", lineHeight: 1 }}>{s.num}</span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Department highlights */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }} className="grid-cols-2 md:grid-cols-4">
+            {[
+              { icon: "🔬", dept: "Sciences",     desc: "Biology, Chemistry, Physics — hands-on lab teaching" },
+              { icon: "📐", dept: "Mathematics",  desc: "Pure Maths, Applied Maths and Statistics" },
+              { icon: "📖", dept: "Humanities",   desc: "English, History, Geography, CRE, SST" },
+              { icon: "💼", dept: "Business & ICT", desc: "Entrepreneurship, Economics, Computer Studies" },
+            ].map((d, i) => (
+              <div key={i} style={{
+                padding: "22px 20px", background: OFF_WHITE, borderRadius: 10,
+                borderTop: `3px solid ${GREEN_MAIN}`, transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                <span style={{ fontSize: 28, display: "block", marginBottom: 10 }}>{d.icon}</span>
+                <h4 style={{ fontSize: 14, fontWeight: 700, color: GREEN_DARK, marginBottom: 6 }}>{d.dept}</h4>
+                <p style={{ fontSize: 13, color: "#5A5A5A", lineHeight: 1.55 }}>{d.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 28, background: GREEN_LIGHT, borderRadius: 10, padding: "18px 24px", display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 22 }}>📌</span>
+            <p style={{ fontSize: 14, color: GREEN_DARK, lineHeight: 1.6 }}>
+              To view the full staff list or enquire about specific departments, contact the school directly at{" "}
+              <strong>gracehighschool2000@gmail.com</strong>
+            </p>
           </div>
         </div>
       </section>
