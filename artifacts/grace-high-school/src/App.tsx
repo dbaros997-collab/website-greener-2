@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
+import schoolLogo from "@assets/download_1780399508014.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
@@ -106,12 +107,9 @@ export default function App() {
         <a href="#" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
           <div style={{
             width: 46, height: 46, borderRadius: "50%",
-            background: `linear-gradient(135deg, #4CAF82 0%, #2ECC71 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700,
-            color: GREEN_DARK, flexShrink: 0,
-            boxShadow: "0 0 0 2px rgba(76,175,130,0.4)",
-          }}>G</div>
+            overflow: "hidden",
+            boxShadow: "0 0 0 2px rgba(76,175,130,0.4)", flexShrink: 0,
+          }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
           <div style={{ color: WHITE }}>
             <strong style={{ display: "block", fontSize: 14, fontWeight: 600, letterSpacing: "0.03em" }}>Grace High School</strong>
             <span style={{ fontSize: 11, color: "#8EEDC0", letterSpacing: "0.08em", textTransform: "uppercase" }}>Gayaza, Uganda</span>
@@ -260,7 +258,7 @@ export default function App() {
                 border: "1px solid rgba(76,175,130,0.2)",
                 animation: "pulse-ring 3s ease-in-out infinite 0.5s",
               }} />
-              <img src={img_trophy} alt="Grace High School" style={{
+              <img src={schoolLogo} alt="Grace High School Logo" style={{
                 width: "100%", height: "100%", objectFit: "cover",
                 borderRadius: "50%", border: "4px solid rgba(76,175,130,0.5)",
               }} />
@@ -908,7 +906,7 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 40 }} className="grid-cols-1 md:grid-cols-4">
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg, #4CAF82 0%, #2ECC71 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Playfair Display',serif", fontSize: 16, fontWeight: 700, color: GREEN_DARK }}>G</div>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", boxShadow: "0 0 0 2px rgba(76,175,130,0.4)" }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
                 <div style={{ color: WHITE }}>
                   <strong style={{ display: "block", fontSize: 13, fontWeight: 600 }}>Grace High School</strong>
                   <span style={{ fontSize: 11, color: "#8EEDC0" }}>Gayaza, Uganda</span>
