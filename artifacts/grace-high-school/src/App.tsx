@@ -110,10 +110,11 @@ export default function App() {
       }}>
         <a href="#" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
           <div style={{
-            width: 46, height: 46, borderRadius: "50%",
-            overflow: "hidden",
-            boxShadow: "0 0 0 2px rgba(76,175,130,0.4)", flexShrink: 0,
-          }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+            width: 56, height: 56, borderRadius: "50%",
+            background: WHITE, padding: 3,
+            boxShadow: "0 0 0 2px rgba(76,175,130,0.5)", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+          }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
           <div style={{ color: WHITE }}>
             <strong style={{ display: "block", fontSize: 14, fontWeight: 600, letterSpacing: "0.03em" }}>Grace High School</strong>
             <span style={{ fontSize: 11, color: "#8EEDC0", letterSpacing: "0.08em", textTransform: "uppercase" }}>Gayaza, Uganda</span>
@@ -263,8 +264,9 @@ export default function App() {
                 animation: "pulse-ring 3s ease-in-out infinite 0.5s",
               }} />
               <img src={schoolLogo} alt="Grace High School Logo" style={{
-                width: "100%", height: "100%", objectFit: "cover",
+                width: "100%", height: "100%", objectFit: "contain",
                 borderRadius: "50%", border: "4px solid rgba(76,175,130,0.5)",
+                background: WHITE, padding: 12,
               }} />
             </div>
           </div>
@@ -910,7 +912,7 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 40 }} className="grid-cols-1 md:grid-cols-4">
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", boxShadow: "0 0 0 2px rgba(76,175,130,0.4)" }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: WHITE, padding: 3, boxShadow: "0 0 0 2px rgba(76,175,130,0.4)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                 <div style={{ color: WHITE }}>
                   <strong style={{ display: "block", fontSize: 13, fontWeight: 600 }}>Grace High School</strong>
                   <span style={{ fontSize: 11, color: "#8EEDC0" }}>Gayaza, Uganda</span>
