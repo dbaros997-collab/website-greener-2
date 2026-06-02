@@ -201,11 +201,7 @@ export default function App() {
                         radial-gradient(circle at 80% 20%, rgba(76,175,130,0.2) 0%, transparent 40%)`,
         }} />
 
-        <div style={{
-          maxWidth: 1100, width: "100%",
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60,
-          alignItems: "center", position: "relative", zIndex: 1,
-        }} className="grid-cols-1 md:grid-cols-2">
+        <div className="hero-grid">
 
           <div>
             <div style={{
@@ -254,22 +250,29 @@ export default function App() {
 
           {/* Hero photo */}
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ position: "relative", width: 320, height: 320 }}>
+            <div style={{ position: "relative", width: 380, height: 380 }} className="hero-crest">
               <div style={{
-                position: "absolute", inset: -16, borderRadius: "50%",
-                border: "2px solid rgba(76,175,130,0.4)",
+                position: "absolute", inset: -20, borderRadius: "50%",
+                border: "2px solid rgba(76,175,130,0.5)",
                 animation: "pulse-ring 3s ease-in-out infinite",
               }} />
               <div style={{
-                position: "absolute", inset: -32, borderRadius: "50%",
-                border: "1px solid rgba(76,175,130,0.2)",
+                position: "absolute", inset: -40, borderRadius: "50%",
+                border: "1px solid rgba(76,175,130,0.25)",
                 animation: "pulse-ring 3s ease-in-out infinite 0.5s",
               }} />
-              <img src={schoolLogo} alt="Grace High School Logo" style={{
-                width: "100%", height: "100%", objectFit: "contain",
-                borderRadius: "50%", border: "4px solid rgba(76,175,130,0.5)",
-                background: WHITE, padding: 12,
-              }} />
+              <div style={{
+                width: "100%", height: "100%", borderRadius: "50%",
+                background: WHITE,
+                border: "6px solid #4CAF82",
+                boxShadow: "0 0 0 3px rgba(76,175,130,0.3), 0 20px 60px rgba(0,0,0,0.4)",
+                overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
+                padding: 10,
+              }}>
+                <img src={schoolLogo} alt="Grace High School Logo" style={{
+                  width: "100%", height: "100%", objectFit: "contain",
+                }} />
+              </div>
             </div>
           </div>
         </div>
@@ -293,7 +296,7 @@ export default function App() {
 
       {/* ===== STATS BAR ===== */}
       <div style={{ background: GREEN_MAIN, padding: "20px 5%", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 20 }}>
+        <div className="stats-grid">
           {[
             { num: "28", label: "Acre Campus" },
             { num: "S1–S6", label: "All Levels" },
@@ -311,7 +314,7 @@ export default function App() {
 
       {/* ===== ABOUT ===== */}
       <section id="about" style={{ background: WHITE, padding: "80px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "start" }}>
+        <div className="about-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <span style={{ display: "block", width: 28, height: 2, background: GREEN_MAIN }} />
@@ -413,7 +416,7 @@ export default function App() {
             A comprehensive National Curriculum across O-Level and A-Level, complemented by vocational programmes that prepare students for life beyond school.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }} className="grid-cols-1 md:grid-cols-3">
+          <div className="programmes-grid">
             {[
               {
                 tag: "S1 – S4", title: "Ordinary Level",
@@ -472,7 +475,7 @@ export default function App() {
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>What's Happening at Grace</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 40 }}>Stay up to date with the latest school news, announcements, and upcoming events.</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 32 }} className="grid-cols-1 md:grid-cols-[2fr_1fr]">
+          <div className="news-grid">
             {/* Main news card */}
             <div style={{ background: GREEN_DARK, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", cursor: "pointer", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-3px)")}
@@ -522,7 +525,7 @@ export default function App() {
           {/* Upcoming events */}
           <div style={{ marginTop: 40 }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: GREEN_DARK, marginBottom: 20 }}>Upcoming Events</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }} className="grid-cols-2 md:grid-cols-4">
+            <div className="events-grid">
               {[
                 { day: "14", month: "July 2025",  title: "New Term Begins",    desc: "Term III — All students report" },
                 { day: "22", month: "Aug 2025",   title: "Sports Day",         desc: "Inter-house competitions" },
@@ -561,7 +564,7 @@ export default function App() {
             Our students consistently excel in national examinations, competitions, and national platforms — proving that Grace High School truly produces leaders.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }} className="grid-cols-1 md:grid-cols-2">
+          <div className="achievements-outer">
             {/* UACE card */}
             <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(76,175,130,0.3)", borderRadius: 12, overflow: "hidden" }}>
               <img src={img_uace} alt="UACE 2023 results" style={{ width: "100%", height: 240, objectFit: "cover" }} />
@@ -643,7 +646,7 @@ export default function App() {
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>What We Stand For</h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>Our values guide every aspect of life at Grace High School — from the classroom to the chapel, from the sports field to the community.</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }} className="grid-cols-2 md:grid-cols-4">
+          <div className="values-grid">
             {[
               { icon: "✝️", title: "Faith",          desc: "Grounded in Christian teaching, we nurture a deep, personal faith in every student." },
               { icon: "🎓", title: "Excellence",     desc: "We push every student to reach their full academic and personal potential." },
@@ -716,7 +719,7 @@ export default function App() {
           </div>
 
           {/* Department highlights */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }} className="grid-cols-2 md:grid-cols-4">
+          <div className="staff-depts">
             {[
               { icon: "🔬", dept: "Sciences",     desc: "Biology, Chemistry, Physics — hands-on lab teaching" },
               { icon: "📐", dept: "Mathematics",  desc: "Pure Maths, Applied Maths and Statistics" },
@@ -816,7 +819,7 @@ export default function App() {
 
       {/* ===== ADMISSIONS ===== */}
       <section id="admissions" style={{ background: GREEN_DARK, padding: "80px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }} className="grid-cols-1 md:grid-cols-2">
+        <div className="admissions-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Admissions
@@ -866,7 +869,7 @@ export default function App() {
               </div>
             ) : (
               <form onSubmit={e => { e.preventDefault(); setFormSent(true); }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+                <div className="form-name-row">
                   {[["First Name","text"],["Surname","text"]].map(([lbl, type]) => (
                     <div key={lbl} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                       <label style={{ fontSize: 12, fontWeight: 600, color: "#5A5A5A", letterSpacing: "0.05em", textTransform: "uppercase" }}>{lbl}</label>
@@ -938,7 +941,7 @@ export default function App() {
 
       {/* ===== CONTACT ===== */}
       <section id="contact" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }} className="grid-cols-1 md:grid-cols-2">
+        <div className="contact-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Contact Us
@@ -995,7 +998,7 @@ export default function App() {
       {/* ===== FOOTER ===== */}
       <footer style={{ background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 40 }} className="grid-cols-1 md:grid-cols-4">
+          <div className="footer-grid">
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: WHITE, padding: 3, boxShadow: "0 0 0 2px rgba(76,175,130,0.4)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>

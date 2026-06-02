@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Beah5U1zwrK24u2UvNXlA"
+uri = "file://artifacts/grace-high-school/grace-high-school-website.tar.gz"
+type = "unspecified"
+title = "Grace High School Website (download)"
