@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import schoolLogo from "@assets/download_1780399508014.jpg";
+import schoolLogo from "@assets/school_logo_transparent.png";
 import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
@@ -248,30 +248,42 @@ export default function App() {
             </div>
           </div>
 
-          {/* Hero photo */}
+          {/* Hero crest — free-standing, no circle */}
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ position: "relative", width: 380, height: 380 }} className="hero-crest">
-              <div style={{
-                position: "absolute", inset: -20, borderRadius: "50%",
-                border: "2px solid rgba(76,175,130,0.5)",
-                animation: "pulse-ring 3s ease-in-out infinite",
-              }} />
-              <div style={{
-                position: "absolute", inset: -40, borderRadius: "50%",
-                border: "1px solid rgba(76,175,130,0.25)",
-                animation: "pulse-ring 3s ease-in-out infinite 0.5s",
-              }} />
-              <div style={{
-                width: "100%", height: "100%", borderRadius: "50%",
-                background: WHITE,
-                border: "6px solid #4CAF82",
-                boxShadow: "0 0 0 3px rgba(76,175,130,0.3), 0 20px 60px rgba(0,0,0,0.4)",
-                overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
-                padding: 10,
-              }}>
-                <img src={schoolLogo} alt="Grace High School Logo" style={{
-                  width: "100%", height: "100%", objectFit: "contain",
+            <div className="hero-crest" style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
+              animation: "crest-float 6s ease-in-out infinite",
+            }}>
+              {/* Glow backdrop */}
+              <div style={{ position: "relative" }}>
+                <div style={{
+                  position: "absolute", inset: -24,
+                  background: "radial-gradient(circle, rgba(76,175,130,0.25) 0%, transparent 70%)",
+                  borderRadius: "50%",
                 }} />
+                <img
+                  src={schoolLogo}
+                  alt="Grace High School Crest"
+                  style={{
+                    width: 340, height: 340,
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 12px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 28px rgba(142,237,192,0.5)) brightness(1.05)",
+                    position: "relative",
+                  }}
+                  className="hero-crest"
+                />
+              </div>
+              {/* School name under crest */}
+              <div style={{ textAlign: "center" }}>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 6,
+                }}>
+                  <span style={{ width: 32, height: 1, background: "rgba(142,237,192,0.5)", display: "block" }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8EEDC0" }}>Est. 2000</span>
+                  <span style={{ width: 32, height: 1, background: "rgba(142,237,192,0.5)", display: "block" }} />
+                </div>
+                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: WHITE, letterSpacing: "0.06em", textTransform: "uppercase" }}>Grace High School</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 3 }}>Gayaza · Wakiso District · Uganda</p>
               </div>
             </div>
           </div>
