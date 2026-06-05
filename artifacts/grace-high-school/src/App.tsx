@@ -37,6 +37,7 @@ export default function App() {
   const [scrolled, setScrolled]       = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [lightbox, setLightbox]       = useState<string | null>(null);
+  const [videoModal, setVideoModal]   = useState<string | null>(null);
   const [testitIdx, setTestiIdx]      = useState(0);
   const [galleryFilter, setGalFilter] = useState("all");
   const [formSent, setFormSent]       = useState(false);
@@ -84,6 +85,15 @@ export default function App() {
     { src: img_media,     label: "Spark TV Feature — Extra-Curricular",cat: "achievements" },
   ];
 
+  const schoolVideos = [
+    { thumb: img_mdd,        cat: "Performance", title: "Music, Dance & Drama Showcase",  youtubeId: "" },
+    { thumb: img_assembly3,  cat: "Events",      title: "Inter-School Fellowship Highlights", youtubeId: "" },
+    { thumb: img_science,    cat: "Academics",   title: "A Day in Our Science Labs",      youtubeId: "" },
+    { thumb: img_trophy,     cat: "Achievements", title: "Prize-Giving & Awards Ceremony", youtubeId: "" },
+    { thumb: img_alevel,     cat: "Student Life", title: "Life at Grace High School",      youtubeId: "" },
+    { thumb: img_campus_hero,cat: "Campus Tour", title: "Tour of Our 28-Acre Campus",     youtubeId: "" },
+  ];
+
   const filtered = galleryFilter === "all"
     ? galleryItems
     : galleryItems.filter(g => g.cat === galleryFilter);
@@ -106,6 +116,31 @@ export default function App() {
       {lightbox && (
         <div className="lightbox-overlay" onClick={() => setLightbox(null)}>
           <img src={lightbox} alt="Full size" />
+        </div>
+      )}
+
+      {/* ===== VIDEO MODAL ===== */}
+      {videoModal !== null && (
+        <div className="lightbox-overlay" onClick={() => setVideoModal(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "min(900px, 92vw)", maxWidth: 900 }}>
+            {videoModal ? (
+              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", background: "#000" }}>
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoModal}?autoplay=1`}
+                  title="School video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+                />
+              </div>
+            ) : (
+              <div style={{ background: GREEN_DARK, borderRadius: 12, padding: "48px 32px", textAlign: "center" }}>
+                <div style={{ fontSize: 44, marginBottom: 12 }}>🎬</div>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE, marginBottom: 8 }}>Video Coming Soon</h3>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 380, margin: "0 auto" }}>This video will be available shortly. Check back soon to watch it here.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -134,7 +169,7 @@ export default function App() {
         {/* Desktop nav */}
         <ul style={{ display: "flex", gap: "1.6rem", listStyle: "none", alignItems: "center" }}
             className="hidden md:flex">
-          {["about","programmes","news","updates","campus","admissions","contact"].map(id => (
+          {["about","programmes","news","updates","campus","videos","admissions","contact"].map(id => (
             <li key={id}>
               <button onClick={() => scrollTo(id)} style={{
                 background: "none", border: "none", cursor: "pointer",
@@ -175,7 +210,7 @@ export default function App() {
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
         }}>
-          {["about","programmes","news","updates","campus","admissions","contact"].map(id => (
+          {["about","programmes","news","updates","campus","videos","admissions","contact"].map(id => (
             <button key={id} onClick={() => scrollTo(id)} style={{
               background: "none", border: "none", cursor: "pointer",
               color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500,
@@ -706,6 +741,48 @@ export default function App() {
               <div key={i} className={`gallery-item${item.wide ? " wide" : ""}`} onClick={() => setLightbox(item.src)}>
                 <img src={item.src} alt={item.label} />
                 <div className="gallery-caption">{item.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== VIDEOS ===== */}
+      <section id="videos" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />School Videos
+          </div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Watch Grace High School in Action</h2>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, marginBottom: 40 }}>
+            Explore videos of school events, performances, and student life. Click any video to play it.
+          </p>
+
+          <div className="videos-grid">
+            {schoolVideos.map((v, i) => (
+              <div key={i} onClick={() => setVideoModal(v.youtubeId)} style={{
+                background: WHITE, borderRadius: 12, overflow: "hidden", cursor: "pointer",
+                border: "1px solid rgba(0,0,0,0.08)", transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(10,64,32,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                <div style={{ position: "relative", height: 190, overflow: "hidden" }}>
+                  <img src={v.thumb} alt={v.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(transparent, rgba(10,64,32,0.55))" }} />
+                  <div style={{
+                    position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                    width: 60, height: 60, borderRadius: "50%", background: "rgba(255,255,255,0.92)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.3)",
+                  }}>
+                    <span style={{ fontSize: 22, color: GREEN_DARK, marginLeft: 4 }}>▶</span>
+                  </div>
+                </div>
+                <div style={{ padding: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{v.cat}</div>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", color: GREEN_DARK, lineHeight: 1.3 }}>{v.title}</h3>
+                </div>
               </div>
             ))}
           </div>
