@@ -197,12 +197,12 @@ export default function App() {
           position: "absolute", inset: 0,
           backgroundImage: `url(${img_campus_hero})`,
           backgroundSize: "cover", backgroundPosition: "center top",
-          opacity: 0.45,
+          opacity: 0.72,
         }} />
         <div style={{
           position: "absolute", inset: 0,
-          background: `radial-gradient(circle at 20% 50%, rgba(26,107,60,0.4) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(76,175,130,0.2) 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 20% 50%, rgba(26,107,60,0.25) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(76,175,130,0.1) 0%, transparent 40%)`,
         }} />
 
         <div className="hero-grid">
