@@ -5,6 +5,7 @@ import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
+import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
@@ -191,9 +192,9 @@ export default function App() {
         {/* Background image */}
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `url(${img_assembly1})`,
-          backgroundSize: "cover", backgroundPosition: "center",
-          opacity: 0.32,
+          backgroundImage: `url(${img_campus_hero})`,
+          backgroundSize: "cover", backgroundPosition: "center top",
+          opacity: 0.45,
         }} />
         <div style={{
           position: "absolute", inset: 0,
