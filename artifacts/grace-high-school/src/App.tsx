@@ -34,6 +34,36 @@ const GREEN_LIGHT = "#E8F5EE";
 const WHITE       = "#FFFFFF";
 const OFF_WHITE   = "#F5FAF7";
 
+const API = "/api";
+
+interface Resource {
+  id: number;
+  title: string;
+  subject: string;
+  category: "past_paper" | "holiday_work";
+  level: string;
+  term: string | null;
+  objectPath: string;
+  fileName: string;
+  fileSize: number | null;
+  contentType: string | null;
+  createdAt: string;
+}
+
+const formatSize = (bytes: number | null): string => {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const uploadLabel: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
+const uploadLabelText: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: GREEN_DARK, letterSpacing: "0.02em" };
+const uploadInput: React.CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif", fontSize: 14, padding: "10px 12px",
+  borderRadius: 8, border: "1px solid rgba(0,0,0,0.15)", background: WHITE, color: "#222",
+};
+
 export default function App() {
   const [scrolled, setScrolled]       = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
@@ -42,6 +72,18 @@ export default function App() {
   const [testitIdx, setTestiIdx]      = useState(0);
   const [galleryFilter, setGalFilter] = useState("all");
   const [formSent, setFormSent]       = useState(false);
+  const [resources, setResources]     = useState<Resource[]>([]);
+  const [resLoading, setResLoading]   = useState(true);
+  const [showUpload, setShowUpload]   = useState(false);
+  const [upTitle, setUpTitle]         = useState("");
+  const [upSubject, setUpSubject]     = useState("");
+  const [upCategory, setUpCategory]   = useState<"past_paper" | "holiday_work">("past_paper");
+  const [upLevel, setUpLevel]         = useState("All");
+  const [upTerm, setUpTerm]           = useState("");
+  const [upFile, setUpFile]           = useState<File | null>(null);
+  const [uploading, setUploading]     = useState(false);
+  const [upError, setUpError]         = useState<string | null>(null);
+  const [upDone, setUpDone]           = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +91,78 @@ export default function App() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const loadResources = async () => {
+    try {
+      const res = await fetch(`${API}/resources`);
+      if (!res.ok) throw new Error("Failed to load resources");
+      setResources(await res.json());
+    } catch {
+      setResources([]);
+    } finally {
+      setResLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadResources();
+  }, []);
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUpError(null);
+    setUpDone(false);
+    if (!upFile || !upTitle.trim() || !upSubject.trim()) {
+      setUpError("Please add a file, title, and subject.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const urlRes = await fetch(`${API}/storage/uploads/request-url`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: upFile.name,
+          size: upFile.size,
+          contentType: upFile.type || "application/octet-stream",
+        }),
+      });
+      if (!urlRes.ok) throw new Error("Could not start upload");
+      const { uploadURL, objectPath } = await urlRes.json();
+
+      const putRes = await fetch(uploadURL, {
+        method: "PUT",
+        headers: { "Content-Type": upFile.type || "application/octet-stream" },
+        body: upFile,
+      });
+      if (!putRes.ok) throw new Error("File upload failed");
+
+      const createRes = await fetch(`${API}/resources`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: upTitle.trim(),
+          subject: upSubject.trim(),
+          category: upCategory,
+          level: upLevel,
+          term: upTerm.trim() || null,
+          objectPath,
+          fileName: upFile.name,
+          fileSize: upFile.size,
+          contentType: upFile.type || "application/octet-stream",
+        }),
+      });
+      if (!createRes.ok) throw new Error("Could not save resource");
+
+      setUpTitle(""); setUpSubject(""); setUpTerm(""); setUpLevel("All");
+      setUpCategory("past_paper"); setUpFile(null); setUpDone(true);
+      await loadResources();
+    } catch (err) {
+      setUpError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (trackRef.current) {
@@ -165,7 +279,7 @@ export default function App() {
         {/* Desktop nav */}
         <ul style={{ display: "flex", gap: "1.6rem", listStyle: "none", alignItems: "center" }}
             className="hidden md:flex">
-          {["about","programmes","news","updates","campus","videos","admissions","contact"].map(id => (
+          {["about","programmes","news","updates","resources","campus","videos","admissions","contact"].map(id => (
             <li key={id}>
               <button onClick={() => scrollTo(id)} style={{
                 background: "none", border: "none", cursor: "pointer",
@@ -206,7 +320,7 @@ export default function App() {
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
         }}>
-          {["about","programmes","news","updates","campus","videos","admissions","contact"].map(id => (
+          {["about","programmes","news","updates","resources","campus","videos","admissions","contact"].map(id => (
             <button key={id} onClick={() => scrollTo(id)} style={{
               background: "none", border: "none", cursor: "pointer",
               color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500,
@@ -781,6 +895,136 @@ export default function App() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== RESOURCES ===== */}
+      <section id="resources" style={{ background: WHITE, padding: "80px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Student Resources
+          </div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Past Papers &amp; Holiday Work</h2>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 40 }}>
+            Download past examination papers and holiday assignments shared by the school. Click any item to download it to your device.
+          </p>
+
+          {resLoading ? (
+            <p style={{ color: "#5A5A5A" }}>Loading resources…</p>
+          ) : (
+            ([
+              { key: "past_paper" as const, label: "Past Papers", icon: "📄" },
+              { key: "holiday_work" as const, label: "Holiday Work", icon: "📝" },
+            ]).map(group => {
+              const items = resources.filter(r => r.category === group.key);
+              return (
+                <div key={group.key} style={{ marginBottom: 44 }}>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: GREEN_DARK, marginBottom: 18, display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 22 }}>{group.icon}</span>{group.label}
+                  </h3>
+                  {items.length === 0 ? (
+                    <p style={{ fontSize: 14, color: "#8A8A8A", fontStyle: "italic" }}>No {group.label.toLowerCase()} have been uploaded yet. Please check back soon.</p>
+                  ) : (
+                    <div className="resources-grid">
+                      {items.map(r => (
+                        <a
+                          key={r.id}
+                          href={`${API}/storage${r.objectPath}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: "block", background: OFF_WHITE, borderRadius: 12, padding: 20,
+                            border: "1px solid rgba(0,0,0,0.08)", textDecoration: "none",
+                            transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(10,64,32,0.12)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)"; }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN }}>{r.subject}</span>
+                            <span style={{ fontSize: 11, color: "#8A8A8A", whiteSpace: "nowrap" }}>{r.level}</span>
+                          </div>
+                          <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: GREEN_DARK, lineHeight: 1.3, marginBottom: 12 }}>{r.title}</h4>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: GREEN_MAIN }}>⬇ Download</span>
+                            <span style={{ fontSize: 11, color: "#A0A0A0" }}>{[r.term, formatSize(r.fileSize)].filter(Boolean).join(" · ")}</span>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+
+          {/* Staff upload area (admin controls coming later) */}
+          <div style={{ marginTop: 24, borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 28 }}>
+            <button
+              onClick={() => setShowUpload(v => !v)}
+              style={{
+                background: "transparent", border: `1.5px solid ${GREEN_MAIN}`, color: GREEN_MAIN,
+                fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, padding: "10px 22px",
+                borderRadius: 8, cursor: "pointer",
+              }}
+            >
+              {showUpload ? "Close staff upload" : "Staff: upload a resource"}
+            </button>
+
+            {showUpload && (
+              <form onSubmit={handleUpload} style={{ marginTop: 24, maxWidth: 620, background: OFF_WHITE, padding: 28, borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)" }}>
+                <p style={{ fontSize: 13, color: "#5A5A5A", marginBottom: 20, lineHeight: 1.6 }}>
+                  For school staff only. Password-protected admin access will be added soon.
+                </p>
+                <div className="upload-grid">
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>Title</span>
+                    <input value={upTitle} onChange={e => setUpTitle(e.target.value)} placeholder="e.g. UACE Mathematics Paper 1, 2024" style={uploadInput} />
+                  </label>
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>Subject</span>
+                    <input value={upSubject} onChange={e => setUpSubject(e.target.value)} placeholder="e.g. Mathematics" style={uploadInput} />
+                  </label>
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>Category</span>
+                    <select value={upCategory} onChange={e => setUpCategory(e.target.value as "past_paper" | "holiday_work")} style={uploadInput}>
+                      <option value="past_paper">Past Paper</option>
+                      <option value="holiday_work">Holiday Work</option>
+                    </select>
+                  </label>
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>Level</span>
+                    <select value={upLevel} onChange={e => setUpLevel(e.target.value)} style={uploadInput}>
+                      {["All", "S1", "S2", "S3", "S4", "S5", "S6"].map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </label>
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>Term (optional)</span>
+                    <input value={upTerm} onChange={e => setUpTerm(e.target.value)} placeholder="e.g. Term 1" style={uploadInput} />
+                  </label>
+                  <label style={uploadLabel}>
+                    <span style={uploadLabelText}>File</span>
+                    <input type="file" onChange={e => setUpFile(e.target.files?.[0] ?? null)} style={{ ...uploadInput, padding: 8 }} />
+                  </label>
+                </div>
+
+                {upError && <p style={{ color: "#C0392B", fontSize: 13, marginTop: 16 }}>{upError}</p>}
+                {upDone && <p style={{ color: GREEN_MAIN, fontSize: 13, marginTop: 16, fontWeight: 600 }}>✓ Resource uploaded successfully.</p>}
+
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  style={{
+                    marginTop: 20, background: uploading ? "#9CC4AE" : GREEN_MAIN, color: WHITE, border: "none",
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, padding: "12px 28px",
+                    borderRadius: 8, cursor: uploading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {uploading ? "Uploading…" : "Upload resource"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>

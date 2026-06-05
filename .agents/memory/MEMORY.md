@@ -1,0 +1,1 @@
+- [Orval codegen naming](orval-codegen-naming.md) — OpenAPI component schema names must not collide with orval's auto-generated `<OperationId>Body`/`Params` zod names.

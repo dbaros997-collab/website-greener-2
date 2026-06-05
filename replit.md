@@ -22,7 +22,11 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- Website UI: `artifacts/grace-high-school/src/App.tsx` (single-file sections; nav links live in two identical arrays) + `src/index.css` (responsive grids).
+- API server: `artifacts/api-server/src/routes/` — `storage.ts` (presigned uploads + object serving), `resources.ts` (past papers / holiday work CRUD), wired in `routes/index.ts`.
+- API contract (source of truth): `lib/api-spec/openapi.yaml` → run codegen to regenerate hooks + zod schemas.
+- DB schema: `lib/db/src/schema/` — `resources.ts` holds the downloadable-resources table.
+- Object storage helpers: `artifacts/api-server/src/lib/objectStorage.ts`.
 
 ## Architecture decisions
 
@@ -30,7 +34,7 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Grace High School (Gayaza, Uganda) marketing website. Sections: about, programmes, news, updates, **resources** (downloadable past papers & holiday work), campus, videos, admissions, contact. The resources section lets students download files the school shares; uploads currently use an unprotected staff form (password-protected admin login is planned).
 
 ## User preferences
 

@@ -144,6 +144,8 @@ body {
 .about-grid      { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
 .programmes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .videos-grid     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.resources-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.upload-grid     { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .news-grid       { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; }
 .admissions-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .events-grid     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -163,6 +165,7 @@ body {
   .about-grid      { grid-template-columns: 1fr !important; gap: 36px !important; }
   .programmes-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
   .videos-grid     { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+  .resources-grid  { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
   .news-grid       { grid-template-columns: 1fr !important; gap: 20px !important; }
   .events-grid     { grid-template-columns: repeat(2, 1fr) !important; }
   .achievements-outer { grid-template-columns: 1fr !important; gap: 20px !important; }
@@ -179,6 +182,8 @@ body {
   .hero-crest      { width: 220px !important; height: 220px !important; }
   .programmes-grid { grid-template-columns: 1fr !important; }
   .videos-grid     { grid-template-columns: 1fr !important; }
+  .resources-grid  { grid-template-columns: 1fr !important; }
+  .upload-grid     { grid-template-columns: 1fr !important; }
   .events-grid     { grid-template-columns: repeat(2, 1fr) !important; }
   .values-grid     { grid-template-columns: repeat(2, 1fr) !important; }
   .staff-depts     { grid-template-columns: repeat(2, 1fr) !important; }

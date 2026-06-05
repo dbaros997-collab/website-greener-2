@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type ListResourcesParams = {
+/**
+ * Optional filter by category (past_paper or holiday_work).
+ */
+category?: string;
+};
