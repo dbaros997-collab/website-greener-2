@@ -6,6 +6,7 @@ import img_library from "@assets/481080206_1149891370163951_6952293395059892096_
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
+import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
@@ -60,6 +61,7 @@ export default function App() {
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
+    { src: img_alevel,    label: "A-Level Students — S5 & S6 Class", cat: "campus", wide: true },
     { src: img_campus_hero, label: "Campus Grounds — 28-Acre Campus, Gayaza", cat: "campus", wide: true },
     { src: img_assembly1, label: "School Assembly — Students Gathered", cat: "events", wide: true },
     { src: img_lab,       label: "Chemistry Lab — Practical Session",   cat: "academics" },
@@ -440,7 +442,7 @@ export default function App() {
               },
               {
                 tag: "S5 – S6", title: "Advanced Level",
-                img: img_lab,
+                img: img_alevel,
                 desc: "Two-year advanced programme leading to the Uganda Advanced Certificate of Education (UACE), preparing students for university entrance.",
                 subjects: ["Sciences","Arts","Business","ICT","Agriculture","Economics"],
               },
