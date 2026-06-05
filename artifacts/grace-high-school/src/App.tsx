@@ -88,12 +88,6 @@ export default function App() {
 
   const schoolVideos = [
     { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
-    { thumb: img_mdd,        cat: "Performance", title: "Music, Dance & Drama Showcase",  youtubeId: "" },
-    { thumb: img_assembly3,  cat: "Events",      title: "Inter-School Fellowship Highlights", youtubeId: "" },
-    { thumb: img_science,    cat: "Academics",   title: "A Day in Our Science Labs",      youtubeId: "" },
-    { thumb: img_trophy,     cat: "Achievements", title: "Prize-Giving & Awards Ceremony", youtubeId: "" },
-    { thumb: img_alevel,     cat: "Student Life", title: "Life at Grace High School",      youtubeId: "" },
-    { thumb: img_campus_hero,cat: "Campus Tour", title: "Tour of Our 28-Acre Campus",     youtubeId: "" },
   ];
 
   const filtered = galleryFilter === "all"
