@@ -25,6 +25,7 @@ import img_assembly3 from "@assets/481907330_1149892830163805_861328294284256056
 import img_conference from "@assets/481919937_1149893610163727_7736672364831677932_n_1780398909153.jpg";
 import img_campus from "@assets/IMG_20260321_093718_497_1780675601336.jpg";
 import img_food from "@assets/481964449_1149999646819790_6834026191577424925_n_1780398909154.jpg";
+import img_featured_video from "@assets/featured_video_thumb_1780677204039.png";
 
 const GREEN_DARK  = "#0A4020";
 const GREEN_MAIN  = "#1A6B3C";
@@ -86,7 +87,7 @@ export default function App() {
   ];
 
   const schoolVideos = [
-    { thumb: img_campus_hero,cat: "Featured",    title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
+    { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
     { thumb: img_mdd,        cat: "Performance", title: "Music, Dance & Drama Showcase",  youtubeId: "" },
     { thumb: img_assembly3,  cat: "Events",      title: "Inter-School Fellowship Highlights", youtubeId: "" },
     { thumb: img_science,    cat: "Academics",   title: "A Day in Our Science Labs",      youtubeId: "" },
