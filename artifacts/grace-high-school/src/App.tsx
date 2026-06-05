@@ -1,4 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  useListNewsItems,
+  useListStats,
+  useListTestimonials,
+  useListVideos,
+  useListProgrammes,
+  useListSchoolValues,
+  useListAdmissionSteps,
+  useListGalleryImages,
+  useListSiteText,
+} from "@workspace/api-client-react";
 
 import schoolLogo from "@assets/school_logo_transparent.png";
 import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
@@ -57,13 +68,6 @@ const formatSize = (bytes: number | null): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const uploadLabel: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
-const uploadLabelText: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: GREEN_DARK, letterSpacing: "0.02em" };
-const uploadInput: React.CSSProperties = {
-  fontFamily: "'DM Sans', sans-serif", fontSize: 14, padding: "10px 12px",
-  borderRadius: 8, border: "1px solid rgba(0,0,0,0.15)", background: WHITE, color: "#222",
-};
-
 export default function App() {
   const [scrolled, setScrolled]       = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
@@ -74,16 +78,6 @@ export default function App() {
   const [formSent, setFormSent]       = useState(false);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
-  const [showUpload, setShowUpload]   = useState(false);
-  const [upTitle, setUpTitle]         = useState("");
-  const [upSubject, setUpSubject]     = useState("");
-  const [upCategory, setUpCategory]   = useState<"past_paper" | "holiday_work">("past_paper");
-  const [upLevel, setUpLevel]         = useState("All");
-  const [upTerm, setUpTerm]           = useState("");
-  const [upFile, setUpFile]           = useState<File | null>(null);
-  const [uploading, setUploading]     = useState(false);
-  const [upError, setUpError]         = useState<string | null>(null);
-  const [upDone, setUpDone]           = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,62 +101,6 @@ export default function App() {
   useEffect(() => {
     loadResources();
   }, []);
-
-  const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setUpError(null);
-    setUpDone(false);
-    if (!upFile || !upTitle.trim() || !upSubject.trim()) {
-      setUpError("Please add a file, title, and subject.");
-      return;
-    }
-    setUploading(true);
-    try {
-      const urlRes = await fetch(`${API}/storage/uploads/request-url`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: upFile.name,
-          size: upFile.size,
-          contentType: upFile.type || "application/octet-stream",
-        }),
-      });
-      if (!urlRes.ok) throw new Error("Could not start upload");
-      const { uploadURL, objectPath } = await urlRes.json();
-
-      const putRes = await fetch(uploadURL, {
-        method: "PUT",
-        headers: { "Content-Type": upFile.type || "application/octet-stream" },
-        body: upFile,
-      });
-      if (!putRes.ok) throw new Error("File upload failed");
-
-      const createRes = await fetch(`${API}/resources`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: upTitle.trim(),
-          subject: upSubject.trim(),
-          category: upCategory,
-          level: upLevel,
-          term: upTerm.trim() || null,
-          objectPath,
-          fileName: upFile.name,
-          fileSize: upFile.size,
-          contentType: upFile.type || "application/octet-stream",
-        }),
-      });
-      if (!createRes.ok) throw new Error("Could not save resource");
-
-      setUpTitle(""); setUpSubject(""); setUpTerm(""); setUpLevel("All");
-      setUpCategory("past_paper"); setUpFile(null); setUpDone(true);
-      await loadResources();
-    } catch (err) {
-      setUpError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   useEffect(() => {
     if (trackRef.current) {
@@ -204,16 +142,123 @@ export default function App() {
     { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
   ];
 
-  const filtered = galleryFilter === "all"
-    ? galleryItems
-    : galleryItems.filter(g => g.cat === galleryFilter);
-
   const testimonials = [
     { text: "Grace High School gave me more than grades — it gave me faith, discipline, and purpose. My UACE results opened doors I never imagined.", name: "Katumwa Hannington", role: "UACE 2023 — 20 Points", init: "KH" },
     { text: "The teachers here go beyond the syllabus. They invest in you as a person, not just a student. I feel ready for university and for life.", name: "Ainebyoona Miriam", role: "S6 Graduate, 2024", init: "AM" },
     { text: "As a parent, I have watched my son transform — academically and morally. The Christian foundation at Grace is real, not just on paper.", name: "Mr. Byaruhanga", role: "Parent of S4 Student", init: "BB" },
     { text: "The vocational skills programme taught me tailoring alongside my A-Levels. I already have income while I wait for university admission.", name: "Namutebi Rose", role: "A-Level Graduate, 2024", init: "NR" },
   ];
+
+  // ===== Dynamic content (DB-backed, with the static content above as a
+  // graceful fallback whenever the API is empty or unreachable). =====
+  const storageUrl = (objectPath: string) => `${API}/storage${objectPath}`;
+
+  const newsQ = useListNewsItems();
+  const statsQ = useListStats();
+  const testimonialsQ = useListTestimonials();
+  const videosQ = useListVideos();
+  const programmesQ = useListProgrammes();
+  const valuesQ = useListSchoolValues();
+  const admissionsQ = useListAdmissionSteps();
+  const galleryQ = useListGalleryImages();
+  const siteTextQ = useListSiteText();
+
+  // Editable section copy: look up by key, falling back to the original
+  // hard-coded strings whenever the API is empty or unreachable.
+  const siteTextMap: Record<string, string> = {};
+  for (const b of siteTextQ.data ?? []) siteTextMap[b.key] = b.value;
+  const text = (key: string, fallback: string) => siteTextMap[key] ?? fallback;
+
+  const NEWS_FALLBACK = [
+    "Admissions Open for 2025/2026 — All Classes S1–S6",
+    "UACE 2023 — Katumwa Hannington scores 20 Points — Glory Be to God!",
+    "Grace High School featured on Spark TV for Extra-Curricular Excellence",
+    "Students represent at National Renewable Energy Conference 2023",
+    "New Term III begins 14 July 2025 — All students report",
+  ];
+  const tickerMessages = newsQ.data?.length
+    ? newsQ.data.map((n) => n.message)
+    : NEWS_FALLBACK;
+
+  const STATS_FALLBACK = [
+    { num: "28", label: "Acre Campus" },
+    { num: "S1–S6", label: "All Levels" },
+    { num: "UCE", label: "& UACE" },
+    { num: "100%", label: "Christian Values" },
+    { num: "∞", label: "Opportunities" },
+  ];
+  const statItems = statsQ.data?.length
+    ? statsQ.data.map((s) => ({ num: s.value, label: s.label }))
+    : STATS_FALLBACK;
+
+  const PROGRAMMES_FALLBACK = [
+    {
+      tag: "S1 – S4", title: "Ordinary Level", img: img_exam,
+      desc: "Four years of broad foundational education leading to the Uganda Certificate of Education (UCE), setting students up for A-Level and beyond.",
+      subjects: ["Mathematics", "Sciences", "English", "History", "Geography", "CRE", "SST", "Languages"],
+    },
+    {
+      tag: "S5 – S6", title: "Advanced Level", img: img_alevel,
+      desc: "Two-year advanced programme leading to the Uganda Advanced Certificate of Education (UACE), preparing students for university entrance.",
+      subjects: ["Sciences", "Arts", "Business", "ICT", "Agriculture", "Economics"],
+    },
+    {
+      tag: "Extracurricular", title: "Vocational Skills", img: img_sewing,
+      desc: "Practical skills training alongside academics, equipping students with capabilities that create real-world opportunities.",
+      subjects: ["Entrepreneurship", "Life Skills", "Sports", "Arts & Crafts", "Leadership", "Welding"],
+    },
+  ];
+  const programmeImg = (title: string) =>
+    PROGRAMMES_FALLBACK.find((p) => p.title === title)?.img ?? img_campus_hero;
+  const programmeItems = programmesQ.data?.length
+    ? programmesQ.data.map((p) => ({
+        tag: p.tag, title: p.title, img: programmeImg(p.title),
+        desc: p.description, subjects: p.subjects,
+      }))
+    : PROGRAMMES_FALLBACK;
+
+  const VALUES_FALLBACK = [
+    { icon: "✝️", title: "Faith", desc: "Grounded in Christian teaching, we nurture a deep, personal faith in every student." },
+    { icon: "🎓", title: "Excellence", desc: "We push every student to reach their full academic and personal potential." },
+    { icon: "🤝", title: "Integrity", desc: "Honesty, respect, and moral uprightness are non-negotiable at Grace." },
+    { icon: "🌱", title: "Growth", desc: "Continuous improvement — spiritually, intellectually, and as a community." },
+  ];
+  const valueItems = valuesQ.data?.length
+    ? valuesQ.data.map((v) => ({ icon: v.icon, title: v.title, desc: v.description }))
+    : VALUES_FALLBACK;
+
+  const ADMISSIONS_FALLBACK = [
+    { step: 1, title: "Contact the School", desc: "Call or email us to express interest and get an admissions form." },
+    { step: 2, title: "Visit Our Campus", desc: "Schedule a tour of our 28-acre campus in Gayaza, Wakiso District." },
+    { step: 3, title: "Submit Application", desc: "Complete the form with academic records and personal information." },
+    { step: 4, title: "Placement Assessment", desc: "Students may sit a brief assessment to identify the right class." },
+    { step: 5, title: "Confirm Enrollment", desc: "Receive your admission letter, pay fees, and report on opening day." },
+  ];
+  const admissionItems = admissionsQ.data?.length
+    ? admissionsQ.data.map((a, i) => ({ step: i + 1, title: a.title, desc: a.description }))
+    : ADMISSIONS_FALLBACK;
+
+  const testimonialItems = testimonialsQ.data?.length
+    ? testimonialsQ.data.map((t) => ({ text: t.quote, name: t.name, role: t.role, init: t.initials }))
+    : testimonials;
+
+  const videoThumb = (youtubeId: string) =>
+    schoolVideos.find((v) => v.youtubeId === youtubeId)?.thumb ??
+    `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  const videoItems = videosQ.data?.length
+    ? videosQ.data.map((v) => ({
+        thumb: videoThumb(v.youtubeId), cat: v.category, title: v.title, youtubeId: v.youtubeId,
+      }))
+    : schoolVideos;
+
+  const galleryViewItems = galleryQ.data?.length
+    ? galleryQ.data.map((g) => ({
+        src: storageUrl(g.objectPath), label: g.caption, cat: g.category, wide: g.wide,
+      }))
+    : galleryItems;
+  const filtered = galleryFilter === "all"
+    ? galleryViewItems
+    : galleryViewItems.filter((g) => g.cat === galleryFilter);
 
   const navBg = scrolled
     ? `rgba(10,64,32,0.98)`
@@ -446,12 +491,7 @@ export default function App() {
       {/* ===== TICKER ===== */}
       <div style={{ background: GREEN_MAIN, overflow: "hidden", padding: "9px 0", whiteSpace: "nowrap" }}>
         <div style={{ display: "inline-block", animation: "ticker-scroll 35s linear infinite" }}>
-          {["Admissions Open for 2025/2026 — All Classes S1–S6",
-            "UACE 2023 — Katumwa Hannington scores 20 Points — Glory Be to God!",
-            "Grace High School featured on Spark TV for Extra-Curricular Excellence",
-            "Students represent at National Renewable Energy Conference 2023",
-            "New Term III begins 14 July 2025 — All students report"
-          ].map((msg, i) => (
+          {tickerMessages.map((msg, i) => (
             <span key={i} style={{ fontSize: 13, fontWeight: 500, color: WHITE, padding: "0 48px", letterSpacing: "0.02em" }}>
               📢 {msg}
             </span>
@@ -462,13 +502,7 @@ export default function App() {
       {/* ===== STATS BAR ===== */}
       <div style={{ background: GREEN_MAIN, padding: "20px 5%", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
         <div className="stats-grid">
-          {[
-            { num: "28", label: "Acre Campus" },
-            { num: "S1–S6", label: "All Levels" },
-            { num: "UCE", label: "& UACE" },
-            { num: "100%", label: "Christian Values" },
-            { num: "∞", label: "Opportunities" },
-          ].map((s, i) => (
+          {statItems.map((s, i) => (
             <div key={i} style={{ textAlign: "center" }}>
               <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: WHITE, display: "block" }}>{s.num}</span>
               <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</span>
@@ -486,16 +520,16 @@ export default function App() {
               About Us
             </div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 16 }}>
-              A School Built on Faith, Vision &amp; Excellence
+              {text("about_heading", "A School Built on Faith, Vision & Excellence")}
             </h2>
             <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 28 }}>
-              Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.
+              {text("about_body", "Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.")}
             </p>
 
             {/* Mission card */}
             <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", marginBottom: 28, borderLeft: `4px solid #4CAF82` }}>
               <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>Our Mission</p>
-              <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"Producing students who are morally upright and Christ-like leaders of tomorrow."</p>
+              <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "Producing students who are morally upright and Christ-like leaders of tomorrow.")}"</p>
               <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>🎓 Tutor / Teacher Services</span>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>📍 Gayaza-Kasangati, Uganda</span>
@@ -576,32 +610,13 @@ export default function App() {
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Academics
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 16 }}>Our Programmes</h2>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 16 }}>{text("programmes_heading", "Our Programmes")}</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>
-            A comprehensive National Curriculum across O-Level and A-Level, complemented by vocational programmes that prepare students for life beyond school.
+            {text("programmes_intro", "A comprehensive National Curriculum across O-Level and A-Level, complemented by vocational programmes that prepare students for life beyond school.")}
           </p>
 
           <div className="programmes-grid">
-            {[
-              {
-                tag: "S1 – S4", title: "Ordinary Level",
-                img: img_exam,
-                desc: "Four years of broad foundational education leading to the Uganda Certificate of Education (UCE), setting students up for A-Level and beyond.",
-                subjects: ["Mathematics","Sciences","English","History","Geography","CRE","SST","Languages"],
-              },
-              {
-                tag: "S5 – S6", title: "Advanced Level",
-                img: img_alevel,
-                desc: "Two-year advanced programme leading to the Uganda Advanced Certificate of Education (UACE), preparing students for university entrance.",
-                subjects: ["Sciences","Arts","Business","ICT","Agriculture","Economics"],
-              },
-              {
-                tag: "Extracurricular", title: "Vocational Skills",
-                img: img_sewing,
-                desc: "Practical skills training alongside academics, equipping students with capabilities that create real-world opportunities.",
-                subjects: ["Entrepreneurship","Life Skills","Sports","Arts & Crafts","Leadership","Welding"],
-              },
-            ].map((p, i) => (
+            {programmeItems.map((p, i) => (
               <div key={i} style={{
                 background: WHITE, borderRadius: 12, overflow: "hidden",
                 border: "1px solid rgba(0,0,0,0.1)", transition: "transform 0.2s, box-shadow 0.2s",
@@ -869,7 +884,7 @@ export default function App() {
           </p>
 
           <div className="videos-grid">
-            {schoolVideos.map((v, i) => (
+            {videoItems.map((v, i) => (
               <div key={i} onClick={() => setVideoModal(v.youtubeId)} style={{
                 background: WHITE, borderRadius: 12, overflow: "hidden", cursor: "pointer",
                 border: "1px solid rgba(0,0,0,0.08)", transition: "transform 0.2s, box-shadow 0.2s",
@@ -958,74 +973,6 @@ export default function App() {
               );
             })
           )}
-
-          {/* Staff upload area (admin controls coming later) */}
-          <div style={{ marginTop: 24, borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 28 }}>
-            <button
-              onClick={() => setShowUpload(v => !v)}
-              style={{
-                background: "transparent", border: `1.5px solid ${GREEN_MAIN}`, color: GREEN_MAIN,
-                fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, padding: "10px 22px",
-                borderRadius: 8, cursor: "pointer",
-              }}
-            >
-              {showUpload ? "Close staff upload" : "Staff: upload a resource"}
-            </button>
-
-            {showUpload && (
-              <form onSubmit={handleUpload} style={{ marginTop: 24, maxWidth: 620, background: OFF_WHITE, padding: 28, borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)" }}>
-                <p style={{ fontSize: 13, color: "#5A5A5A", marginBottom: 20, lineHeight: 1.6 }}>
-                  For school staff only. Password-protected admin access will be added soon.
-                </p>
-                <div className="upload-grid">
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>Title</span>
-                    <input value={upTitle} onChange={e => setUpTitle(e.target.value)} placeholder="e.g. UACE Mathematics Paper 1, 2024" style={uploadInput} />
-                  </label>
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>Subject</span>
-                    <input value={upSubject} onChange={e => setUpSubject(e.target.value)} placeholder="e.g. Mathematics" style={uploadInput} />
-                  </label>
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>Category</span>
-                    <select value={upCategory} onChange={e => setUpCategory(e.target.value as "past_paper" | "holiday_work")} style={uploadInput}>
-                      <option value="past_paper">Past Paper</option>
-                      <option value="holiday_work">Holiday Work</option>
-                    </select>
-                  </label>
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>Level</span>
-                    <select value={upLevel} onChange={e => setUpLevel(e.target.value)} style={uploadInput}>
-                      {["All", "S1", "S2", "S3", "S4", "S5", "S6"].map(l => <option key={l} value={l}>{l}</option>)}
-                    </select>
-                  </label>
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>Term (optional)</span>
-                    <input value={upTerm} onChange={e => setUpTerm(e.target.value)} placeholder="e.g. Term 1" style={uploadInput} />
-                  </label>
-                  <label style={uploadLabel}>
-                    <span style={uploadLabelText}>File</span>
-                    <input type="file" onChange={e => setUpFile(e.target.files?.[0] ?? null)} style={{ ...uploadInput, padding: 8 }} />
-                  </label>
-                </div>
-
-                {upError && <p style={{ color: "#C0392B", fontSize: 13, marginTop: 16 }}>{upError}</p>}
-                {upDone && <p style={{ color: GREEN_MAIN, fontSize: 13, marginTop: 16, fontWeight: 600 }}>✓ Resource uploaded successfully.</p>}
-
-                <button
-                  type="submit"
-                  disabled={uploading}
-                  style={{
-                    marginTop: 20, background: uploading ? "#9CC4AE" : GREEN_MAIN, color: WHITE, border: "none",
-                    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, padding: "12px 28px",
-                    borderRadius: 8, cursor: uploading ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {uploading ? "Uploading…" : "Upload resource"}
-                </button>
-              </form>
-            )}
-          </div>
         </div>
       </section>
 
@@ -1039,12 +986,7 @@ export default function App() {
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>Our values guide every aspect of life at Grace High School — from the classroom to the chapel, from the sports field to the community.</p>
 
           <div className="values-grid">
-            {[
-              { icon: "✝️", title: "Faith",          desc: "Grounded in Christian teaching, we nurture a deep, personal faith in every student." },
-              { icon: "🎓", title: "Excellence",     desc: "We push every student to reach their full academic and personal potential." },
-              { icon: "🤝", title: "Integrity",      desc: "Honesty, respect, and moral uprightness are non-negotiable at Grace." },
-              { icon: "🌱", title: "Growth",         desc: "Continuous improvement — spiritually, intellectually, and as a community." },
-            ].map((v, i) => (
+            {valueItems.map((v, i) => (
               <div key={i} style={{
                 padding: "28px 20px", border: "1px solid rgba(76,175,130,0.2)",
                 borderRadius: 10, transition: "background 0.2s, border-color 0.2s",
@@ -1152,7 +1094,7 @@ export default function App() {
 
           <div style={{ overflow: "hidden" }}>
             <div ref={trackRef} className="testimonials-track">
-              {testimonials.map((t, i) => (
+              {testimonialItems.map((t, i) => (
                 <div key={i} className="testimonial-card" style={{
                   background: WHITE, borderRadius: 12, padding: 28,
                   border: "1px solid rgba(0,0,0,0.08)",
@@ -1186,7 +1128,7 @@ export default function App() {
             onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.color = WHITE; }}
             onMouseLeave={e => { e.currentTarget.style.background = WHITE; e.currentTarget.style.color = "#1A1A1A"; }}
             >←</button>
-            <button onClick={() => setTestiIdx(Math.min(testimonials.length - 1, testitIdx + 1))} style={{
+            <button onClick={() => setTestiIdx(Math.min(testimonialItems.length - 1, testitIdx + 1))} style={{
               width: 40, height: 40, borderRadius: "50%", border: "1.5px solid rgba(0,0,0,0.1)",
               background: WHITE, cursor: "pointer", fontSize: 18,
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -1196,7 +1138,7 @@ export default function App() {
             onMouseLeave={e => { e.currentTarget.style.background = WHITE; e.currentTarget.style.color = "#1A1A1A"; }}
             >→</button>
             <div style={{ display: "flex", gap: 8, alignItems: "center", marginLeft: 12 }}>
-              {testimonials.map((_, i) => (
+              {testimonialItems.map((_, i) => (
                 <div key={i} onClick={() => setTestiIdx(i)} style={{
                   width: i === testitIdx ? 20 : 8,
                   height: 8, borderRadius: 4,
@@ -1216,18 +1158,12 @@ export default function App() {
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Admissions
             </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>Join the Grace Family</h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.</p>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>{text("admissions_heading", "Join the Grace Family")}</h2>
+            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>{text("admissions_intro", "Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.")}</p>
 
             {/* Admission steps */}
             <div style={{ display: "grid", gap: 14 }}>
-              {[
-                { step: 1, title: "Contact the School",   desc: "Call or email us to express interest and get an admissions form." },
-                { step: 2, title: "Visit Our Campus",     desc: "Schedule a tour of our 28-acre campus in Gayaza, Wakiso District." },
-                { step: 3, title: "Submit Application",   desc: "Complete the form with academic records and personal information." },
-                { step: 4, title: "Placement Assessment", desc: "Students may sit a brief assessment to identify the right class." },
-                { step: 5, title: "Confirm Enrollment",   desc: "Receive your admission letter, pay fees, and report on opening day." },
-              ].map(s => (
+              {admissionItems.map(s => (
                 <div key={s.step} style={{
                   display: "flex", gap: 16, alignItems: "flex-start", padding: "18px 20px",
                   background: "rgba(255,255,255,0.05)", borderRadius: 8,

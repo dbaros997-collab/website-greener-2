@@ -8,6 +8,7 @@ import {
   DeleteResourceParams,
 } from "@workspace/api-zod";
 import { ObjectStorageService } from "../lib/objectStorage";
+import { requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -30,7 +31,7 @@ router.get("/resources", async (req, res): Promise<void> => {
   res.json(ListResourcesResponse.parse(rows));
 });
 
-router.post("/resources", async (req, res): Promise<void> => {
+router.post("/resources", requireAuth, async (req, res): Promise<void> => {
   const parsed = CreateResourceBody.safeParse(req.body);
   if (!parsed.success) {
     req.log.warn({ errors: parsed.error.message }, "Invalid resource body");
@@ -56,7 +57,7 @@ router.post("/resources", async (req, res): Promise<void> => {
   res.status(201).json(ListResourcesResponseItem.parse(resource));
 });
 
-router.delete("/resources/:id", async (req, res): Promise<void> => {
+router.delete("/resources/:id", requireAuth, async (req, res): Promise<void> => {
   const params = DeleteResourceParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

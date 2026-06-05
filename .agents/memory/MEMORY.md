@@ -1,1 +1,3 @@
 - [Orval codegen naming](orval-codegen-naming.md) — OpenAPI component schema names must not collide with orval's auto-generated `<OperationId>Body`/`Params` zod names.
+- [Drizzle push vs session table](drizzle-push-session-table.md) — `db run push` hangs (TTY prompt) because connect-pg-simple's `session` table isn't in schema; add single tables via SQL. Also: admin password only bootstraps when staff_users is empty.
+- [connect-pg-simple bundling](connect-pg-simple-bundling.md) — esbuild bundle omits its `table.sql`, so create the `session` table manually instead of `createTableIfMissing`.

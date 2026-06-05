@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { ensureAdminUser } from "./lib/bootstrap";
 
 const rawPort = process.env["PORT"];
 
@@ -15,11 +16,23 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
+async function start(): Promise<void> {
+  // Make sure a staff account exists so the admin dashboard is usable on first
+  // boot. Failures here must not prevent the server from serving traffic.
+  try {
+    await ensureAdminUser();
+  } catch (err) {
+    logger.error({ err }, "Failed to bootstrap admin account");
   }
 
-  logger.info({ port }, "Server listening");
-});
+  app.listen(port, (err) => {
+    if (err) {
+      logger.error({ err }, "Error listening on port");
+      process.exit(1);
+    }
+
+    logger.info({ port }, "Server listening");
+  });
+}
+
+void start();

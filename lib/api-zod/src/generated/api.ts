@@ -130,3 +130,723 @@ export const DeleteResourceParams = zod.object({
 })
 
 
+/**
+ * @summary List News
+ */
+export const ListNewsItemsQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListNewsItemsResponseItem = zod.object({
+  "id": zod.number(),
+  "message": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListNewsItemsResponse = zod.array(ListNewsItemsResponseItem)
+
+
+/**
+ * @summary Create a NewsItem
+ */
+
+
+
+export const CreateNewsItemBody = zod.object({
+  "message": zod.string().min(1)
+})
+
+
+/**
+ * @summary Reorder News
+ */
+export const ReorderNewsItemsBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderNewsItemsResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a NewsItem
+ */
+export const UpdateNewsItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateNewsItemBody = zod.object({
+  "message": zod.string().min(1).optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateNewsItemResponse = zod.object({
+  "id": zod.number(),
+  "message": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a NewsItem
+ */
+export const DeleteNewsItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Gallery
+ */
+export const ListGalleryImagesQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListGalleryImagesResponseItem = zod.object({
+  "id": zod.number(),
+  "caption": zod.string(),
+  "category": zod.string(),
+  "objectPath": zod.string(),
+  "wide": zod.boolean(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListGalleryImagesResponse = zod.array(ListGalleryImagesResponseItem)
+
+
+/**
+ * @summary Create a GalleryImage
+ */
+
+
+
+
+export const CreateGalleryImageBody = zod.object({
+  "caption": zod.string().min(1),
+  "category": zod.string().optional(),
+  "objectPath": zod.string().min(1),
+  "wide": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Reorder Gallery
+ */
+export const ReorderGalleryImagesBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderGalleryImagesResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a GalleryImage
+ */
+export const UpdateGalleryImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateGalleryImageBody = zod.object({
+  "caption": zod.string().min(1).optional(),
+  "category": zod.string().optional(),
+  "objectPath": zod.string().min(1).optional(),
+  "wide": zod.boolean().optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateGalleryImageResponse = zod.object({
+  "id": zod.number(),
+  "caption": zod.string(),
+  "category": zod.string(),
+  "objectPath": zod.string(),
+  "wide": zod.boolean(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a GalleryImage
+ */
+export const DeleteGalleryImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Testimonials
+ */
+export const ListTestimonialsQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListTestimonialsResponseItem = zod.object({
+  "id": zod.number(),
+  "quote": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "initials": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListTestimonialsResponse = zod.array(ListTestimonialsResponseItem)
+
+
+/**
+ * @summary Create a Testimonial
+ */
+
+
+
+
+export const CreateTestimonialBody = zod.object({
+  "quote": zod.string().min(1),
+  "name": zod.string().min(1),
+  "role": zod.string().optional(),
+  "initials": zod.string().optional()
+})
+
+
+/**
+ * @summary Reorder Testimonials
+ */
+export const ReorderTestimonialsBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderTestimonialsResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a Testimonial
+ */
+export const UpdateTestimonialParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateTestimonialBody = zod.object({
+  "quote": zod.string().min(1).optional(),
+  "name": zod.string().min(1).optional(),
+  "role": zod.string().optional(),
+  "initials": zod.string().optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateTestimonialResponse = zod.object({
+  "id": zod.number(),
+  "quote": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "initials": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a Testimonial
+ */
+export const DeleteTestimonialParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Videos
+ */
+export const ListVideosQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListVideosResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "youtubeId": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListVideosResponse = zod.array(ListVideosResponseItem)
+
+
+/**
+ * @summary Create a Video
+ */
+
+
+
+
+export const CreateVideoBody = zod.object({
+  "title": zod.string().min(1),
+  "category": zod.string().optional(),
+  "youtubeId": zod.string().min(1)
+})
+
+
+/**
+ * @summary Reorder Videos
+ */
+export const ReorderVideosBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderVideosResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a Video
+ */
+export const UpdateVideoParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateVideoBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "category": zod.string().optional(),
+  "youtubeId": zod.string().min(1).optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateVideoResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "youtubeId": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a Video
+ */
+export const DeleteVideoParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Programmes
+ */
+export const ListProgrammesQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListProgrammesResponseItem = zod.object({
+  "id": zod.number(),
+  "tag": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "subjects": zod.array(zod.string()),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListProgrammesResponse = zod.array(ListProgrammesResponseItem)
+
+
+/**
+ * @summary Create a Programme
+ */
+
+
+
+export const CreateProgrammeBody = zod.object({
+  "tag": zod.string().optional(),
+  "title": zod.string().min(1),
+  "description": zod.string().optional(),
+  "subjects": zod.array(zod.string()).optional()
+})
+
+
+/**
+ * @summary Reorder Programmes
+ */
+export const ReorderProgrammesBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderProgrammesResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a Programme
+ */
+export const UpdateProgrammeParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateProgrammeBody = zod.object({
+  "tag": zod.string().optional(),
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().optional(),
+  "subjects": zod.array(zod.string()).optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateProgrammeResponse = zod.object({
+  "id": zod.number(),
+  "tag": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "subjects": zod.array(zod.string()),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a Programme
+ */
+export const DeleteProgrammeParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Stats
+ */
+export const ListStatsQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListStatsResponseItem = zod.object({
+  "id": zod.number(),
+  "value": zod.string(),
+  "label": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListStatsResponse = zod.array(ListStatsResponseItem)
+
+
+/**
+ * @summary Create a Stat
+ */
+
+
+
+
+export const CreateStatBody = zod.object({
+  "value": zod.string().min(1),
+  "label": zod.string().min(1)
+})
+
+
+/**
+ * @summary Reorder Stats
+ */
+export const ReorderStatsBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderStatsResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a Stat
+ */
+export const UpdateStatParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateStatBody = zod.object({
+  "value": zod.string().min(1).optional(),
+  "label": zod.string().min(1).optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateStatResponse = zod.object({
+  "id": zod.number(),
+  "value": zod.string(),
+  "label": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a Stat
+ */
+export const DeleteStatParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Values
+ */
+export const ListSchoolValuesQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListSchoolValuesResponseItem = zod.object({
+  "id": zod.number(),
+  "icon": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListSchoolValuesResponse = zod.array(ListSchoolValuesResponseItem)
+
+
+/**
+ * @summary Create a SchoolValue
+ */
+
+
+
+export const CreateSchoolValueBody = zod.object({
+  "icon": zod.string().optional(),
+  "title": zod.string().min(1),
+  "description": zod.string().optional()
+})
+
+
+/**
+ * @summary Reorder Values
+ */
+export const ReorderSchoolValuesBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderSchoolValuesResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a SchoolValue
+ */
+export const UpdateSchoolValueParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateSchoolValueBody = zod.object({
+  "icon": zod.string().optional(),
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateSchoolValueResponse = zod.object({
+  "id": zod.number(),
+  "icon": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a SchoolValue
+ */
+export const DeleteSchoolValueParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List Admissions
+ */
+export const ListAdmissionStepsQueryParams = zod.object({
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include hidden items.')
+})
+
+export const ListAdmissionStepsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdmissionStepsResponse = zod.array(ListAdmissionStepsResponseItem)
+
+
+/**
+ * @summary Create a AdmissionStep
+ */
+
+
+
+export const CreateAdmissionStepBody = zod.object({
+  "title": zod.string().min(1),
+  "description": zod.string().optional()
+})
+
+
+/**
+ * @summary Reorder Admissions
+ */
+export const ReorderAdmissionStepsBody = zod.object({
+  "ids": zod.array(zod.number())
+})
+
+export const ReorderAdmissionStepsResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a AdmissionStep
+ */
+export const UpdateAdmissionStepParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateAdmissionStepBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().optional(),
+  "isVisible": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateAdmissionStepResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "isVisible": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a AdmissionStep
+ */
+export const DeleteAdmissionStepParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary List editable section text blocks
+ */
+export const ListSiteTextResponseItem = zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "value": zod.string(),
+  "multiline": zod.boolean(),
+  "sortOrder": zod.number()
+})
+export const ListSiteTextResponse = zod.array(ListSiteTextResponseItem)
+
+
+/**
+ * @summary Update a section text block's value
+ */
+export const UpdateSiteTextParams = zod.object({
+  "key": zod.coerce.string()
+})
+
+export const UpdateSiteTextBody = zod.object({
+  "value": zod.string()
+})
+
+export const UpdateSiteTextResponse = zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "value": zod.string(),
+  "multiline": zod.boolean(),
+  "sortOrder": zod.number()
+})
+
+
+/**
+ * @summary Log in with username and password
+ */
+
+
+
+
+export const LoginBody = zod.object({
+  "username": zod.string().min(1),
+  "password": zod.string().min(1)
+})
+
+export const LoginResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string()
+})
+
+
+/**
+ * @summary Log out
+ */
+export const LogoutResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Get the current authenticated user
+ */
+export const GetCurrentUserResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string()
+})
+
+

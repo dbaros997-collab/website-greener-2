@@ -78,10 +78,329 @@ export interface ErrorEnvelope {
   error: string;
 }
 
+export interface NewsItem {
+  id: number;
+  message: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type NewsItemList = NewsItem[];
+
+export interface NewsItemInput {
+  /** @minLength 1 */
+  message: string;
+}
+
+export interface NewsItemPatch {
+  /** @minLength 1 */
+  message?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface GalleryImage {
+  id: number;
+  caption: string;
+  category: string;
+  objectPath: string;
+  wide: boolean;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type GalleryImageList = GalleryImage[];
+
+export interface GalleryImageInput {
+  /** @minLength 1 */
+  caption: string;
+  category?: string;
+  /** @minLength 1 */
+  objectPath: string;
+  wide?: boolean;
+}
+
+export interface GalleryImagePatch {
+  /** @minLength 1 */
+  caption?: string;
+  category?: string;
+  /** @minLength 1 */
+  objectPath?: string;
+  wide?: boolean;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface Testimonial {
+  id: number;
+  quote: string;
+  name: string;
+  role: string;
+  initials: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type TestimonialList = Testimonial[];
+
+export interface TestimonialInput {
+  /** @minLength 1 */
+  quote: string;
+  /** @minLength 1 */
+  name: string;
+  role?: string;
+  initials?: string;
+}
+
+export interface TestimonialPatch {
+  /** @minLength 1 */
+  quote?: string;
+  /** @minLength 1 */
+  name?: string;
+  role?: string;
+  initials?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface Video {
+  id: number;
+  title: string;
+  category: string;
+  youtubeId: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type VideoList = Video[];
+
+export interface VideoInput {
+  /** @minLength 1 */
+  title: string;
+  category?: string;
+  /** @minLength 1 */
+  youtubeId: string;
+}
+
+export interface VideoPatch {
+  /** @minLength 1 */
+  title?: string;
+  category?: string;
+  /** @minLength 1 */
+  youtubeId?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface Programme {
+  id: number;
+  tag: string;
+  title: string;
+  description: string;
+  subjects: string[];
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type ProgrammeList = Programme[];
+
+export interface ProgrammeInput {
+  tag?: string;
+  /** @minLength 1 */
+  title: string;
+  description?: string;
+  subjects?: string[];
+}
+
+export interface ProgrammePatch {
+  tag?: string;
+  /** @minLength 1 */
+  title?: string;
+  description?: string;
+  subjects?: string[];
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface Stat {
+  id: number;
+  value: string;
+  label: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type StatList = Stat[];
+
+export interface StatInput {
+  /** @minLength 1 */
+  value: string;
+  /** @minLength 1 */
+  label: string;
+}
+
+export interface StatPatch {
+  /** @minLength 1 */
+  value?: string;
+  /** @minLength 1 */
+  label?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface SchoolValue {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type SchoolValueList = SchoolValue[];
+
+export interface SchoolValueInput {
+  icon?: string;
+  /** @minLength 1 */
+  title: string;
+  description?: string;
+}
+
+export interface SchoolValuePatch {
+  icon?: string;
+  /** @minLength 1 */
+  title?: string;
+  description?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface AdmissionStep {
+  id: number;
+  title: string;
+  description: string;
+  isVisible: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type AdmissionStepList = AdmissionStep[];
+
+export interface AdmissionStepInput {
+  /** @minLength 1 */
+  title: string;
+  description?: string;
+}
+
+export interface AdmissionStepPatch {
+  /** @minLength 1 */
+  title?: string;
+  description?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+}
+
+export interface ReorderInput {
+  ids: number[];
+}
+
+export interface OkResponse {
+  ok: boolean;
+}
+
+export interface SiteText {
+  key: string;
+  label: string;
+  value: string;
+  multiline: boolean;
+  sortOrder: number;
+}
+
+export type SiteTextList = SiteText[];
+
+export interface SiteTextInput {
+  value: string;
+}
+
+export interface LoginInput {
+  /** @minLength 1 */
+  username: string;
+  /** @minLength 1 */
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+}
+
 export type ListResourcesParams = {
 /**
  * Optional filter by category (past_paper or holiday_work).
  */
 category?: string;
+};
+
+export type ListNewsItemsParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListGalleryImagesParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListTestimonialsParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListVideosParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListProgrammesParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListStatsParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListSchoolValuesParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
+};
+
+export type ListAdmissionStepsParams = {
+/**
+ * Admin-only. When true and authenticated, include hidden items.
+ */
+includeHidden?: boolean;
 };
 
