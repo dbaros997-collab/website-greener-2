@@ -786,16 +786,16 @@ export default function App() {
       </section>
 
       {/* ===== ACHIEVEMENTS ===== */}
-      <section id="achievements" style={{ background: GREEN_DARK, padding: "64px 5%" }}>
+      <section id="achievements" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
               <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
               Our Achievements
               <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
             </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, lineHeight: 1.2, marginBottom: 14 }}>A Tradition of Excellence</h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.72)", lineHeight: 1.7 }}>Year after year, our students excel in the classroom and beyond — growing into confident, capable, and Christ-like leaders.</p>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>A Tradition of Excellence</h2>
+            <p style={{ fontSize: 16, color: "#4A6655", lineHeight: 1.7 }}>Year after year, our students excel in the classroom and beyond — growing into confident, capable, and Christ-like leaders.</p>
           </div>
           <div className="achv-grid">
             {[
@@ -804,12 +804,14 @@ export default function App() {
               { icon: <><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></>, title: "Beyond the Classroom", desc: "Achievements in sports, music, dance & drama, debate, and student leadership." },
               { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, title: "Christ-Centred Character", desc: "Graduates who are disciplined, morally upright, and God-fearing." },
             ].map((a, i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "26px 22px", textAlign: "center" }}>
-                <div style={{ width: 56, height: 56, margin: "0 auto 16px", borderRadius: 14, background: "rgba(142,237,192,0.12)", border: "1px solid rgba(142,237,192,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#8EEDC0" }}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{a.icon}</svg>
+              <div key={i} style={{ background: WHITE, border: "1px solid rgba(10,64,32,0.07)", borderRadius: 16, padding: "30px 24px", textAlign: "center", boxShadow: "0 10px 30px rgba(10,64,32,0.07)", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 18px 40px rgba(10,64,32,0.14)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.07)"; }}>
+                <div style={{ width: 60, height: 60, margin: "0 auto 18px", borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE, boxShadow: "0 8px 18px rgba(26,107,60,0.32)" }}>
+                  <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{a.icon}</svg>
                 </div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: WHITE, marginBottom: 8 }}>{a.title}</h3>
-                <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.6 }}>{a.desc}</p>
+                <h3 style={{ fontSize: 16.5, fontWeight: 700, color: GREEN_DARK, marginBottom: 8 }}>{a.title}</h3>
+                <p style={{ fontSize: 13.5, color: "#5A6B60", lineHeight: 1.6 }}>{a.desc}</p>
               </div>
             ))}
           </div>
