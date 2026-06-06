@@ -37,6 +37,7 @@ import img_conference from "@assets/481919937_1149893610163727_77366723648316779
 import img_campus from "@assets/IMG_20260321_093718_497_1780675601336.jpg";
 import img_food from "@assets/481964449_1149999646819790_6834026191577424925_n_1780398909154.jpg";
 import img_featured_video from "@assets/featured_video_thumb_1780677204039.png";
+import { generateApplicationForm } from "./applicationForm";
 
 const GREEN_DARK  = "#0A4020";
 const GREEN_MAIN  = "#1A6B3C";
@@ -1258,6 +1259,39 @@ export default function App() {
               <p style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, margin: 0 }}>
                 <strong style={{ color: WHITE }}>Admissions are open</strong> for all classes (S1–S6) for the 2025/2026 academic year. Apply early to secure a place.
               </p>
+            </div>
+
+            {/* Download application forms */}
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 32, marginBottom: 6 }}>Download Application Form</h3>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, marginBottom: 16 }}>
+              Print, fill in, and return the completed form to the school office. Choose the form for your entry class.
+            </p>
+            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {([
+                { level: "S1" as const, label: "S1 Application Form", note: "For Senior One (from PLE)" },
+                { level: "S5" as const, label: "S5 Application Form", note: "For Senior Five (from UCE)" },
+              ]).map(f => (
+                <button key={f.level} onClick={() => generateApplicationForm(f.level)} style={{
+                  display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
+                  background: WHITE, border: "none", borderRadius: 8, padding: "16px 18px",
+                  fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 30px rgba(0,0,0,0.25)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <span style={{
+                    flexShrink: 0, width: 40, height: 40, borderRadius: 8,
+                    background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, color: WHITE,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                  </span>
+                  <span>
+                    <span style={{ display: "block", fontSize: 14, fontWeight: 700, color: GREEN_DARK }}>{f.label}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: "#7A8A80", marginTop: 2 }}>{f.note} · PDF</span>
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
