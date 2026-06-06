@@ -207,10 +207,11 @@ body {
 /* Named classes used on the grid wrapper divs so media queries can override inline styles */
 .stats-grid      { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
 .about-grid      { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
-.programmes-rows { display: grid; gap: 24px; }
-.programme-row     { display: flex; align-items: stretch; }
-.programme-row-img { width: 40%; flex-shrink: 0; min-height: 240px; }
-.programme-row-body { width: 60%; }
+.programmes-rows { display: grid; gap: 56px; }
+.programme-row     { display: flex; align-items: center; gap: 48px; }
+.programme-row--reverse { flex-direction: row-reverse; }
+.programme-row-img { width: 50%; flex-shrink: 0; min-height: 300px; }
+.programme-row-body { width: 50%; }
 .videos-grid     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .resources-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .upload-grid     { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -227,8 +228,9 @@ body {
 /* ========== TABLET BREAKPOINT (≤ 900px) ========== */
 @media (max-width: 900px) {
   .about-grid      { grid-template-columns: 1fr !important; gap: 36px !important; }
-  .programme-row     { flex-direction: column !important; }
-  .programme-row-img { width: 100% !important; height: 200px; min-height: 0 !important; }
+  .programme-row     { flex-direction: column !important; gap: 20px !important; }
+  .programme-row--reverse { flex-direction: column !important; }
+  .programme-row-img { width: 100% !important; height: 240px; min-height: 0 !important; }
   .programme-row-body { width: 100% !important; }
   .videos-grid     { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
   .resources-grid  { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }

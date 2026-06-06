@@ -728,22 +728,13 @@ export default function App() {
 
           <div className="programmes-rows">
             {programmeItems.map((p, i) => (
-              <div key={i} className="programme-row" style={{
-                background: WHITE, borderRadius: 12, overflow: "hidden",
-                border: "1px solid rgba(0,0,0,0.1)", transition: "transform 0.2s, box-shadow 0.2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-              >
-                <div className="programme-row-img" style={{ position: "relative", overflow: "hidden" }}>
+              <div key={i} className={`programme-row${i % 2 === 1 ? " programme-row--reverse" : ""}`}>
+                <div className="programme-row-img" style={{ overflow: "hidden", borderRadius: 12, minHeight: 300 }}>
                   <img src={p.img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(10,64,32,0.25), rgba(10,64,32,0.85))` }} />
-                  <div style={{ position: "absolute", bottom: 16, left: 16 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 4 }}>{p.tag}</div>
-                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE }}>{p.title}</h3>
-                  </div>
                 </div>
-                <div className="programme-row-body" style={{ padding: 28, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <div className="programme-row-body" style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "8px 4px" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>{p.title}</h3>
                   <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 18 }}>{p.desc}</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {p.subjects.map(s => (
