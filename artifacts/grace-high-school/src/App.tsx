@@ -126,6 +126,16 @@ export default function App() {
     loadResources();
   }, []);
 
+  // Close the video modal when the Escape key is pressed.
+  useEffect(() => {
+    if (videoModal === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setVideoModal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [videoModal]);
+
   // Live updates: subscribe to the API's Server-Sent Events stream so any change
   // made in the admin dashboard refreshes the public site instantly, without a
   // page reload. The EventSource auto-reconnects if the connection drops.
@@ -307,7 +317,22 @@ export default function App() {
       {/* ===== VIDEO MODAL ===== */}
       {videoModal !== null && (
         <div className="lightbox-overlay" onClick={() => setVideoModal(null)}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "min(900px, 92vw)", maxWidth: 900 }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: "relative", width: "min(900px, 92vw)", maxWidth: 900 }}>
+            <button
+              onClick={() => setVideoModal(null)}
+              aria-label="Close video"
+              style={{
+                position: "absolute", top: -48, right: 0, zIndex: 2,
+                width: 40, height: 40, borderRadius: "50%", border: "none", cursor: "pointer",
+                background: "rgba(255,255,255,0.15)", color: WHITE, fontSize: 20, lineHeight: 1,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = GOLD)}
+              onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
+            >
+              ✕
+            </button>
             {videoModal ? (
               <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", background: "#000" }}>
                 <iframe
