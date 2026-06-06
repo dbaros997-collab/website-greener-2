@@ -54,11 +54,7 @@ const HERO_SLIDES = [
   img_alevel,
 ];
 
-const HERO_TAGLINES = [
-  "Faith, Vision & Excellence",
-  "Shaping Tomorrow's Leaders",
-  "A Foundation for a Bright Future",
-];
+const HERO_WORDS = ["Vision", "Faith", "Excellence"];
 
 const API = "/api";
 
@@ -636,69 +632,50 @@ export default function App() {
             }} />
           </div>
 
+          {/* Eyebrow — "Be Part of Our Story" */}
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(201,162,75,0.12)", border: "1px solid rgba(230,198,110,0.45)",
-            borderRadius: 100, padding: "7px 18px",
-            fontSize: 12, fontWeight: 600, color: GOLD_LIGHT,
-            letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 26,
-            backdropFilter: "blur(4px)",
-          }}>✦ Welcome to Excellence</div>
+            fontFamily: "'Playfair Display', serif", fontStyle: "italic",
+            fontSize: "clamp(1rem, 2vw, 1.4rem)", color: GOLD_LIGHT,
+            marginBottom: 16, letterSpacing: "0.01em",
+            textShadow: "0 2px 16px rgba(0,0,0,0.5)",
+          }}>Be Part of Our Story</div>
 
+          {/* Rotating headline — "___ to Create the Future." */}
           <h1 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: "clamp(2.6rem, 5.4vw, 4.6rem)",
-            color: WHITE, lineHeight: 1.08, marginBottom: 24,
-            letterSpacing: "-0.01em", textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+            fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800,
+            fontSize: "clamp(2.7rem, 6.6vw, 5.3rem)",
+            color: WHITE, lineHeight: 1.02, marginBottom: 26,
+            letterSpacing: "-0.02em", textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}>
-            Run With a{" "}
-            <em style={{
-              fontStyle: "italic",
+            <span key={heroSlide} className="hero-word" style={{
+              display: "inline-block",
               background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
               WebkitBackgroundClip: "text", backgroundClip: "text",
               WebkitTextFillColor: "transparent",
-            }}>Vision</em>
-            <br />at Grace High School
+            }}>{HERO_WORDS[heroSlide % HERO_WORDS.length]}</span>{" "}
+            to Create<br />the Future.
           </h1>
 
-          <div key={heroSlide} className="hero-tagline" style={{
-            fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontWeight: 600,
-            fontSize: "clamp(1.05rem, 2.2vw, 1.5rem)", marginBottom: 22,
-            background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
-            WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>{HERO_TAGLINES[heroSlide % HERO_TAGLINES.length]}</div>
-
-          <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.88)", marginBottom: 38, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}>
+          <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.88)", marginBottom: 36, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
             A Christian-founded mixed secondary school on a 28-acre campus in Gayaza — producing morally upright, academically excellent, Christ-like leaders of tomorrow.
           </p>
 
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             <button onClick={() => scrollTo("admissions")} style={{
-              background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
-              padding: "15px 30px", borderRadius: 6, fontWeight: 700, fontSize: 15,
-              border: "none", cursor: "pointer", letterSpacing: "0.02em",
-              boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
+              background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, color: WHITE,
+              padding: "16px 40px", borderRadius: 6, fontWeight: 700, fontSize: 15,
+              border: "1px solid rgba(230,198,110,0.5)", cursor: "pointer", letterSpacing: "0.02em",
+              boxShadow: "0 12px 34px rgba(10,64,32,0.45)",
               transition: "box-shadow 0.25s, transform 0.15s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
-            >Apply For O'Level</button>
-
-            <button onClick={() => scrollTo("admissions")} style={{
-              background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
-              padding: "15px 30px", borderRadius: 6, fontWeight: 700, fontSize: 15,
-              border: "none", cursor: "pointer", letterSpacing: "0.02em",
-              boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
-              transition: "box-shadow 0.25s, transform 0.15s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
-            >Apply For A'Level</button>
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 18px 44px rgba(10,64,32,0.6)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 12px 34px rgba(10,64,32,0.45)"; }}
+            >Enroll Now</button>
 
             <button onClick={() => scrollTo("about")} style={{
               background: "rgba(255,255,255,0.06)", color: WHITE,
               border: "1.5px solid rgba(255,255,255,0.45)",
-              padding: "15px 32px", borderRadius: 6, fontWeight: 600, fontSize: 15,
+              padding: "16px 34px", borderRadius: 6, fontWeight: 600, fontSize: 15,
               cursor: "pointer", backdropFilter: "blur(6px)",
               transition: "border-color 0.2s, color 0.2s, background 0.2s",
             }}
@@ -732,6 +709,60 @@ export default function App() {
         </div>
       </div>
 
+      {/* ===== SERVICE CARDS ===== */}
+      <section style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+        <div className="service-grid">
+          {[
+            {
+              icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>,
+              title: "Admissions to All Classes",
+              desc: "Now open for S1–S6. Join a disciplined, faith-based community where every learner is guided toward academic effort and character growth.",
+              id: "admissions",
+            },
+            {
+              icon: <><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></>,
+              title: "Why Choose Grace?",
+              desc: "Structured teaching, close supervision and continuous assessment help our students excel and progress with confidence.",
+              id: "about",
+            },
+            {
+              icon: <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></>,
+              title: "Academic Results",
+              desc: "A consistent record of strong UNEB performance at O-Level and A-Level, with graduates advancing to leading universities.",
+              id: "achievements",
+            },
+            {
+              icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></>,
+              title: "Student Resources",
+              desc: "Download past papers and holiday work, and explore everyday school life through our videos and campus gallery.",
+              id: "resources",
+            },
+          ].map((c, i) => (
+            <button key={i} onClick={() => scrollTo(c.id)} style={{
+              textAlign: "left", cursor: "pointer", background: WHITE,
+              border: "1px solid rgba(10,64,32,0.08)", borderRadius: 14,
+              padding: "28px 24px 26px", borderBottom: `4px solid ${GOLD}`,
+              boxShadow: "0 10px 30px rgba(10,64,32,0.07)",
+              display: "flex", flexDirection: "column", gap: 14,
+              transition: "transform 0.25s ease, box-shadow 0.25s ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 20px 44px rgba(10,64,32,0.16)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.07)"; }}
+            >
+              <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE, boxShadow: "0 8px 20px rgba(10,64,32,0.25)" }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{c.icon}</svg>
+              </div>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.18rem", color: GREEN_DARK, lineHeight: 1.25, margin: 0 }}>{c.title}</h3>
+              <p style={{ fontSize: 14, color: "#5A6B60", lineHeight: 1.65, margin: 0 }}>{c.desc}</p>
+              <span style={{ marginTop: "auto", fontSize: 13, fontWeight: 700, color: GREEN_MAIN, letterSpacing: "0.02em", display: "inline-flex", alignItems: "center", gap: 6, paddingTop: 4 }}>
+                Learn More
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* ===== WELCOME ===== */}
       <section id="welcome" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div className="welcome-grid">
@@ -741,6 +772,11 @@ export default function App() {
             <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
               <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
               <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Run With a Vision</span>
+            </div>
+            {/* Years-of-experience badge */}
+            <div style={{ position: "absolute", zIndex: 3, top: -18, right: -14, width: 96, height: 96, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", boxShadow: "0 12px 28px rgba(201,162,75,0.4)", border: "3px solid #FFFFFF" }}>
+              <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "#3A2D08", lineHeight: 1 }}>25+</span>
+              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#5A4715", marginTop: 3, lineHeight: 1.2 }}>Years of<br />Experience</span>
             </div>
           </div>
           <div>
