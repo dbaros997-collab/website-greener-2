@@ -140,20 +140,20 @@ export default function App() {
     setOpenMobileGroup(null);
   };
 
-  const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string }[] }[] = [
+  const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string; desc: string }[] }[] = [
     { label: "Home", id: "__home" },
     { label: "About", children: [
-      { label: "About Us", id: "about" },
-      { label: "Campus Gallery", id: "campus" },
+      { label: "About Us", id: "about", desc: "Our story, Christian foundation & values" },
+      { label: "Campus Gallery", id: "campus", desc: "Photos of our 28-acre Gayaza campus" },
     ] },
     { label: "Academics", children: [
-      { label: "Programmes", id: "programmes" },
-      { label: "Student Resources", id: "resources" },
-      { label: "Videos", id: "videos" },
+      { label: "Programmes", id: "programmes", desc: "O-Level, A-Level & vocational skills" },
+      { label: "Student Resources", id: "resources", desc: "Download past papers & holiday work" },
+      { label: "Videos", id: "videos", desc: "Watch everyday life at Grace" },
     ] },
     { label: "School Life", children: [
-      { label: "News & Events", id: "news" },
-      { label: "Updates", id: "updates" },
+      { label: "News & Events", id: "news", desc: "Latest happenings around the school" },
+      { label: "Updates", id: "updates", desc: "Notices for parents & guardians" },
     ] },
     { label: "Admissions", id: "admissions" },
     { label: "Contact", id: "contact" },
@@ -408,20 +408,23 @@ export default function App() {
                   position: "absolute", top: "100%", left: 0, paddingTop: 12,
                 }}>
                   <div style={{
-                    background: WHITE, borderRadius: 8, minWidth: 210,
+                    background: WHITE, borderRadius: 10, minWidth: 290,
                     boxShadow: "0 12px 32px rgba(10,64,32,0.18)",
                     border: `1px solid ${GREEN_LIGHT}`, overflow: "hidden",
-                    display: "flex", flexDirection: "column", padding: "6px 0",
+                    display: "flex", flexDirection: "column", padding: "8px",
                   }}>
                     {group.children.map(child => (
                       <button key={child.id} onClick={() => scrollTo(child.id)} style={{
-                        background: "none", border: "none", cursor: "pointer",
-                        color: GREEN_DARK, fontSize: 13.5, fontWeight: 500,
-                        textAlign: "left", padding: "10px 18px", transition: "background 0.15s, color 0.15s",
+                        background: "none", border: "none", cursor: "pointer", borderRadius: 8,
+                        textAlign: "left", padding: "10px 12px", transition: "background 0.15s",
+                        display: "block",
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.background = GREEN_LIGHT; e.currentTarget.style.color = GREEN_MAIN; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = GREEN_DARK; }}
-                      >{child.label}</button>
+                      onMouseEnter={e => { e.currentTarget.style.background = GREEN_LIGHT; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
+                      >
+                        <span style={{ display: "block", color: GREEN_DARK, fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{child.label}</span>
+                        <span style={{ display: "block", color: "#6A7A70", fontSize: 12, lineHeight: 1.45 }}>{child.desc}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -481,9 +484,11 @@ export default function App() {
                   {group.children.map(child => (
                     <button key={child.id} onClick={() => scrollTo(child.id)} style={{
                       background: "none", border: "none", cursor: "pointer",
-                      color: "#8EEDC0", fontSize: 14.5, fontWeight: 500,
                       padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", textAlign: "left",
-                    }}>{child.label}</button>
+                    }}>
+                      <span style={{ display: "block", color: "#8EEDC0", fontSize: 14.5, fontWeight: 600 }}>{child.label}</span>
+                      <span style={{ display: "block", color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{child.desc}</span>
+                    </button>
                   ))}
                 </div>
               )}
