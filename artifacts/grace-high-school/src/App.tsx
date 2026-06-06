@@ -22,7 +22,6 @@ import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
 import img_vision_watermark from "@assets/3@_(7)_1780733151190.JPG";
 import img_science from "@assets/IMG_0144_-_Copy_1780654332068.jpg";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
-import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
@@ -169,7 +168,6 @@ export default function App() {
       { label: "Videos", id: "videos", desc: "Watch everyday life at Grace" },
     ] },
     { label: "School Life", children: [
-      { label: "News & Events", id: "news", desc: "Latest happenings around the school" },
       { label: "Updates", id: "updates", desc: "Notices for parents & guardians" },
     ] },
     { label: "Admissions", id: "admissions" },
@@ -866,37 +864,6 @@ export default function App() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ===== NEWS & EVENTS ===== */}
-      <section id="news" style={{ background: WHITE, padding: "56px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />News & Events
-          </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>What's Happening at Grace</h2>
-          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 40 }}>Stay up to date with the latest school news, announcements, and upcoming events.</p>
-
-          <div>
-            {/* Main news card */}
-            <div style={{ background: GREEN_DARK, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", cursor: "pointer", transition: "transform 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-3px)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
-              <div style={{ height: 220, overflow: "hidden", position: "relative" }}>
-                <img src={img_assembly2} alt="Students at Grace High School" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(transparent, rgba(10,64,32,0.8))" }} />
-              </div>
-              <div style={{ padding: 24, flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>Admissions</div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: WHITE, marginBottom: 10, lineHeight: 1.3 }}>Admissions Open for All Classes — 2025/2026 Academic Year</h3>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>Grace High School is proud to announce that admissions are now open for all classes from S1 to S6. We welcome students ready to run with a vision and embrace academic excellence and Christian values.</p>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 16 }}>📅 2025 · Grace High School, Gayaza</div>
-              </div>
-            </div>
-
-          </div>
-
         </div>
       </section>
 
