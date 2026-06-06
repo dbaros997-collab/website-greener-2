@@ -1261,9 +1261,17 @@ export default function App() {
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer style={{ background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <footer style={{ position: "relative", background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px", overflow: "hidden" }}>
+        {/* Crest watermark */}
+        <img src={schoolLogo} alt="" aria-hidden="true" style={{
+          position: "absolute", right: "-3%", top: "50%", transform: "translateY(-50%)",
+          width: "min(560px, 60%)", opacity: 0.05, pointerEvents: "none",
+          filter: "grayscale(1) brightness(2)", userSelect: "none",
+        }} />
+
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
           <div className="footer-grid">
+            {/* About Us */}
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: WHITE, padding: 3, boxShadow: "0 0 0 2px rgba(76,175,130,0.4)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
@@ -1272,29 +1280,47 @@ export default function App() {
                   <span style={{ fontSize: 11, color: "#8EEDC0" }}>Gayaza, Uganda</span>
                 </div>
               </div>
+              <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 10 }}>About Us</h4>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
-                A Christian-founded mixed secondary school on a 28-acre campus in Gayaza, producing leaders of tomorrow.
+                Grace High School fosters a supportive, Christ-centred environment where every student feels valued and empowered to reach their full potential.
               </p>
             </div>
-            {[
-              { title: "Quick Links", links: ["About Us","Programmes","News & Events","Campus Gallery","Admissions","Contact"] },
-              { title: "Academics",   links: ["Ordinary Level (S1–S4)","Advanced Level (S5–S6)","Vocational Skills","Extracurricular","Results & Achievements"] },
-              { title: "Connect",     links: ["gracehighschool2000@gmail.com","Namavundu Road, Gayaza","Wakiso District, Uganda","Near Kasangati Town","Always Open 🟢"] },
-            ].map((col, i) => (
-              <div key={i}>
-                <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 16 }}>{col.title}</h4>
-                <ul style={{ listStyle: "none", display: "grid", gap: 8 }}>
-                  {col.links.map(link => (
-                    <li key={link}>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", cursor: "pointer", transition: "color 0.2s" }}
-                      onMouseEnter={e => (e.currentTarget.style.color = "#8EEDC0")}
-                      onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.55)")}
-                      >{link}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+
+            {/* Opening Hours */}
+            <div>
+              <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 16 }}>Opening Hours</h4>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 6 }}>Open Monday – Saturday</p>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>7:00am to 6:00pm</p>
+            </div>
+
+            {/* Our Students */}
+            <div>
+              <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 16 }}>Our Students</h4>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                A student of Grace High School grows into a caring, innovative and reflective thinker, rooted in faith, excellence and integrity.
+              </p>
+            </div>
+
+            {/* News Feed */}
+            <div>
+              <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 16 }}>News Feed</h4>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", lineHeight: 1.55, marginBottom: 4 }}>Admissions Open for All Classes — 2025/2026 Academic Year</p>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>2025 · Grace High School</span>
+            </div>
+
+            {/* Get In Touch */}
+            <div>
+              <h4 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 16 }}>Get In Touch</h4>
+              <ul style={{ listStyle: "none", display: "grid", gap: 8 }}>
+                <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>Namavundu Road, Gayaza</li>
+                <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>Wakiso District, Uganda</li>
+                <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>Near Kasangati Town</li>
+                <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, marginTop: 4 }}>
+                  Email:<br />
+                  <a href="mailto:gracehighschool2000@gmail.com" style={{ color: "#8EEDC0", textDecoration: "none" }}>gracehighschool2000@gmail.com</a>
+                </li>
+              </ul>
+            </div>
           </div>
 
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
