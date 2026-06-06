@@ -5,7 +5,6 @@ import {
   useListTestimonials,
   useListVideos,
   useListProgrammes,
-  useListSchoolValues,
   useListAdmissionSteps,
   useListGalleryImages,
   useListSiteText,
@@ -164,7 +163,6 @@ export default function App() {
   const testimonialsQ = useListTestimonials();
   const videosQ = useListVideos();
   const programmesQ = useListProgrammes();
-  const valuesQ = useListSchoolValues();
   const admissionsQ = useListAdmissionSteps();
   const galleryQ = useListGalleryImages();
   const siteTextQ = useListSiteText();
@@ -222,16 +220,6 @@ export default function App() {
         desc: p.description, subjects: p.subjects,
       }))
     : PROGRAMMES_FALLBACK;
-
-  const VALUES_FALLBACK = [
-    { icon: "✝️", title: "Faith", desc: "Grounded in Christian teaching, we nurture a deep, personal faith in every student." },
-    { icon: "🎓", title: "Excellence", desc: "We push every student to reach their full academic and personal potential." },
-    { icon: "🤝", title: "Integrity", desc: "Honesty, respect, and moral uprightness are non-negotiable at Grace." },
-    { icon: "🌱", title: "Growth", desc: "Continuous improvement — spiritually, intellectually, and as a community." },
-  ];
-  const valueItems = valuesQ.data?.length
-    ? valuesQ.data.map((v) => ({ icon: v.icon, title: v.title, desc: v.description }))
-    : VALUES_FALLBACK;
 
   const ADMISSIONS_FALLBACK = [
     { step: 1, title: "Contact the School", desc: "Call or email us to express interest and get an admissions form." },
@@ -986,33 +974,6 @@ export default function App() {
               );
             })
           )}
-        </div>
-      </section>
-
-      {/* ===== SCHOOL VALUES ===== */}
-      <section style={{ background: GREEN_DARK, padding: "56px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Our Values
-          </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>What We Stand For</h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>Our values guide every aspect of life at Grace High School — from the classroom to the chapel, from the sports field to the community.</p>
-
-          <div className="values-grid">
-            {valueItems.map((v, i) => (
-              <div key={i} style={{
-                padding: "28px 20px", border: "1px solid rgba(76,175,130,0.2)",
-                borderRadius: 10, transition: "background 0.2s, border-color 0.2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(76,175,130,0.1)"; e.currentTarget.style.borderColor = "rgba(76,175,130,0.5)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(76,175,130,0.2)"; }}
-              >
-                <span style={{ fontSize: 28, marginBottom: 14, display: "block" }}>{v.icon}</span>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: "#8EEDC0", marginBottom: 8 }}>{v.title}</h3>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{v.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
