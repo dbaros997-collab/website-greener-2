@@ -1325,7 +1325,10 @@ export default function App() {
 
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>© {new Date().getFullYear()} Grace High School – Gayaza. All rights reserved.</p>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontStyle: "italic" }}>"Run With a Vision" — Isaiah 40:31</p>
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#8EEDC0", marginBottom: 2 }}>Grace High School — Education For A Bright Future</p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontStyle: "italic" }}>"Run With a Vision" — Isaiah 40:31</p>
+            </div>
           </div>
         </div>
       </footer>
