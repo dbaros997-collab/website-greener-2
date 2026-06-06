@@ -44,6 +44,8 @@ const GREEN_MID   = "#237A48";
 const GREEN_LIGHT = "#E8F5EE";
 const WHITE       = "#FFFFFF";
 const OFF_WHITE   = "#F5FAF7";
+const GOLD        = "#C9A24B";
+const GOLD_LIGHT  = "#E6C66E";
 
 const API = "/api";
 
@@ -339,10 +341,15 @@ export default function App() {
           ))}
           <li>
             <button onClick={() => scrollTo("admissions")} style={{
-              background: "#4CAF82", color: GREEN_DARK,
-              padding: "8px 20px", borderRadius: 4, fontWeight: 600,
-              border: "none", cursor: "pointer", fontSize: 14,
-            }}>Apply Now</button>
+              background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
+              padding: "9px 22px", borderRadius: 6, fontWeight: 700,
+              border: "none", cursor: "pointer", fontSize: 14, letterSpacing: "0.02em",
+              boxShadow: "0 6px 18px rgba(201,162,75,0.3)",
+              transition: "transform 0.15s, box-shadow 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 10px 26px rgba(201,162,75,0.45)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(201,162,75,0.3)"; }}
+            >Apply Now</button>
           </li>
         </ul>
 
@@ -391,57 +398,83 @@ export default function App() {
           position: "absolute", inset: 0,
           backgroundImage: `url(${img_campus_hero})`,
           backgroundSize: "cover", backgroundPosition: "center top",
-          opacity: 0.72,
+          transform: "scale(1.05)",
+        }} />
+        {/* Cinematic scrim — keeps the headline crisp and adds depth */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: `linear-gradient(105deg, rgba(7,45,22,0.95) 0%, rgba(7,45,22,0.82) 38%, rgba(10,64,32,0.48) 70%, rgba(10,64,32,0.32) 100%)`,
         }} />
         <div style={{
           position: "absolute", inset: 0,
-          background: `radial-gradient(circle at 20% 50%, rgba(26,107,60,0.25) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(76,175,130,0.1) 0%, transparent 40%)`,
+          background: `radial-gradient(circle at 78% 30%, rgba(201,162,75,0.20) 0%, transparent 46%),
+                        linear-gradient(to bottom, rgba(7,45,22,0.25) 0%, transparent 24%, transparent 68%, rgba(7,45,22,0.9) 100%)`,
         }} />
+
+        {/* Scroll cue */}
+        <div className="scroll-cue" style={{
+          position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",
+          zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.85)", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Scroll</span>
+          <span style={{ width: 22, height: 36, borderRadius: 12, border: "1.5px solid rgba(255,255,255,0.4)", display: "flex", justifyContent: "center", paddingTop: 6 }}>
+            <span style={{ width: 3, height: 7, borderRadius: 2, background: GOLD_LIGHT, display: "block" }} />
+          </span>
+        </div>
 
         <div className="hero-grid">
 
           <div>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 8,
-              background: "rgba(76,175,130,0.15)", border: "1px solid rgba(76,175,130,0.4)",
-              borderRadius: 100, padding: "6px 16px",
-              fontSize: 12, fontWeight: 600, color: "#8EEDC0",
-              letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 24,
+              background: "rgba(201,162,75,0.12)", border: "1px solid rgba(230,198,110,0.45)",
+              borderRadius: 100, padding: "7px 18px",
+              fontSize: 12, fontWeight: 600, color: GOLD_LIGHT,
+              letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 26,
+              backdropFilter: "blur(4px)",
             }}>✦ Gayaza, Wakiso District — Uganda</div>
 
             <h1 style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(2.4rem, 4vw, 3.6rem)",
-              color: WHITE, lineHeight: 1.15, marginBottom: 20,
+              fontSize: "clamp(2.6rem, 4.6vw, 4.2rem)",
+              color: WHITE, lineHeight: 1.08, marginBottom: 22,
+              letterSpacing: "-0.01em", textShadow: "0 2px 30px rgba(0,0,0,0.4)",
             }}>
               Run With a{" "}
-              <em style={{ fontStyle: "italic", color: "#8EEDC0" }}>Vision</em>
+              <em style={{
+                fontStyle: "italic",
+                background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
+                WebkitBackgroundClip: "text", backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>Vision</em>
               <br />at Grace High School
             </h1>
 
-            <p style={{ fontSize: 16, lineHeight: 1.75, color: "rgba(255,255,255,0.75)", marginBottom: 36, maxWidth: 480 }}>
+            <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.85)", marginBottom: 38, maxWidth: 500 }}>
               A Christian-founded mixed secondary school on a 28-acre campus in Gayaza — producing morally upright, academically excellent, Christ-like leaders of tomorrow.
             </p>
 
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
               <button onClick={() => scrollTo("admissions")} style={{
-                background: "#4CAF82", color: GREEN_DARK,
-                padding: "13px 28px", borderRadius: 4, fontWeight: 600, fontSize: 15,
-                border: "none", cursor: "pointer", transition: "background 0.2s, transform 0.1s",
+                background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
+                padding: "15px 34px", borderRadius: 6, fontWeight: 700, fontSize: 15,
+                border: "none", cursor: "pointer", letterSpacing: "0.02em",
+                boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
+                transition: "box-shadow 0.25s, transform 0.15s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2ECC71"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#4CAF82"; e.currentTarget.style.transform = "translateY(0)"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
               >Apply Now</button>
 
               <button onClick={() => scrollTo("about")} style={{
-                background: "transparent", color: WHITE,
-                border: "1.5px solid rgba(255,255,255,0.4)",
-                padding: "13px 28px", borderRadius: 4, fontWeight: 500, fontSize: 15,
-                cursor: "pointer", transition: "border-color 0.2s, color 0.2s",
+                background: "rgba(255,255,255,0.06)", color: WHITE,
+                border: "1.5px solid rgba(255,255,255,0.45)",
+                padding: "15px 32px", borderRadius: 6, fontWeight: 600, fontSize: 15,
+                cursor: "pointer", backdropFilter: "blur(6px)",
+                transition: "border-color 0.2s, color 0.2s, background 0.2s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "#4CAF82"; e.currentTarget.style.color = "#8EEDC0"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; e.currentTarget.style.color = WHITE; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD_LIGHT; e.currentTarget.style.color = GOLD_LIGHT; e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)"; e.currentTarget.style.color = WHITE; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
               >Learn More</button>
             </div>
           </div>
@@ -608,7 +641,7 @@ export default function App() {
       <section id="programmes" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Academics
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Academics
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 16 }}>{text("programmes_heading", "Our Programmes")}</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>
@@ -650,7 +683,7 @@ export default function App() {
       <section id="news" style={{ background: WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />News & Events
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />News & Events
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>What's Happening at Grace</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 40 }}>Stay up to date with the latest school news, announcements, and upcoming events.</p>
@@ -737,7 +770,7 @@ export default function App() {
       <section id="updates" style={{ background: GREEN_LIGHT, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Updates for Parents
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Updates for Parents
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>School Updates &amp; Announcements</h2>
           <p style={{ fontSize: 16, color: "#4A5A50", lineHeight: 1.7, maxWidth: 620, marginBottom: 40 }}>
@@ -834,7 +867,7 @@ export default function App() {
       <section id="campus" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Campus Life
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Campus Life
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Life at Grace High School</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 24 }}>Our 28-acre campus near Kasangati, Gayaza provides a serene, green environment ideal for learning, worship, and growth.</p>
@@ -876,7 +909,7 @@ export default function App() {
       <section id="videos" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />School Videos
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />School Videos
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Watch Grace High School in Action</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, marginBottom: 40 }}>
@@ -918,7 +951,7 @@ export default function App() {
       <section id="resources" style={{ background: WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Student Resources
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Student Resources
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Past Papers &amp; Holiday Work</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 40 }}>
@@ -1007,7 +1040,7 @@ export default function App() {
       <section id="staff" style={{ background: WHITE, padding: "80px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Our Team
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Our Team
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>
             Meet Our Dedicated Staff
@@ -1088,7 +1121,7 @@ export default function App() {
       <section style={{ background: OFF_WHITE, padding: "80px 5%", overflow: "hidden" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Testimonials
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Testimonials
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 40 }}>What Our Community Says</h2>
 
@@ -1156,7 +1189,7 @@ export default function App() {
         <div className="admissions-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Admissions
+              <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Admissions
             </div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>{text("admissions_heading", "Join the Grace Family")}</h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>{text("admissions_intro", "Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.")}</p>
@@ -1272,7 +1305,7 @@ export default function App() {
         <div className="contact-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ width: 28, height: 2, background: GREEN_MAIN, display: "block" }} />Contact Us
+              <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Contact Us
             </div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Get in Touch</h2>
             <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 480, marginBottom: 36 }}>
