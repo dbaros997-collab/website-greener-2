@@ -689,7 +689,7 @@ export default function App() {
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>What's Happening at Grace</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 40 }}>Stay up to date with the latest school news, announcements, and upcoming events.</p>
 
-          <div className="news-grid">
+          <div>
             {/* Main news card */}
             <div style={{ background: GREEN_DARK, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", cursor: "pointer", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-3px)")}
@@ -706,34 +706,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Sidebar */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                { img: img_assembly3,  cat: "Fellowship",  title: "Inter-School Christian Fellowship", desc: "Annual Gayaza Zone fellowship event hosted at our campus chapel." },
-                { img: img_trophy,     cat: "Sports",      title: "Sports Day & Prize Giving",         desc: "Annual sports competitions and awards ceremony for outstanding students." },
-                { img: img_exam,       cat: "Academics",   title: "End of Term Exams",                 desc: "All candidates prepare for term-end assessments. Timetable from the office." },
-                { img: img_sewing,     cat: "Vocational",  title: "Vocational Skills Exhibition",      desc: "Students showcase their practical skills and entrepreneurial projects." },
-              ].map((item, i) => (
-                <div key={i} style={{
-                  background: OFF_WHITE, borderRadius: 8,
-                  border: "1px solid rgba(0,0,0,0.08)", cursor: "pointer",
-                  display: "flex", gap: 0, alignItems: "stretch", overflow: "hidden",
-                  transition: "border-color 0.2s, transform 0.2s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = GREEN_MAIN; e.currentTarget.style.transform = "translateX(3px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateX(0)"; }}
-                >
-                  <div style={{ width: 80, flexShrink: 0, overflow: "hidden" }}>
-                    <img src={item.img} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  </div>
-                  <div style={{ padding: "12px 14px" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 3 }}>{item.cat}</div>
-                    <h4 style={{ fontSize: 13, fontWeight: 600, color: GREEN_DARK, marginBottom: 4, lineHeight: 1.3 }}>{item.title}</h4>
-                    <p style={{ fontSize: 12, color: "#5A5A5A", lineHeight: 1.45 }}>{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Upcoming events */}
