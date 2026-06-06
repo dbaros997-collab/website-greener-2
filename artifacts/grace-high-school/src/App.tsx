@@ -576,14 +576,19 @@ export default function App() {
               {text("about_body", "Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.")}
             </p>
 
-            {/* Mission card */}
-            <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", marginBottom: 28, borderLeft: `4px solid #4CAF82` }}>
-              <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>Our Mission</p>
-              <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "Producing students who are morally upright and Christ-like leaders of tomorrow.")}"</p>
-              <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>🎓 Tutor / Teacher Services</span>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>📍 Gayaza-Kasangati, Uganda</span>
-                <span style={{ fontSize: 12, color: "#4CAF82", fontWeight: 600 }}>🟢 Always Open</span>
+            {/* Vision & Mission */}
+            <div style={{ display: "grid", gap: 16, marginBottom: 28 }}>
+              <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
+                <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: GOLD_LIGHT, marginBottom: 8 }}>Our Vision</p>
+                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "To be a centre of excellence that raises God-fearing, visionary leaders who make a lasting difference in their communities and the world.")}"</p>
+              </div>
+              <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid #4CAF82` }}>
+                <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>Our Mission</p>
+                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "Producing students who are morally upright and Christ-like leaders of tomorrow.")}"</p>
+                <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>📍 Gayaza-Kasangati, Uganda</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>✝️ Christian-Founded</span>
+                </div>
               </div>
             </div>
 
@@ -632,15 +637,13 @@ export default function App() {
                 ["Foundation", "Christian"],
                 ["Admissions", "Open — All Classes"],
                 ["Email", "gracehighschool2000@gmail.com"],
-                ["Hours", "Always Open 🟢"],
-                ["Zone", "Gayaza Zone Schools"],
               ].map(([label, val], i) => (
                 <div key={i} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "flex-start",
                   padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 14,
                 }}>
                   <span style={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>{label}</span>
-                  <span style={{ color: label === "Hours" ? "#4CAF82" : WHITE, textAlign: "right", maxWidth: 200 }}>{val}</span>
+                  <span style={{ color: WHITE, textAlign: "right", maxWidth: 200 }}>{val}</span>
                 </div>
               ))}
             </div>

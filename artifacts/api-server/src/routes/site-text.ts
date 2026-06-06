@@ -30,6 +30,13 @@ const SITE_TEXT_BLOCKS: SiteTextBlock[] = [
       "Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.",
   },
   {
+    key: "about_vision",
+    label: "About — Vision statement",
+    multiline: true,
+    defaultValue:
+      "To be a centre of excellence that raises God-fearing, visionary leaders who make a lasting difference in their communities and the world.",
+  },
+  {
     key: "about_mission",
     label: "About — Mission statement",
     multiline: true,
