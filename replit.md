@@ -41,9 +41,16 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Product
 
-Grace High School (Gayaza, Uganda) marketing website. Sections: about, programmes, news, updates, **resources** (downloadable past papers & holiday work), campus, videos, admissions, contact. The resources section lets students download files the school shares.
+Grace High School (Gayaza, Uganda) marketing website. Sections: about, programmes, achievements, news, updates, **resources** (downloadable past papers & holiday work), campus, videos, admissions, contact. The resources section lets students download files the school shares.
 
 A staff-only **Admin Dashboard** (preview `/admin/`) lets staff manage all editable content — news ticker, gallery (with image upload), testimonials, videos, programmes, stats, values, admission steps, and resources — with create/edit/delete, reorder, and show/hide. A **Section Text** tab also lets staff edit the fixed section copy (About heading/body/mission, Programmes heading/intro, Admissions heading/intro). Access is gated by a username+password login (server-side Postgres sessions). The public site reflects these changes live via public GET APIs.
+
+## Recent changes
+
+- **Testimonials removed from the public site.** The testimonials section and all its supporting front-end code (query hook, carousel state/refs, CSS) were deleted from `artifacts/grace-high-school`. Testimonials still exist as a content type in the API, DB, and the Admin Dashboard (so staff can still manage them), but nothing renders them on the public site. Re-adding the public section would mean re-wiring the hook + UI, not new backend work.
+- **Achievements section** (`id="achievements"`) is styled on a light-green (`GREEN_LIGHT`) background with white cards, soft shadows, and gradient icon badges (`GREEN_MAIN → GREEN_DARK`). Layout class `.achv-grid` (collapses to 2 columns ≤900px).
+- **Welcome/About photo** uses a Gemini-enhanced community image imported via the `@assets/` alias (`img_about_group` in `App.tsx`).
+- **Programmes section** uses the alternating image-row layout (`.programmes-rows` / `.programme-row`, image and text side-by-side, every other row reversed; stacks vertically on mobile). A card-grid variation was trialled and reverted — rows are the intended design.
 
 ## User preferences
 
