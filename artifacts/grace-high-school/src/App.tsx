@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   useListNewsItems,
   useListStats,
-  useListTestimonials,
   useListVideos,
   useListProgrammes,
   useListAdmissionSteps,
@@ -90,14 +89,12 @@ export default function App() {
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [lightbox, setLightbox]       = useState<string | null>(null);
   const [videoModal, setVideoModal]   = useState<string | null>(null);
-  const [testitIdx, setTestiIdx]      = useState(0);
   const [galleryFilter, setGalFilter] = useState("all");
   const [admSlide, setAdmSlide]       = useState(0);
   const [formSent, setFormSent]       = useState(false);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
   const [heroSlide, setHeroSlide]     = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -126,12 +123,6 @@ export default function App() {
   useEffect(() => {
     loadResources();
   }, []);
-
-  useEffect(() => {
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateX(-${testitIdx * 364}px)`;
-    }
-  }, [testitIdx]);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -185,20 +176,12 @@ export default function App() {
     { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
   ];
 
-  const testimonials = [
-    { text: "Grace High School gave me more than grades — it gave me faith, discipline, and purpose. My UACE results opened doors I never imagined.", name: "Katumwa Hannington", role: "UACE 2023 — 20 Points", init: "KH" },
-    { text: "The teachers here go beyond the syllabus. They invest in you as a person, not just a student. I feel ready for university and for life.", name: "Ainebyoona Miriam", role: "S6 Graduate, 2024", init: "AM" },
-    { text: "As a parent, I have watched my son transform — academically and morally. The Christian foundation at Grace is real, not just on paper.", name: "Mr. Byaruhanga", role: "Parent of S4 Student", init: "BB" },
-    { text: "The vocational skills programme taught me tailoring alongside my A-Levels. I already have income while I wait for university admission.", name: "Namutebi Rose", role: "A-Level Graduate, 2024", init: "NR" },
-  ];
-
   // ===== Dynamic content (DB-backed, with the static content above as a
   // graceful fallback whenever the API is empty or unreachable). =====
   const storageUrl = (objectPath: string) => `${API}/storage${objectPath}`;
 
   const newsQ = useListNewsItems();
   const statsQ = useListStats();
-  const testimonialsQ = useListTestimonials();
   const videosQ = useListVideos();
   const programmesQ = useListProgrammes();
   const admissionsQ = useListAdmissionSteps();
@@ -269,10 +252,6 @@ export default function App() {
   const admissionItems = admissionsQ.data?.length
     ? admissionsQ.data.map((a, i) => ({ step: i + 1, title: a.title, desc: a.description }))
     : ADMISSIONS_FALLBACK;
-
-  const testimonialItems = testimonialsQ.data?.length
-    ? testimonialsQ.data.map((t) => ({ text: t.quote, name: t.name, role: t.role, init: t.initials }))
-    : testimonials;
 
   const videoThumb = (youtubeId: string) =>
     schoolVideos.find((v) => v.youtubeId === youtubeId)?.thumb ??
@@ -1168,73 +1147,6 @@ export default function App() {
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* ===== TESTIMONIALS ===== */}
-      <section style={{ background: OFF_WHITE, padding: "56px 5%", overflow: "hidden" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Testimonials
-          </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 40 }}>What Our Community Says</h2>
-
-          <div style={{ overflow: "hidden" }}>
-            <div ref={trackRef} className="testimonials-track">
-              {testimonialItems.map((t, i) => (
-                <div key={i} className="testimonial-card" style={{
-                  background: WHITE, borderRadius: 12, padding: 28,
-                  border: "1px solid rgba(0,0,0,0.08)",
-                }}>
-                  <div style={{ fontSize: 48, color: GREEN_LIGHT, fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8 }}>"</div>
-                  <p style={{ fontSize: 15, lineHeight: 1.7, color: "#1A1A1A", marginBottom: 20, fontStyle: "italic" }}>{t.text}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{
-                      width: 42, height: 42, borderRadius: "50%",
-                      background: GREEN_DARK, display: "flex", alignItems: "center", justifyContent: "center",
-                      fontWeight: 700, color: "#8EEDC0", fontSize: 15, flexShrink: 0,
-                    }}>{t.init}</div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#5CAF50", marginBottom: 2 }}>★★★★★</div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK }}>{t.name}</div>
-                      <div style={{ fontSize: 12, color: "#5A5A5A" }}>{t.role}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
-            <button onClick={() => setTestiIdx(Math.max(0, testitIdx - 1))} style={{
-              width: 40, height: 40, borderRadius: "50%", border: "1.5px solid rgba(0,0,0,0.1)",
-              background: WHITE, cursor: "pointer", fontSize: 18,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.color = WHITE; }}
-            onMouseLeave={e => { e.currentTarget.style.background = WHITE; e.currentTarget.style.color = "#1A1A1A"; }}
-            >←</button>
-            <button onClick={() => setTestiIdx(Math.min(testimonialItems.length - 1, testitIdx + 1))} style={{
-              width: 40, height: 40, borderRadius: "50%", border: "1.5px solid rgba(0,0,0,0.1)",
-              background: WHITE, cursor: "pointer", fontSize: 18,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.color = WHITE; }}
-            onMouseLeave={e => { e.currentTarget.style.background = WHITE; e.currentTarget.style.color = "#1A1A1A"; }}
-            >→</button>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", marginLeft: 12 }}>
-              {testimonialItems.map((_, i) => (
-                <div key={i} onClick={() => setTestiIdx(i)} style={{
-                  width: i === testitIdx ? 20 : 8,
-                  height: 8, borderRadius: 4,
-                  background: i === testitIdx ? GREEN_MAIN : "rgba(0,0,0,0.15)",
-                  cursor: "pointer", transition: "all 0.2s",
-                }} />
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
