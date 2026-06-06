@@ -59,6 +59,7 @@ import {
 } from "@workspace/api-zod";
 import { requireAuth } from "../lib/auth";
 import { ObjectStorageService } from "../lib/objectStorage";
+import { broadcast } from "../lib/events";
 
 // drizzle's generic table types make a fully-typed factory awkward; zod
 // validation is the real safety net, so we use loose casts on the query builder.
@@ -127,6 +128,7 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
       .values({ ...parsed.data, sortOrder: maxSort + 1 })
       .returning()) as Array<Record<string, unknown>>;
 
+    broadcast(resource);
     res.status(201).json(created);
   });
 
@@ -151,6 +153,7 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
         }
       });
 
+      broadcast(resource);
       res.json({ ok: true });
     },
   );
@@ -188,6 +191,7 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
         return;
       }
 
+      broadcast(resource);
       res.json(updated);
     },
   );
@@ -224,6 +228,7 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
         }
       }
 
+      broadcast(resource);
       res.sendStatus(204);
     },
   );

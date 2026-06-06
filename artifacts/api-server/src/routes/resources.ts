@@ -9,6 +9,7 @@ import {
 } from "@workspace/api-zod";
 import { ObjectStorageService } from "../lib/objectStorage";
 import { requireAuth } from "../lib/auth";
+import { broadcast } from "../lib/events";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -54,6 +55,7 @@ router.post("/resources", requireAuth, async (req, res): Promise<void> => {
     })
     .returning();
 
+  broadcast("resources");
   res.status(201).json(ListResourcesResponseItem.parse(resource));
 });
 
@@ -83,6 +85,7 @@ router.delete("/resources/:id", requireAuth, async (req, res): Promise<void> => 
     );
   }
 
+  broadcast("resources");
   res.sendStatus(204);
 });
 

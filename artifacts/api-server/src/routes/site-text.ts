@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, siteTextTable } from "@workspace/db";
 import { UpdateSiteTextBody, ListSiteTextResponse } from "@workspace/api-zod";
 import { requireAuth } from "../lib/auth";
+import { broadcast } from "../lib/events";
 
 // Canonical, editable section-level copy. This is the single source of truth:
 // the GET endpoint merges these defaults with any saved DB overrides, so the
@@ -124,6 +125,7 @@ router.patch(
         set: { value: parsed.data.value, label: block.label, multiline: block.multiline, sortOrder },
       });
 
+    broadcast("site-text");
     res.json({
       key: block.key,
       label: block.label,

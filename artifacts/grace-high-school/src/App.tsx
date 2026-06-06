@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useListNewsItems,
   useListStats,
@@ -84,6 +85,7 @@ const formatSize = (bytes: number | null): string => {
 };
 
 export default function App() {
+  const queryClient = useQueryClient();
   const [scrolled, setScrolled]       = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [openGroup, setOpenGroup]     = useState<string | null>(null);
@@ -124,6 +126,22 @@ export default function App() {
   useEffect(() => {
     loadResources();
   }, []);
+
+  // Live updates: subscribe to the API's Server-Sent Events stream so any change
+  // made in the admin dashboard refreshes the public site instantly, without a
+  // page reload. The EventSource auto-reconnects if the connection drops.
+  useEffect(() => {
+    const source = new EventSource(`${API}/events`);
+    const onChange = () => {
+      queryClient.invalidateQueries();
+      loadResources();
+    };
+    source.addEventListener("content-changed", onChange);
+    return () => {
+      source.removeEventListener("content-changed", onChange);
+      source.close();
+    };
+  }, [queryClient]);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
