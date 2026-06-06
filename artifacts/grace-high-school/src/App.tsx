@@ -18,6 +18,7 @@ import img_assembly1 from "@assets/483102123_1154996392986782_697232213751179497
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
+import img_vision_watermark from "@assets/3@_(7)_1780733151190.JPG";
 import img_science from "@assets/IMG_0144_-_Copy_1780654332068.jpg";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
 import img_assembly2 from "@assets/484133260_1154995782986843_2670185066900187260_n_1780398909146.jpg";
@@ -658,23 +659,37 @@ export default function App() {
             </p>
 
             {/* Vision & Mission */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 28, alignItems: "stretch" }}>
-              <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                  <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.18)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🌍</div>
-                  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: GOLD_LIGHT, margin: 0 }}>Our Vision</p>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 12, marginBottom: 28, border: `1px solid ${GREEN_LIGHT}` }}>
+              <img src={img_vision_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.2 }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(232,245,238,0.93) 0%, rgba(232,245,238,0.85) 100%)" }} />
+              <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, padding: 18, alignItems: "stretch" }}>
+                <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.16)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#9A7A2E" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    </div>
+                    <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9A7A2E", margin: 0 }}>Our Vision</p>
+                  </div>
+                  <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
                 </div>
-                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
-              </div>
-              <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid #4CAF82` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                  <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(76,175,130,0.18)", border: "1px solid #4CAF82", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✝️</div>
-                  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", margin: 0 }}>Our Mission</p>
-                </div>
-                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
-                <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>📍 Gayaza-Kasangati, Uganda</span>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>✝️ Christian-Founded</span>
+                <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GREEN_MAIN}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(26,107,60,0.12)", border: `1px solid ${GREEN_MAIN}`, display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
+                    </div>
+                    <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>Our Mission</p>
+                  </div>
+                  <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
+                  <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                      Gayaza-Kasangati, Uganda
+                    </span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></svg>
+                      Christian-Founded
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
