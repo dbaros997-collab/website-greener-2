@@ -597,30 +597,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Feature cards */}
-            <div style={{ display: "grid", gap: 16 }}>
-              {[
-                { icon: "✝️", title: "Christian Foundation", desc: "Rooted in Christian values, we develop the whole person — spiritually, academically, and socially." },
-                { icon: "📚", title: "Academic Excellence", desc: "National Curriculum at both O-Level and A-Level, preparing students for university and beyond." },
-                { icon: "🔧", title: "Vocational Skilling", desc: "Practical skills programmes ensure graduates are equipped for real-world opportunities." },
-                { icon: "🌿", title: "Spacious 28-Acre Campus", desc: "Sports grounds, lush greens, and a peaceful learning environment near Kasangati." },
-              ].map((f, i) => (
-                <div key={i} style={{
-                  display: "flex", gap: 16, padding: "18px 20px",
-                  background: OFF_WHITE, borderRadius: 8,
-                  borderLeft: `3px solid ${GREEN_MAIN}`, transition: "transform 0.2s",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "translateX(4px)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "translateX(0)")}
-                >
-                  <div style={{ width: 40, height: 40, flexShrink: 0, background: GREEN_LIGHT, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{f.icon}</div>
-                  <div>
-                    <h3 style={{ fontSize: 15, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>{f.title}</h3>
-                    <p style={{ fontSize: 13, color: "#5A5A5A", lineHeight: 1.5 }}>{f.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           <div>
