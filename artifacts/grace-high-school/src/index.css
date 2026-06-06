@@ -264,3 +264,12 @@ body {
 @media (max-width: 400px) {
   .gallery-grid { grid-template-columns: 1fr; }
 }
+
+.adm-slide-body { animation: admFade 0.35s ease; }
+@keyframes admFade {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .adm-slide-body { animation: none; }
+}

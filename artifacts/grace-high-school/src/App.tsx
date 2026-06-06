@@ -86,6 +86,7 @@ export default function App() {
   const [videoModal, setVideoModal]   = useState<string | null>(null);
   const [testitIdx, setTestiIdx]      = useState(0);
   const [galleryFilter, setGalFilter] = useState("all");
+  const [admSlide, setAdmSlide]       = useState(0);
   const [formSent, setFormSent]       = useState(false);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
@@ -1162,90 +1163,144 @@ export default function App() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>{text("admissions_heading", "Join the Grace Family")}</h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>{text("admissions_intro", "Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.")}</p>
 
-            {/* Admission steps */}
-            <div style={{ display: "grid", gap: 14 }}>
-              {admissionItems.map(s => (
-                <div key={s.step} style={{
-                  display: "flex", gap: 16, alignItems: "flex-start", padding: "18px 20px",
-                  background: "rgba(255,255,255,0.05)", borderRadius: 8,
-                  border: "1px solid rgba(255,255,255,0.08)",
+            {/* Admissions info slider */}
+            {(() => {
+              const slides: { title: string; body: React.ReactNode }[] = [
+                {
+                  title: "How to Apply",
+                  body: (
+                    <div style={{ display: "grid", gap: 12 }}>
+                      {admissionItems.map(s => (
+                        <div key={s.step} style={{
+                          display: "flex", gap: 16, alignItems: "flex-start", padding: "16px 18px",
+                          background: "rgba(255,255,255,0.05)", borderRadius: 8,
+                          border: "1px solid rgba(255,255,255,0.08)",
+                        }}>
+                          <div style={{
+                            width: 32, height: 32, flexShrink: 0, background: "#4CAF82", color: GREEN_DARK,
+                            borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                            fontWeight: 700, fontSize: 14,
+                          }}>{s.step}</div>
+                          <div>
+                            <h4 style={{ fontSize: 14, fontWeight: 600, color: WHITE, marginBottom: 3 }}>{s.title}</h4>
+                            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                },
+                {
+                  title: "Entry Points",
+                  body: (
+                    <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                      {[
+                        { tag: "O-Level", cls: "Senior 1 – Senior 4", req: "Direct entry into S1 for candidates who have sat PLE. Transfers into S2–S4 are considered subject to vacancies and a short placement assessment." },
+                        { tag: "A-Level", cls: "Senior 5 – Senior 6", req: "Open to candidates whose UCE results meet the requirements for their chosen subject combination. S6 transfers considered on available space." },
+                      ].map(e => (
+                        <div key={e.tag} style={{
+                          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                          borderRadius: 8, padding: "18px 20px",
+                        }}>
+                          <span style={{
+                            display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                            textTransform: "uppercase", color: GREEN_DARK, background: "#8EEDC0",
+                            borderRadius: 100, padding: "3px 12px", marginBottom: 10,
+                          }}>{e.tag}</span>
+                          <h4 style={{ fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 6 }}>{e.cls}</h4>
+                          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{e.req}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                },
+                {
+                  title: "What to Bring",
+                  body: (
+                    <div style={{
+                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: 8, padding: "22px 24px", display: "grid", gap: 13,
+                    }}>
+                      {[
+                        "A completed Grace High School application form",
+                        "Photocopy of the PLE results slip (S1) or UCE results (S5)",
+                        "Report cards or academic records from the previous school",
+                        "Two recent passport-size photographs of the student",
+                        "A copy of the student's birth certificate",
+                        "A transfer letter from the former school (transfers only)",
+                      ].map((r, i) => (
+                        <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                          <span style={{ flexShrink: 0, marginTop: 1, color: "#8EEDC0" }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                          </span>
+                          <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{r}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                },
+                {
+                  title: "Good to Know",
+                  body: (
+                    <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                      {[
+                        { icon: <><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" /><path d="M9 20v-6h6v6" /></>, title: "Boarding & Day", desc: "We offer both boarding and day options, with safe, well-supervised dormitories on our 28-acre campus." },
+                        { icon: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>, title: "Fees & Payment", desc: "A detailed fees structure is provided on application. School fees are payable per term before reporting." },
+                      ].map((g, i) => (
+                        <div key={i} style={{
+                          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                          borderRadius: 8, padding: "18px 20px",
+                        }}>
+                          <span style={{ display: "block", color: "#8EEDC0", marginBottom: 10 }}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{g.icon}</svg>
+                          </span>
+                          <h4 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 5 }}>{g.title}</h4>
+                          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>{g.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                },
+              ];
+              const idx = ((admSlide % slides.length) + slides.length) % slides.length;
+              const active = slides[idx];
+              const go = (d: number) => setAdmSlide(((idx + d) % slides.length + slides.length) % slides.length);
+              const arrowBtn = {
+                width: 36, height: 36, borderRadius: "50%", cursor: "pointer",
+                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)",
+                color: WHITE, display: "flex", alignItems: "center", justifyContent: "center",
+              } as React.CSSProperties;
+              return (
+                <div style={{
+                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 12, padding: "24px 24px 20px",
                 }}>
-                  <div style={{
-                    width: 32, height: 32, flexShrink: 0, background: "#4CAF82", color: GREEN_DARK,
-                    borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                    fontWeight: 700, fontSize: 14,
-                  }}>{s.step}</div>
-                  <div>
-                    <h4 style={{ fontSize: 14, fontWeight: 600, color: WHITE, marginBottom: 3 }}>{s.title}</h4>
-                    <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18 }}>
+                    <div>
+                      <span style={{ display: "block", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 4 }}>{idx + 1} / {slides.length}</span>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", color: WHITE, margin: 0 }}>{active.title}</h3>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                      <button onClick={() => go(-1)} aria-label="Previous" style={arrowBtn}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                      </button>
+                      <button onClick={() => go(1)} aria-label="Next" style={arrowBtn}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div key={idx} className="adm-slide-body" style={{ minHeight: 300 }}>{active.body}</div>
+                  <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 20 }}>
+                    {slides.map((s, i) => (
+                      <button key={i} onClick={() => setAdmSlide(i)} aria-label={`Go to ${s.title}`} aria-current={i === idx} style={{
+                        width: i === idx ? 26 : 9, height: 9, borderRadius: 100, cursor: "pointer", border: "none", padding: 0,
+                        background: i === idx ? "#8EEDC0" : "rgba(255,255,255,0.22)", transition: "width 0.25s, background 0.25s",
+                      }} />
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Entry points */}
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 36, marginBottom: 16 }}>Entry Points</h3>
-            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              {[
-                { tag: "O-Level", cls: "Senior 1 – Senior 4", req: "Direct entry into S1 for candidates who have sat PLE. Transfers into S2–S4 are considered subject to vacancies and a short placement assessment." },
-                { tag: "A-Level", cls: "Senior 5 – Senior 6", req: "Open to candidates whose UCE results meet the requirements for their chosen subject combination. S6 transfers considered on available space." },
-              ].map(e => (
-                <div key={e.tag} style={{
-                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 8, padding: "18px 20px",
-                }}>
-                  <span style={{
-                    display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                    textTransform: "uppercase", color: GREEN_DARK, background: "#8EEDC0",
-                    borderRadius: 100, padding: "3px 12px", marginBottom: 10,
-                  }}>{e.tag}</span>
-                  <h4 style={{ fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 6 }}>{e.cls}</h4>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{e.req}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Requirements checklist */}
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 32, marginBottom: 16 }}>What to Bring</h3>
-            <div style={{
-              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 8, padding: "22px 24px", display: "grid", gap: 13,
-            }}>
-              {[
-                "A completed Grace High School application form",
-                "Photocopy of the PLE results slip (S1) or UCE results (S5)",
-                "Report cards or academic records from the previous school",
-                "Two recent passport-size photographs of the student",
-                "A copy of the student's birth certificate",
-                "A transfer letter from the former school (transfers only)",
-              ].map((r, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ flexShrink: 0, marginTop: 1, color: "#8EEDC0" }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  </span>
-                  <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{r}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Good to know */}
-            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 24 }}>
-              {[
-                { icon: <><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" /><path d="M9 20v-6h6v6" /></>, title: "Boarding & Day", desc: "We offer both boarding and day options, with safe, well-supervised dormitories on our 28-acre campus." },
-                { icon: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>, title: "Fees & Payment", desc: "A detailed fees structure is provided on application. School fees are payable per term before reporting." },
-              ].map((g, i) => (
-                <div key={i} style={{
-                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 8, padding: "18px 20px",
-                }}>
-                  <span style={{ display: "block", color: "#8EEDC0", marginBottom: 10 }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{g.icon}</svg>
-                  </span>
-                  <h4 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 5 }}>{g.title}</h4>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>{g.desc}</p>
-                </div>
-              ))}
-            </div>
+              );
+            })()}
 
             {/* Intake banner */}
             <div style={{
