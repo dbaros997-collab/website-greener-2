@@ -5,7 +5,14 @@ import "./index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, refetchOnWindowFocus: false, staleTime: 60_000 },
+    queries: {
+      retry: 1,
+      staleTime: 10_000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchInterval: 15_000,
+      refetchIntervalInBackground: false,
+    },
   },
 });
 
