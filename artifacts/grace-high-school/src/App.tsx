@@ -1268,11 +1268,11 @@ export default function App() {
           position: "absolute", inset: 0, pointerEvents: "none", userSelect: "none",
           backgroundImage: `url(${img_footer_watermark})`,
           backgroundSize: "cover", backgroundPosition: "center",
-          opacity: 0.08,
+          opacity: 0.22,
         }} />
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: `linear-gradient(180deg, ${GREEN_DARK}cc, ${GREEN_DARK}e6)`,
+          background: `linear-gradient(180deg, ${GREEN_DARK}80, ${GREEN_DARK}99)`,
         }} />
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
