@@ -439,9 +439,9 @@ export default function App() {
 
       {/* ===== HERO ===== */}
       <section style={{
-        minHeight: "100vh", background: GREEN_DARK,
+        minHeight: "88vh", background: GREEN_DARK,
         display: "flex", alignItems: "center", justifyContent: "center",
-        position: "relative", overflow: "hidden", padding: "130px 5% 70px",
+        position: "relative", overflow: "hidden", padding: "120px 5% 64px",
       }}>
         {/* Background image slideshow — crossfades between campus photos */}
         {HERO_SLIDES.map((src, i) => (
@@ -449,20 +449,21 @@ export default function App() {
             position: "absolute", inset: 0,
             backgroundImage: `url(${src})`,
             backgroundSize: "cover", backgroundPosition: "center",
+            filter: "saturate(1.08) contrast(1.04) brightness(1.03)",
             transform: i === heroSlide ? "scale(1.08)" : "scale(1.0)",
             opacity: i === heroSlide ? 1 : 0,
             transition: "opacity 1.4s ease-in-out, transform 6s ease-out",
           }} />
         ))}
-        {/* Cinematic scrim — balanced for a centered headline */}
+        {/* Cinematic scrim — neutral charcoal so the photo colours stay true */}
         <div style={{
           position: "absolute", inset: 0,
-          background: `linear-gradient(180deg, rgba(7,45,22,0.82) 0%, rgba(7,45,22,0.55) 42%, rgba(7,45,22,0.72) 100%)`,
+          background: `linear-gradient(180deg, rgba(10,18,14,0.62) 0%, rgba(10,18,14,0.30) 45%, rgba(8,16,12,0.72) 100%)`,
         }} />
         <div style={{
           position: "absolute", inset: 0,
-          background: `radial-gradient(ellipse 70% 60% at 50% 42%, rgba(201,162,75,0.16) 0%, transparent 60%),
-                        radial-gradient(ellipse 120% 85% at 50% 50%, transparent 32%, rgba(7,45,22,0.55) 100%)`,
+          background: `radial-gradient(ellipse 70% 60% at 50% 44%, rgba(201,162,75,0.14) 0%, transparent 60%),
+                        radial-gradient(ellipse 120% 90% at 50% 50%, transparent 38%, rgba(8,16,12,0.5) 100%)`,
         }} />
 
         {/* Scroll cue */}
@@ -573,7 +574,7 @@ export default function App() {
       </div>
 
       {/* ===== ABOUT ===== */}
-      <section id="about" style={{ background: WHITE, padding: "80px 5%" }}>
+      <section id="about" style={{ background: WHITE, padding: "56px 5%" }}>
         <div className="about-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -666,13 +667,13 @@ export default function App() {
       </section>
 
       {/* ===== PROGRAMMES ===== */}
-      <section id="programmes" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
+      <section id="programmes" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Academics
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 16 }}>{text("programmes_heading", "Our Programmes")}</h2>
-          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>
             {text("programmes_intro", "A comprehensive National Curriculum across O-Level and A-Level, complemented by vocational programmes that prepare students for life beyond school.")}
           </p>
 
@@ -708,7 +709,7 @@ export default function App() {
       </section>
 
       {/* ===== NEWS & EVENTS ===== */}
-      <section id="news" style={{ background: WHITE, padding: "80px 5%" }}>
+      <section id="news" style={{ background: WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />News & Events
@@ -795,7 +796,7 @@ export default function App() {
       </section>
 
       {/* ===== UPDATES / PARENT NOTICEBOARD ===== */}
-      <section id="updates" style={{ background: GREEN_LIGHT, padding: "80px 5%" }}>
+      <section id="updates" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Updates for Parents
@@ -850,13 +851,13 @@ export default function App() {
       </section>
 
       {/* ===== ACHIEVEMENTS ===== */}
-      <section style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, #0E5028 60%, ${GREEN_MID} 100%)`, padding: "80px 5%" }}>
+      <section style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, #0E5028 60%, ${GREEN_MID} 100%)`, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Our Achievements
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>Excellence in Academics &amp; Beyond</h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>
             Our students consistently excel in national examinations, competitions, and national platforms — proving that Grace High School truly produces leaders.
           </p>
 
@@ -892,7 +893,7 @@ export default function App() {
       </section>
 
       {/* ===== CAMPUS GALLERY ===== */}
-      <section id="campus" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
+      <section id="campus" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Campus Life
@@ -936,7 +937,7 @@ export default function App() {
       </section>
 
       {/* ===== VIDEOS ===== */}
-      <section id="videos" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
+      <section id="videos" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />School Videos
@@ -978,7 +979,7 @@ export default function App() {
       </section>
 
       {/* ===== RESOURCES ===== */}
-      <section id="resources" style={{ background: WHITE, padding: "80px 5%" }}>
+      <section id="resources" style={{ background: WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Student Resources
@@ -1040,13 +1041,13 @@ export default function App() {
       </section>
 
       {/* ===== SCHOOL VALUES ===== */}
-      <section style={{ background: GREEN_DARK, padding: "80px 5%" }}>
+      <section style={{ background: GREEN_DARK, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Our Values
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>What We Stand For</h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 48 }}>Our values guide every aspect of life at Grace High School — from the classroom to the chapel, from the sports field to the community.</p>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>Our values guide every aspect of life at Grace High School — from the classroom to the chapel, from the sports field to the community.</p>
 
           <div className="values-grid">
             {valueItems.map((v, i) => (
@@ -1067,7 +1068,7 @@ export default function App() {
       </section>
 
       {/* ===== STAFF ===== */}
-      <section id="staff" style={{ background: WHITE, padding: "80px 5%" }}>
+      <section id="staff" style={{ background: WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Our Team
@@ -1148,7 +1149,7 @@ export default function App() {
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-      <section style={{ background: OFF_WHITE, padding: "80px 5%", overflow: "hidden" }}>
+      <section style={{ background: OFF_WHITE, padding: "56px 5%", overflow: "hidden" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Testimonials
@@ -1215,7 +1216,7 @@ export default function App() {
       </section>
 
       {/* ===== ADMISSIONS ===== */}
-      <section id="admissions" style={{ background: GREEN_DARK, padding: "80px 5%" }}>
+      <section id="admissions" style={{ background: GREEN_DARK, padding: "56px 5%" }}>
         <div className="admissions-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -1357,7 +1358,7 @@ export default function App() {
       </section>
 
       {/* ===== CONTACT ===== */}
-      <section id="contact" style={{ background: OFF_WHITE, padding: "80px 5%" }}>
+      <section id="contact" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div className="contact-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
