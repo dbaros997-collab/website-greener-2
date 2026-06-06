@@ -441,17 +441,19 @@ export default function App() {
         boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "0 2px 12px rgba(10,64,32,0.06)",
         transition: "height 0.3s, background 0.3s, box-shadow 0.3s",
       }}>
-        <a href="#" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
-          <div style={{
-            width: 60, height: 60, borderRadius: 12,
-            background: WHITE, padding: 4,
-            boxShadow: "0 6px 18px rgba(10,64,32,0.18)", border: `1px solid ${GREEN_LIGHT}`, flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-          }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
-          <div style={{ color: GREEN_DARK }}>
-            <strong style={{ display: "block", fontSize: 15, fontWeight: 700, letterSpacing: "0.01em", fontFamily: "'Playfair Display', serif" }}>Grace High School</strong>
-            <span style={{ fontSize: 10.5, color: GREEN_MAIN, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 600 }}>Gayaza, Uganda</span>
-          </div>
+        <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <img
+            src={schoolLogo}
+            alt="Grace High School Logo"
+            style={{
+              height: scrolled ? 64 : 84,
+              width: "auto",
+              objectFit: "contain",
+              flexShrink: 0,
+              transition: "height 0.3s",
+              filter: "drop-shadow(0 4px 10px rgba(10,64,32,0.22))",
+            }}
+          />
         </a>
 
         {/* Desktop nav */}
