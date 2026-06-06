@@ -1184,6 +1184,84 @@ export default function App() {
               ))}
             </div>
 
+            {/* Entry points */}
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 36, marginBottom: 16 }}>Entry Points</h3>
+            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {[
+                { tag: "O-Level", cls: "Senior 1 – Senior 4", req: "Direct entry into S1 for candidates who have sat PLE. Transfers into S2–S4 are considered subject to vacancies and a short placement assessment." },
+                { tag: "A-Level", cls: "Senior 5 – Senior 6", req: "Open to candidates whose UCE results meet the requirements for their chosen subject combination. S6 transfers considered on available space." },
+              ].map(e => (
+                <div key={e.tag} style={{
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 8, padding: "18px 20px",
+                }}>
+                  <span style={{
+                    display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                    textTransform: "uppercase", color: GREEN_DARK, background: "#8EEDC0",
+                    borderRadius: 100, padding: "3px 12px", marginBottom: 10,
+                  }}>{e.tag}</span>
+                  <h4 style={{ fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 6 }}>{e.cls}</h4>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{e.req}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Requirements checklist */}
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 32, marginBottom: 16 }}>What to Bring</h3>
+            <div style={{
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8, padding: "22px 24px", display: "grid", gap: 13,
+            }}>
+              {[
+                "A completed Grace High School application form",
+                "Photocopy of the PLE results slip (S1) or UCE results (S5)",
+                "Report cards or academic records from the previous school",
+                "Two recent passport-size photographs of the student",
+                "A copy of the student's birth certificate",
+                "A transfer letter from the former school (transfers only)",
+              ].map((r, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ flexShrink: 0, marginTop: 1, color: "#8EEDC0" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  </span>
+                  <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{r}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Good to know */}
+            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 24 }}>
+              {[
+                { icon: <><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" /><path d="M9 20v-6h6v6" /></>, title: "Boarding & Day", desc: "We offer both boarding and day options, with safe, well-supervised dormitories on our 28-acre campus." },
+                { icon: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>, title: "Fees & Payment", desc: "A detailed fees structure is provided on application. School fees are payable per term before reporting." },
+              ].map((g, i) => (
+                <div key={i} style={{
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 8, padding: "18px 20px",
+                }}>
+                  <span style={{ display: "block", color: "#8EEDC0", marginBottom: 10 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{g.icon}</svg>
+                  </span>
+                  <h4 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 5 }}>{g.title}</h4>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>{g.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Intake banner */}
+            <div style={{
+              display: "flex", gap: 14, alignItems: "center", marginTop: 24,
+              background: "linear-gradient(135deg, rgba(142,237,192,0.14), rgba(76,175,130,0.1))",
+              border: "1px solid rgba(142,237,192,0.3)", borderRadius: 8, padding: "16px 20px",
+            }}>
+              <span style={{ flexShrink: 0, color: "#8EEDC0" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /><path d="m9 16 2 2 4-4" /></svg>
+              </span>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, margin: 0 }}>
+                <strong style={{ color: WHITE }}>Admissions are open</strong> for all classes (S1–S6) for the 2025/2026 academic year. Apply early to secure a place.
+              </p>
+            </div>
+
             {/* Boarding image */}
             <div style={{ borderRadius: 10, overflow: "hidden", marginTop: 28, height: 180 }}>
               <img src={img_dorm} alt="Dormitory" style={{ width: "100%", height: "100%", objectFit: "cover" }} />

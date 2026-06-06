@@ -251,6 +251,7 @@ body {
   .stats-grid      { grid-template-columns: repeat(2, 1fr) !important; }
   .footer-grid     { grid-template-columns: 1fr !important; }
   .form-name-row   { grid-template-columns: 1fr !important; }
+  .entry-points-grid { grid-template-columns: 1fr !important; }
 
   .gallery-grid    { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
   .gallery-item.wide { grid-column: span 1; }
