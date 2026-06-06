@@ -503,14 +503,25 @@ export default function App() {
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             <button onClick={() => scrollTo("admissions")} style={{
               background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
-              padding: "15px 34px", borderRadius: 6, fontWeight: 700, fontSize: 15,
+              padding: "15px 30px", borderRadius: 6, fontWeight: 700, fontSize: 15,
               border: "none", cursor: "pointer", letterSpacing: "0.02em",
               boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
               transition: "box-shadow 0.25s, transform 0.15s",
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
-            >Apply Now</button>
+            >Apply For O'Level</button>
+
+            <button onClick={() => scrollTo("admissions")} style={{
+              background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
+              padding: "15px 30px", borderRadius: 6, fontWeight: 700, fontSize: 15,
+              border: "none", cursor: "pointer", letterSpacing: "0.02em",
+              boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
+              transition: "box-shadow 0.25s, transform 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
+            >Apply For A'Level</button>
 
             <button onClick={() => scrollTo("about")} style={{
               background: "rgba(255,255,255,0.06)", color: WHITE,
