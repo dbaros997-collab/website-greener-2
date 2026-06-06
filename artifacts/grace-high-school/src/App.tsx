@@ -49,7 +49,6 @@ const GOLD_LIGHT  = "#E6C66E";
 
 const HERO_SLIDES = [
   img_campus_hero,
-  img_campus,
   img_assembly1,
   img_alevel,
 ];
@@ -167,7 +166,6 @@ export default function App() {
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
-    { src: img_campus,      label: "Campus Grounds — 28 Acres of Green",     cat: "campus" },
     { src: img_dorm,        label: "Dormitory — Boarding Facilities",        cat: "campus" },
     { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
@@ -684,11 +682,6 @@ export default function App() {
           </div>
 
           <div>
-            {/* Campus image */}
-            <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 24, height: 240 }}>
-              <img src={img_campus} alt="Campus grounds" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-
             {/* School Profile card */}
             <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 32, color: WHITE }}>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: "#8EEDC0", marginBottom: 20 }}>School Profile</h3>
@@ -1291,10 +1284,6 @@ export default function App() {
       {/* ===== CONTACT ===== */}
       <section id="contact" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
-          {/* Map-like campus photo */}
-          <div style={{ borderRadius: 12, overflow: "hidden", height: 300, marginBottom: 20 }}>
-            <img src={img_campus} alt="Campus grounds" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          </div>
           <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 28, color: WHITE }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: "#8EEDC0", marginBottom: 14 }}>Find Us on Campus</h3>
             <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 18 }}>
