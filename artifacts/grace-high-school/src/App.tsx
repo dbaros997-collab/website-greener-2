@@ -352,7 +352,8 @@ export default function App() {
 
   const navBg = scrolled
     ? `rgba(255,255,255,0.98)`
-    : `rgba(255,255,255,0.96)`;
+    : `transparent`;
+  const navText = scrolled ? GREEN_DARK : WHITE;
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: OFF_WHITE, color: "#1A1A1A", overflowX: "hidden" }}>
@@ -401,9 +402,10 @@ export default function App() {
       {/* ===== UTILITY BAR ===== */}
       <div style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 1001,
-        background: "#062C15", height: 36, padding: "0 5%",
+        background: scrolled ? "#062C15" : "transparent", height: 36, padding: "0 5%",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent",
+        transition: "background 0.3s",
       }}>
         <div className="utility-links" style={{ display: "flex", alignItems: "center", gap: 22 }}>
           {[
@@ -434,11 +436,11 @@ export default function App() {
       {/* ===== NAV ===== */}
       <nav style={{
         position: "fixed", top: 36, left: 0, right: 0, zIndex: 1000,
-        background: navBg, backdropFilter: "blur(10px)",
+        background: navBg, backdropFilter: scrolled ? "blur(10px)" : "none",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: `0 5%`, height: scrolled ? "62px" : "74px",
-        borderBottom: "1px solid rgba(0,0,0,0.06)",
-        boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "0 2px 12px rgba(10,64,32,0.06)",
+        borderBottom: scrolled ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
+        boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "none",
         transition: "height 0.3s, background 0.3s, box-shadow 0.3s",
       }}>
         <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
@@ -466,12 +468,13 @@ export default function App() {
             >
               <button onClick={() => !group.children && group.id && navGo(group.id)} style={{
                 background: "none", border: "none", cursor: "pointer",
-                color: openGroup === group.label ? GOLD : GREEN_DARK, fontSize: 14, fontWeight: 600,
+                color: openGroup === group.label ? GOLD : navText, fontSize: 14, fontWeight: 600,
                 letterSpacing: "0.01em", transition: "color 0.2s",
+                textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.35)",
                 display: "inline-flex", alignItems: "center", gap: 5,
               }}
               onMouseEnter={e => (e.currentTarget.style.color = GOLD)}
-              onMouseLeave={e => (e.currentTarget.style.color = openGroup === group.label ? GOLD : GREEN_DARK)}
+              onMouseLeave={e => (e.currentTarget.style.color = openGroup === group.label ? GOLD : navText)}
               >
                 {group.label}
                 {group.children && (
@@ -526,7 +529,7 @@ export default function App() {
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {[0,1,2].map(i => (
-            <span key={i} style={{ width: 24, height: 2, background: GREEN_DARK, borderRadius: 2, display: "block" }} />
+            <span key={i} style={{ width: 24, height: 2, background: navText, borderRadius: 2, display: "block", transition: "background 0.3s" }} />
           ))}
         </button>
       </nav>
