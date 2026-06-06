@@ -478,7 +478,7 @@ export default function App() {
             fontSize: 12, fontWeight: 600, color: GOLD_LIGHT,
             letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 26,
             backdropFilter: "blur(4px)",
-          }}>✦ Est. 2000 · Gayaza, Wakiso District — Uganda</div>
+          }}>✦ Welcome to Excellence</div>
 
           <h1 style={{
             fontFamily: "'Playfair Display', serif",
