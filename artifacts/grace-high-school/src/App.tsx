@@ -301,9 +301,42 @@ export default function App() {
         </div>
       )}
 
+      {/* ===== UTILITY BAR ===== */}
+      <div style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1001,
+        background: "#062C15", height: 36, padding: "0 5%",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+      }}>
+        <div className="utility-links" style={{ display: "flex", alignItems: "center", gap: 22 }}>
+          {[
+            { id: "resources", label: "Student Resources" },
+            { id: "campus", label: "Campus Life" },
+            { id: "contact", label: "Contact" },
+          ].map(l => (
+            <button key={l.id} onClick={() => scrollTo(l.id)} style={{
+              background: "none", border: "none", cursor: "pointer",
+              color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 500, letterSpacing: "0.02em",
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = GOLD_LIGHT)}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+            >{l.label}</button>
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschool2000@gmail.com</span>
+          <a href="/admin/" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            color: GOLD_LIGHT, fontSize: 12, fontWeight: 600, textDecoration: "none",
+            letterSpacing: "0.04em", textTransform: "uppercase",
+          }}>Staff Login →</a>
+        </div>
+      </div>
+
       {/* ===== NAV ===== */}
       <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
+        position: "fixed", top: 36, left: 0, right: 0, zIndex: 1000,
         background: navBg, backdropFilter: "blur(10px)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: `0 5%`, height: scrolled ? "58px" : "68px",
@@ -324,7 +357,7 @@ export default function App() {
         </a>
 
         {/* Desktop nav */}
-        <ul style={{ display: "flex", gap: "1.6rem", listStyle: "none", alignItems: "center" }}
+        <ul style={{ gap: "1.6rem", listStyle: "none", alignItems: "center" }}
             className="hidden md:flex">
           {["about","programmes","news","updates","resources","campus","videos","admissions","contact"].map(id => (
             <li key={id}>
@@ -367,7 +400,7 @@ export default function App() {
       {/* Mobile menu */}
       {menuOpen && (
         <div style={{
-          position: "fixed", top: 68, left: 0, right: 0, zIndex: 999,
+          position: "fixed", top: scrolled ? 94 : 104, left: 0, right: 0, zIndex: 999,
           background: GREEN_DARK, padding: "20px 5% 28px",
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
@@ -391,7 +424,7 @@ export default function App() {
       <section style={{
         minHeight: "100vh", background: GREEN_DARK,
         display: "flex", alignItems: "center", justifyContent: "center",
-        position: "relative", overflow: "hidden", padding: "100px 5% 60px",
+        position: "relative", overflow: "hidden", padding: "120px 5% 70px",
       }}>
         {/* Background image */}
         <div style={{
@@ -400,15 +433,15 @@ export default function App() {
           backgroundSize: "cover", backgroundPosition: "center top",
           transform: "scale(1.05)",
         }} />
-        {/* Cinematic scrim — keeps the headline crisp and adds depth */}
+        {/* Cinematic scrim — balanced for a centered headline */}
         <div style={{
           position: "absolute", inset: 0,
-          background: `linear-gradient(105deg, rgba(7,45,22,0.95) 0%, rgba(7,45,22,0.82) 38%, rgba(10,64,32,0.48) 70%, rgba(10,64,32,0.32) 100%)`,
+          background: `linear-gradient(180deg, rgba(7,45,22,0.82) 0%, rgba(7,45,22,0.55) 42%, rgba(7,45,22,0.72) 100%)`,
         }} />
         <div style={{
           position: "absolute", inset: 0,
-          background: `radial-gradient(circle at 78% 30%, rgba(201,162,75,0.20) 0%, transparent 46%),
-                        linear-gradient(to bottom, rgba(7,45,22,0.25) 0%, transparent 24%, transparent 68%, rgba(7,45,22,0.9) 100%)`,
+          background: `radial-gradient(ellipse 70% 60% at 50% 42%, rgba(201,162,75,0.16) 0%, transparent 60%),
+                        radial-gradient(ellipse 120% 85% at 50% 50%, transparent 32%, rgba(7,45,22,0.55) 100%)`,
         }} />
 
         {/* Scroll cue */}
@@ -422,101 +455,75 @@ export default function App() {
           </span>
         </div>
 
-        <div className="hero-grid">
-
-          <div>
+        <div className="hero-center" style={{
+          maxWidth: 880, margin: "0 auto", textAlign: "center",
+          position: "relative", zIndex: 1,
+          display: "flex", flexDirection: "column", alignItems: "center",
+        }}>
+          {/* Crest */}
+          <div style={{ position: "relative", marginBottom: 24, animation: "crest-float 6s ease-in-out infinite" }}>
             <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              background: "rgba(201,162,75,0.12)", border: "1px solid rgba(230,198,110,0.45)",
-              borderRadius: 100, padding: "7px 18px",
-              fontSize: 12, fontWeight: 600, color: GOLD_LIGHT,
-              letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 26,
-              backdropFilter: "blur(4px)",
-            }}>✦ Gayaza, Wakiso District — Uganda</div>
-
-            <h1 style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(2.6rem, 4.6vw, 4.2rem)",
-              color: WHITE, lineHeight: 1.08, marginBottom: 22,
-              letterSpacing: "-0.01em", textShadow: "0 2px 30px rgba(0,0,0,0.4)",
-            }}>
-              Run With a{" "}
-              <em style={{
-                fontStyle: "italic",
-                background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
-                WebkitBackgroundClip: "text", backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}>Vision</em>
-              <br />at Grace High School
-            </h1>
-
-            <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.85)", marginBottom: 38, maxWidth: 500 }}>
-              A Christian-founded mixed secondary school on a 28-acre campus in Gayaza — producing morally upright, academically excellent, Christ-like leaders of tomorrow.
-            </p>
-
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-              <button onClick={() => scrollTo("admissions")} style={{
-                background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
-                padding: "15px 34px", borderRadius: 6, fontWeight: 700, fontSize: 15,
-                border: "none", cursor: "pointer", letterSpacing: "0.02em",
-                boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
-                transition: "box-shadow 0.25s, transform 0.15s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
-              >Apply Now</button>
-
-              <button onClick={() => scrollTo("about")} style={{
-                background: "rgba(255,255,255,0.06)", color: WHITE,
-                border: "1.5px solid rgba(255,255,255,0.45)",
-                padding: "15px 32px", borderRadius: 6, fontWeight: 600, fontSize: 15,
-                cursor: "pointer", backdropFilter: "blur(6px)",
-                transition: "border-color 0.2s, color 0.2s, background 0.2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD_LIGHT; e.currentTarget.style.color = GOLD_LIGHT; e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)"; e.currentTarget.style.color = WHITE; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-              >Learn More</button>
-            </div>
+              position: "absolute", inset: -22,
+              background: "radial-gradient(circle, rgba(76,175,130,0.28) 0%, transparent 70%)",
+              borderRadius: "50%",
+            }} />
+            <img src={schoolLogo} alt="Grace High School Crest" style={{
+              width: 108, height: 108, objectFit: "contain", position: "relative",
+              filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.55)) drop-shadow(0 0 22px rgba(142,237,192,0.45)) brightness(1.05)",
+            }} />
           </div>
 
-          {/* Hero crest — free-standing, no circle */}
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div className="hero-crest" style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
-              animation: "crest-float 6s ease-in-out infinite",
-            }}>
-              {/* Glow backdrop */}
-              <div style={{ position: "relative" }}>
-                <div style={{
-                  position: "absolute", inset: -24,
-                  background: "radial-gradient(circle, rgba(76,175,130,0.25) 0%, transparent 70%)",
-                  borderRadius: "50%",
-                }} />
-                <img
-                  src={schoolLogo}
-                  alt="Grace High School Crest"
-                  style={{
-                    width: 340, height: 340,
-                    objectFit: "contain",
-                    filter: "drop-shadow(0 12px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 28px rgba(142,237,192,0.5)) brightness(1.05)",
-                    position: "relative",
-                  }}
-                  className="hero-crest"
-                />
-              </div>
-              {/* School name under crest */}
-              <div style={{ textAlign: "center" }}>
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 6,
-                }}>
-                  <span style={{ width: 32, height: 1, background: "rgba(142,237,192,0.5)", display: "block" }} />
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8EEDC0" }}>Est. 2000</span>
-                  <span style={{ width: 32, height: 1, background: "rgba(142,237,192,0.5)", display: "block" }} />
-                </div>
-                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: WHITE, letterSpacing: "0.06em", textTransform: "uppercase" }}>Grace High School</p>
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 3 }}>Gayaza · Wakiso District · Uganda</p>
-              </div>
-            </div>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(201,162,75,0.12)", border: "1px solid rgba(230,198,110,0.45)",
+            borderRadius: 100, padding: "7px 18px",
+            fontSize: 12, fontWeight: 600, color: GOLD_LIGHT,
+            letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 26,
+            backdropFilter: "blur(4px)",
+          }}>✦ Est. 2000 · Gayaza, Wakiso District — Uganda</div>
+
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(2.6rem, 5.4vw, 4.6rem)",
+            color: WHITE, lineHeight: 1.08, marginBottom: 24,
+            letterSpacing: "-0.01em", textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+          }}>
+            Run With a{" "}
+            <em style={{
+              fontStyle: "italic",
+              background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
+              WebkitBackgroundClip: "text", backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>Vision</em>
+            <br />at Grace High School
+          </h1>
+
+          <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.88)", marginBottom: 38, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}>
+            A Christian-founded mixed secondary school on a 28-acre campus in Gayaza — producing morally upright, academically excellent, Christ-like leaders of tomorrow.
+          </p>
+
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+            <button onClick={() => scrollTo("admissions")} style={{
+              background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
+              padding: "15px 34px", borderRadius: 6, fontWeight: 700, fontSize: 15,
+              border: "none", cursor: "pointer", letterSpacing: "0.02em",
+              boxShadow: "0 10px 30px rgba(201,162,75,0.35)",
+              transition: "box-shadow 0.25s, transform 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 42px rgba(201,162,75,0.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(201,162,75,0.35)"; }}
+            >Apply Now</button>
+
+            <button onClick={() => scrollTo("about")} style={{
+              background: "rgba(255,255,255,0.06)", color: WHITE,
+              border: "1.5px solid rgba(255,255,255,0.45)",
+              padding: "15px 32px", borderRadius: 6, fontWeight: 600, fontSize: 15,
+              cursor: "pointer", backdropFilter: "blur(6px)",
+              transition: "border-color 0.2s, color 0.2s, background 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD_LIGHT; e.currentTarget.style.color = GOLD_LIGHT; e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)"; e.currentTarget.style.color = WHITE; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+            >Read Our Story</button>
           </div>
         </div>
       </section>
@@ -1296,6 +1303,32 @@ export default function App() {
                 >Submit Enquiry</button>
               </form>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== AFFILIATIONS ===== */}
+      <section style={{ background: WHITE, padding: "56px 5%", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>Affiliations &amp; Partners</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.4vw, 2rem)", color: GREEN_DARK, marginBottom: 28 }}>Recognised &amp; Connected</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
+            {[
+              "Uganda National Curriculum",
+              "UNEB — Examinations Body",
+              "Ministry of Education & Sports",
+              "Gayaza Zone Schools",
+              "Wakiso District Education",
+            ].map((p, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 10,
+                background: OFF_WHITE, border: "1px solid rgba(0,0,0,0.08)",
+                borderRadius: 100, padding: "12px 22px",
+              }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", flexShrink: 0 }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK }}>{p}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

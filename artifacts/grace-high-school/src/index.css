@@ -122,6 +122,7 @@ body {
 }
 .scroll-cue > span:last-child > span { animation: scroll-bob 2.2s ease-in-out infinite; }
 @media (max-width: 900px) { .scroll-cue { display: none !important; } }
+@media (max-width: 768px) { .utility-links { display: none !important; } }
 
 /* ========== CREST FLOAT ========== */
 @keyframes crest-float {
@@ -160,7 +161,6 @@ body {
 
 /* ========== RESPONSIVE SECTION GRIDS ========== */
 /* Named classes used on the grid wrapper divs so media queries can override inline styles */
-.hero-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; width: 100%; position: relative; z-index: 1; }
 .stats-grid      { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
 .about-grid      { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
 .programmes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
@@ -179,10 +179,6 @@ body {
 
 /* ========== TABLET BREAKPOINT (≤ 900px) ========== */
 @media (max-width: 900px) {
-  .hero-grid       { grid-template-columns: 1fr !important; gap: 36px !important; }
-  .hero-grid > div:first-child { order: 2; text-align: left; }
-  .hero-grid > div:last-child  { order: 1; display: flex; justify-content: center; }
-
   .about-grid      { grid-template-columns: 1fr !important; gap: 36px !important; }
   .programmes-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
   .videos-grid     { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
@@ -200,7 +196,6 @@ body {
 
 /* ========== MOBILE BREAKPOINT (≤ 580px) ========== */
 @media (max-width: 580px) {
-  .hero-crest      { width: 220px !important; height: 220px !important; }
   .programmes-grid { grid-template-columns: 1fr !important; }
   .videos-grid     { grid-template-columns: 1fr !important; }
   .resources-grid  { grid-template-columns: 1fr !important; }
