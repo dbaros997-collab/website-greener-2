@@ -708,34 +708,6 @@ export default function App() {
 
           </div>
 
-          {/* Upcoming events */}
-          <div style={{ marginTop: 40 }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: GREEN_DARK, marginBottom: 20 }}>Upcoming Events</h3>
-            <div className="events-grid">
-              {[
-                { day: "14", month: "July 2025",  title: "New Term Begins",    desc: "Term III — All students report" },
-                { day: "22", month: "Aug 2025",   title: "Sports Day",         desc: "Inter-house competitions" },
-                { day: "05", month: "Sep 2025",   title: "Parents' Day",       desc: "Open day for parents & guardians" },
-                { day: "20", month: "Nov 2025",   title: "End of Year Exams",  desc: "Final assessments — all classes" },
-              ].map((ev, i) => (
-                <div key={i} style={{
-                  background: OFF_WHITE, borderRadius: 8, padding: 16,
-                  border: "1px solid rgba(0,0,0,0.08)", textAlign: "center",
-                  transition: "transform 0.2s, border-color 0.2s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)"; }}
-                >
-                  <div style={{ background: GREEN_DARK, borderRadius: 6, padding: 8, marginBottom: 10 }}>
-                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#8EEDC0", display: "block", lineHeight: 1 }}>{ev.day}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>{ev.month}</span>
-                  </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>{ev.title}</h4>
-                  <p style={{ fontSize: 12, color: "#5A5A5A" }}>{ev.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
