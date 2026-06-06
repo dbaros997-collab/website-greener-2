@@ -263,8 +263,8 @@ export default function App() {
     : galleryViewItems.filter((g) => g.cat === galleryFilter);
 
   const navBg = scrolled
-    ? `rgba(10,64,32,0.98)`
-    : `rgba(10,64,32,0.95)`;
+    ? `rgba(255,255,255,0.98)`
+    : `rgba(255,255,255,0.96)`;
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: OFF_WHITE, color: "#1A1A1A", overflowX: "hidden" }}>
@@ -339,20 +339,21 @@ export default function App() {
         position: "fixed", top: 36, left: 0, right: 0, zIndex: 1000,
         background: navBg, backdropFilter: "blur(10px)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: `0 5%`, height: scrolled ? "58px" : "68px",
-        borderBottom: "1px solid rgba(255,255,255,0.15)",
-        transition: "height 0.3s, background 0.3s",
+        padding: `0 5%`, height: scrolled ? "62px" : "74px",
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+        boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "0 2px 12px rgba(10,64,32,0.06)",
+        transition: "height 0.3s, background 0.3s, box-shadow 0.3s",
       }}>
         <a href="#" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
           <div style={{
-            width: 56, height: 56, borderRadius: "50%",
-            background: WHITE, padding: 3,
-            boxShadow: "0 0 0 2px rgba(76,175,130,0.5)", flexShrink: 0,
+            width: 60, height: 60, borderRadius: 12,
+            background: WHITE, padding: 4,
+            boxShadow: "0 6px 18px rgba(10,64,32,0.18)", border: `1px solid ${GREEN_LIGHT}`, flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
           }}><img src={schoolLogo} alt="Grace High School Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
-          <div style={{ color: WHITE }}>
-            <strong style={{ display: "block", fontSize: 14, fontWeight: 600, letterSpacing: "0.03em" }}>Grace High School</strong>
-            <span style={{ fontSize: 11, color: "#8EEDC0", letterSpacing: "0.08em", textTransform: "uppercase" }}>Gayaza, Uganda</span>
+          <div style={{ color: GREEN_DARK }}>
+            <strong style={{ display: "block", fontSize: 15, fontWeight: 700, letterSpacing: "0.01em", fontFamily: "'Playfair Display', serif" }}>Grace High School</strong>
+            <span style={{ fontSize: 10.5, color: GREEN_MAIN, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 600 }}>Gayaza, Uganda</span>
           </div>
         </a>
 
@@ -363,12 +364,12 @@ export default function App() {
             <li key={id}>
               <button onClick={() => scrollTo(id)} style={{
                 background: "none", border: "none", cursor: "pointer",
-                color: "rgba(255,255,255,0.85)", fontSize: 14, fontWeight: 500,
-                letterSpacing: "0.02em", textTransform: "capitalize",
+                color: GREEN_DARK, fontSize: 14, fontWeight: 600,
+                letterSpacing: "0.01em", textTransform: "capitalize",
                 transition: "color 0.2s",
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#8EEDC0")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.85)")}
+              onMouseEnter={e => (e.currentTarget.style.color = GOLD)}
+              onMouseLeave={e => (e.currentTarget.style.color = GREEN_DARK)}
               >{id.charAt(0).toUpperCase() + id.slice(1)}</button>
             </li>
           ))}
@@ -392,7 +393,7 @@ export default function App() {
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {[0,1,2].map(i => (
-            <span key={i} style={{ width: 24, height: 2, background: "white", borderRadius: 2, display: "block" }} />
+            <span key={i} style={{ width: 24, height: 2, background: GREEN_DARK, borderRadius: 2, display: "block" }} />
           ))}
         </button>
       </nav>
@@ -400,7 +401,7 @@ export default function App() {
       {/* Mobile menu */}
       {menuOpen && (
         <div style={{
-          position: "fixed", top: scrolled ? 94 : 104, left: 0, right: 0, zIndex: 999,
+          position: "fixed", top: scrolled ? 98 : 110, left: 0, right: 0, zIndex: 999,
           background: GREEN_DARK, padding: "20px 5% 28px",
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
@@ -424,7 +425,7 @@ export default function App() {
       <section style={{
         minHeight: "100vh", background: GREEN_DARK,
         display: "flex", alignItems: "center", justifyContent: "center",
-        position: "relative", overflow: "hidden", padding: "120px 5% 70px",
+        position: "relative", overflow: "hidden", padding: "130px 5% 70px",
       }}>
         {/* Background image */}
         <div style={{
