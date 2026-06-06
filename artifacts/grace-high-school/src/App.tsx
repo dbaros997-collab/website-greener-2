@@ -1207,56 +1207,21 @@ export default function App() {
 
       {/* ===== CONTACT ===== */}
       <section id="contact" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
-        <div className="contact-grid">
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Contact Us
-            </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Get in Touch</h2>
-            <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 480, marginBottom: 36 }}>
-              We are always open. Whether you are a prospective family, a student, or a partner — reach out to us and we will respond promptly.
-            </p>
-            <div style={{ display: "grid", gap: 16 }}>
-              {[
-                { icon: "📍", label: "Address",    val: "Namavundu Road, Gayaza, Wakiso District, Uganda" },
-                { icon: "📧", label: "Email",      val: "gracehighschool2000@gmail.com" },
-                { icon: "📍", label: "Landmark",   val: "Near Kasangati Town, Gayaza Zone" },
-                { icon: "🕐", label: "Hours",      val: "Always Open — Mon to Sat, 7am – 6pm" },
-              ].map((c, i) => (
-                <div key={i} style={{
-                  display: "flex", gap: 14, alignItems: "flex-start",
-                  padding: "18px 20px", background: WHITE, borderRadius: 8,
-                  border: "1px solid rgba(0,0,0,0.08)",
-                }}>
-                  <div style={{
-                    width: 40, height: 40, flexShrink: 0, background: GREEN_LIGHT,
-                    borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                  }}>{c.icon}</div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 3 }}>{c.label}</div>
-                    <div style={{ fontSize: 14, color: "#1A1A1A" }}>{c.val}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          {/* Map-like campus photo */}
+          <div style={{ borderRadius: 12, overflow: "hidden", height: 300, marginBottom: 20 }}>
+            <img src={img_campus} alt="Campus grounds" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
-
-          <div>
-            {/* Map-like campus photo */}
-            <div style={{ borderRadius: 12, overflow: "hidden", height: 260, marginBottom: 20 }}>
-              <img src={img_campus} alt="Campus grounds" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-            <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 24, color: WHITE }}>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "#8EEDC0", marginBottom: 14 }}>Find Us on Campus</h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 16 }}>
-                Grace High School is located near Kasangati Town along Namavundu Road, Gayaza, in Wakiso District. Our 28-acre campus is easily accessible from Kampala via Gayaza Road.
-              </p>
-              <a href="mailto:gracehighschool2000@gmail.com" style={{
-                display: "inline-block", background: "#4CAF82", color: GREEN_DARK,
-                padding: "11px 24px", borderRadius: 6, fontWeight: 700, fontSize: 14,
-                textDecoration: "none",
-              }}>Email Us Now</a>
-            </div>
+          <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 28, color: WHITE }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: "#8EEDC0", marginBottom: 14 }}>Find Us on Campus</h3>
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 18 }}>
+              Grace High School is located near Kasangati Town along Namavundu Road, Gayaza, in Wakiso District. Our 28-acre campus is easily accessible from Kampala via Gayaza Road.
+            </p>
+            <a href="mailto:gracehighschool2000@gmail.com" style={{
+              display: "inline-block", background: "#4CAF82", color: GREEN_DARK,
+              padding: "11px 24px", borderRadius: 6, fontWeight: 700, fontSize: 14,
+              textDecoration: "none",
+            }}>Email Us Now</a>
           </div>
         </div>
       </section>
