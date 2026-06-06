@@ -698,33 +698,47 @@ export default function App() {
 
           <div>
             {/* School Profile card */}
-            <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 32, color: WHITE }}>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: "#8EEDC0", marginBottom: 20 }}>School Profile</h3>
-              {[
-                ["Type", "Mixed Secondary School"],
-                ["Location", "Namavundu Road, Gayaza, Wakiso"],
-                ["Nearest Landmark", "Near Kasangati Town"],
-                ["Campus Size", "28 Acres"],
-                ["Curriculum", "National Curriculum (Uganda)"],
-                ["Levels Offered", "O-Level (S1–S4) & A-Level (S5–S6)"],
-                ["Foundation", "Christian"],
-                ["Admissions", "Open — All Classes"],
-                ["Email", "gracehighschool2000@gmail.com"],
-              ].map(([label, val], i) => (
-                <div key={i} style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-                  padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 14,
-                }}>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>{label}</span>
-                  <span style={{ color: WHITE, textAlign: "right", maxWidth: 200 }}>{val}</span>
-                </div>
-              ))}
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 12, border: `1px solid ${GREEN_LIGHT}` }}>
+              <img src={img_vision_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.2 }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(232,245,238,0.94) 0%, rgba(232,245,238,0.88) 100%)" }} />
+              <div style={{ position: "relative", padding: 32 }}>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: GREEN_DARK, marginBottom: 20 }}>School Profile</h3>
+                {[
+                  { icon: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>, label: "Type", val: "Mixed Secondary School" },
+                  { icon: <><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></>, label: "Location", val: "Namavundu Road, Gayaza, Wakiso" },
+                  { icon: <><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></>, label: "Nearest Landmark", val: "Near Kasangati Town" },
+                  { icon: <><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></>, label: "Campus Size", val: "28 Acres" },
+                  { icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></>, label: "Curriculum", val: "National Curriculum (Uganda)" },
+                  { icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>, label: "Levels Offered", val: "O-Level (S1–S4) & A-Level (S5–S6)" },
+                  { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, label: "Foundation", val: "Christian" },
+                  { icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>, label: "Admissions", val: "Open — All Classes" },
+                  { icon: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></>, label: "Email", val: "gracehighschool2000@gmail.com" },
+                ].map((row, i) => (
+                  <div key={i} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
+                    padding: "11px 0", borderBottom: "1px solid rgba(10,64,32,0.1)", fontSize: 14,
+                  }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 9, color: GREEN_MAIN, fontWeight: 600 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{row.icon}</svg>
+                      {row.label}
+                    </span>
+                    <span style={{ color: GREEN_DARK, textAlign: "right", maxWidth: 200, fontWeight: 500 }}>{row.val}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Motto */}
-            <div style={{ background: GREEN_MAIN, borderRadius: 8, padding: "20px 24px", marginTop: 20 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.65)", marginBottom: 4 }}>School Motto</p>
-              <blockquote style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontStyle: "italic", color: WHITE, fontWeight: 700 }}>"Run With a Vision"</blockquote>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 8, marginTop: 20, border: `1px solid ${GREEN_LIGHT}` }}>
+              <img src={img_vision_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.2 }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(232,245,238,0.93) 0%, rgba(232,245,238,0.86) 100%)" }} />
+              <div style={{ position: "relative", padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, color: "#9A7A2E" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7 7h4v6c0 2.2-1.8 4-4 4v-2c1.1 0 2-.9 2-2H7zM15 7h4v6c0 2.2-1.8 4-4 4v-2c1.1 0 2-.9 2-2h-2z" /></svg>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>School Motto</p>
+                </div>
+                <blockquote style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontStyle: "italic", color: GREEN_DARK, fontWeight: 700, margin: 0 }}>"Run With a Vision"</blockquote>
+              </div>
             </div>
           </div>
         </div>
