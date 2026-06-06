@@ -94,9 +94,17 @@ export default function App() {
   const [resLoading, setResLoading]   = useState(true);
   const [heroSlide, setHeroSlide]     = useState(0);
 
+  const lastScrollY = useRef(0);
+  const scrollDir = useRef<"down" | "up">("down");
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => {
+      const y = window.scrollY;
+      scrollDir.current = y >= lastScrollY.current ? "down" : "up";
+      lastScrollY.current = y;
+      setScrolled(y > 40);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -115,7 +123,19 @@ export default function App() {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          entry.target.classList.toggle("is-visible", entry.isIntersecting);
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          } else {
+            // Reset so the animation replays next time the section returns.
+            // Prime the direction it should slide in FROM: when the user is
+            // scrolling down it will re-enter from below; when scrolling up it
+            // should re-enter from above.
+            entry.target.classList.remove("is-visible");
+            entry.target.classList.toggle(
+              "reveal-from-top",
+              scrollDir.current === "down"
+            );
+          }
         });
       },
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
