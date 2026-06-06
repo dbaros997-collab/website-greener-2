@@ -14,6 +14,7 @@ import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
+import img_about_group from "@assets/IMG_0105_1780737528455.jpg";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
@@ -647,7 +648,7 @@ export default function App() {
         <div className="welcome-grid">
           <div className="welcome-media" style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: -10, borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.18))`, zIndex: 0 }} />
-            <img src={img_assembly1} alt="Grace High School community" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 430, objectFit: "cover", borderRadius: 14, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
+            <img src={img_about_group} alt="Grace High School community" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 430, objectFit: "cover", borderRadius: 14, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
             <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
               <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
               <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Run With a Vision</span>
