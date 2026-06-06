@@ -106,6 +106,28 @@ export default function App() {
     return () => clearInterval(id);
   }, []);
 
+  // Scroll-reveal: fade/slide sections into view as the user scrolls down.
+  // The .reveal section wrappers are all static in the JSX (only their inner
+  // content is data-driven), so a single observer set up on mount is enough.
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+    document
+      .querySelectorAll<HTMLElement>(".reveal:not(.is-visible)")
+      .forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   const loadResources = async () => {
     try {
       const res = await fetch(`${API}/resources`);
@@ -702,7 +724,7 @@ export default function App() {
       </div>
 
       {/* ===== SERVICE CARDS ===== */}
-      <section style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div className="service-grid">
           {[
             {
@@ -756,7 +778,7 @@ export default function App() {
       </section>
 
       {/* ===== WELCOME ===== */}
-      <section id="welcome" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="welcome" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div className="welcome-grid">
           <div className="welcome-media" style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: -10, borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.18))`, zIndex: 0 }} />
@@ -802,7 +824,7 @@ export default function App() {
       </section>
 
       {/* ===== ABOUT ===== */}
-      <section id="about" style={{ background: WHITE, padding: "56px 5%" }}>
+      <section id="about" className="reveal" style={{ background: WHITE, padding: "56px 5%" }}>
         <div className="about-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -903,7 +925,7 @@ export default function App() {
       </section>
 
       {/* ===== ACHIEVEMENTS ===== */}
-      <section id="achievements" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
+      <section id="achievements" className="reveal" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -936,7 +958,7 @@ export default function App() {
       </section>
 
       {/* ===== PROGRAMMES ===== */}
-      <section id="programmes" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="programmes" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Academics
@@ -969,7 +991,7 @@ export default function App() {
       </section>
 
       {/* ===== UPDATES / PARENT NOTICEBOARD ===== */}
-      <section id="updates" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
+      <section id="updates" className="reveal" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Updates for Parents
@@ -1024,7 +1046,7 @@ export default function App() {
       </section>
 
       {/* ===== CAMPUS GALLERY ===== */}
-      <section id="campus" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="campus" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Campus Life
@@ -1084,7 +1106,7 @@ export default function App() {
       </section>
 
       {/* ===== VIDEOS ===== */}
-      <section id="videos" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="videos" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />School Videos
@@ -1126,7 +1148,7 @@ export default function App() {
       </section>
 
       {/* ===== RESOURCES ===== */}
-      <section id="resources" style={{ background: WHITE, padding: "56px 5%" }}>
+      <section id="resources" className="reveal" style={{ background: WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Student Resources
@@ -1188,7 +1210,7 @@ export default function App() {
       </section>
 
       {/* ===== STAFF ===== */}
-      <section id="staff" style={{ background: WHITE, padding: "56px 5%" }}>
+      <section id="staff" className="reveal" style={{ background: WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Our Team
@@ -1240,7 +1262,7 @@ export default function App() {
       </section>
 
       {/* ===== ADMISSIONS ===== */}
-      <section id="admissions" style={{ background: GREEN_DARK, padding: "56px 5%" }}>
+      <section id="admissions" className="reveal" style={{ background: GREEN_DARK, padding: "56px 5%" }}>
         <div className="admissions-grid">
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -1516,7 +1538,7 @@ export default function App() {
       </section>
 
       {/* ===== AFFILIATIONS ===== */}
-      <section style={{ background: WHITE, padding: "56px 5%", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+      <section className="reveal" style={{ background: WHITE, padding: "56px 5%", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", textAlign: "center" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>Affiliations &amp; Partners</div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.4vw, 2rem)", color: GREEN_DARK, marginBottom: 28 }}>Recognised &amp; Connected</h2>
@@ -1542,7 +1564,7 @@ export default function App() {
       </section>
 
       {/* ===== CONTACT ===== */}
-      <section id="contact" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="contact" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
           <div style={{ background: GREEN_DARK, borderRadius: 12, padding: 28, color: WHITE }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: "#8EEDC0", marginBottom: 14 }}>Find Us on Campus</h3>
