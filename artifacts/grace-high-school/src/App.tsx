@@ -14,7 +14,7 @@ import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
-import img_about_group from "@assets/IMG_0105_1780737528455.jpg";
+import img_about_group from "@assets/Gemini_Generated_Image_sdzh7psdzh7psdzh_1780738486562.png";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
