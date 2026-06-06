@@ -838,48 +838,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ===== ACHIEVEMENTS ===== */}
-      <section style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, #0E5028 60%, ${GREEN_MID} 100%)`, padding: "56px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <span style={{ width: 28, height: 2, background: "#8EEDC0", display: "block" }} />Our Achievements
-          </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>Excellence in Academics &amp; Beyond</h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, maxWidth: 560, marginBottom: 32 }}>
-            Our students consistently excel in national examinations, competitions, and national platforms — proving that Grace High School truly produces leaders.
-          </p>
-
-          <div className="achievements-outer">
-            {/* UACE card */}
-            <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(76,175,130,0.3)", borderRadius: 12, overflow: "hidden" }}>
-              <img src={img_uace} alt="UACE 2023 results" style={{ width: "100%", height: 240, objectFit: "cover" }} />
-              <div style={{ padding: "20px 24px" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>🎓 UACE 2023 — Top Performer</div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginBottom: 8 }}>Katumwa Hannington — 20 Points</h3>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>MTC-A · GEO-A · ENT-A · ICT-4 · GEP-4 · <em style={{ color: "#8EEDC0" }}>Glory Be to God</em></p>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gap: 20 }}>
-              {[
-                { img: img_trophy,    tag: "🏆 Award",            title: "Trophy & Certificate of Excellence", desc: "Students and staff celebrating an award win on the Grace High School campus." },
-                { img: img_conference,tag: "🌍 National Conference",title: "Renewable Energy Conference 2023",  desc: "Grace High School student delegates represented at Speke Resort, Kampala." },
-                { img: img_media,     tag: "📺 Media Feature",    title: "Featured on Spark TV",              desc: "Grace High School Extra-Curricular Activities covered by national television." },
-              ].map((a, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(76,175,130,0.25)", borderRadius: 12, overflow: "hidden", display: "flex" }}>
-                  <img src={a.img} alt={a.title} style={{ width: 120, objectFit: "cover", flexShrink: 0 }} />
-                  <div style={{ padding: "16px 18px" }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 6 }}>{a.tag}</div>
-                    <h4 style={{ fontSize: 14, fontWeight: 600, color: WHITE, marginBottom: 6 }}>{a.title}</h4>
-                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{a.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===== CAMPUS GALLERY ===== */}
       <section id="campus" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
