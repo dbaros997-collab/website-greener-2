@@ -448,12 +448,12 @@ export default function App() {
             src={schoolLogo}
             alt="Grace High School Logo"
             style={{
-              height: scrolled ? 64 : 84,
+              height: scrolled ? 88 : 120,
               width: "auto",
               objectFit: "contain",
               flexShrink: 0,
               transition: "height 0.3s",
-              filter: "drop-shadow(0 4px 10px rgba(10,64,32,0.22))",
+              filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.3))",
             }}
           />
         </a>
@@ -624,19 +624,6 @@ export default function App() {
           position: "relative", zIndex: 1,
           display: "flex", flexDirection: "column", alignItems: "center",
         }}>
-          {/* Crest */}
-          <div style={{ position: "relative", marginBottom: 24, animation: "crest-float 6s ease-in-out infinite" }}>
-            <div style={{
-              position: "absolute", inset: -22,
-              background: "radial-gradient(circle, rgba(76,175,130,0.28) 0%, transparent 70%)",
-              borderRadius: "50%",
-            }} />
-            <img src={schoolLogo} alt="Grace High School Crest" style={{
-              width: 108, height: 108, objectFit: "contain", position: "relative",
-              filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.55)) drop-shadow(0 0 22px rgba(142,237,192,0.45)) brightness(1.05)",
-            }} />
-          </div>
-
           {/* Eyebrow — "Be Part of Our Story" */}
           <div style={{
             fontFamily: "'Playfair Display', serif", fontStyle: "italic",
