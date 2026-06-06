@@ -16,6 +16,7 @@ import img_library from "@assets/481080206_1149891370163951_6952293395059892096_
 import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
+import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
 import img_science from "@assets/IMG_0144_-_Copy_1780654332068.jpg";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
@@ -1262,11 +1263,16 @@ export default function App() {
 
       {/* ===== FOOTER ===== */}
       <footer style={{ position: "relative", background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px", overflow: "hidden" }}>
-        {/* Crest watermark */}
-        <img src={schoolLogo} alt="" aria-hidden="true" style={{
-          position: "absolute", right: "-3%", top: "50%", transform: "translateY(-50%)",
-          width: "min(560px, 60%)", opacity: 0.05, pointerEvents: "none",
-          filter: "grayscale(1) brightness(2)", userSelect: "none",
+        {/* Campus watermark */}
+        <div aria-hidden="true" style={{
+          position: "absolute", inset: 0, pointerEvents: "none", userSelect: "none",
+          backgroundImage: `url(${img_footer_watermark})`,
+          backgroundSize: "cover", backgroundPosition: "center",
+          opacity: 0.08,
+        }} />
+        <div aria-hidden="true" style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: `linear-gradient(180deg, ${GREEN_DARK}cc, ${GREEN_DARK}e6)`,
         }} />
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
