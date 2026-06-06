@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListNewsItems,
@@ -134,6 +134,60 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [videoModal]);
+
+  // Play the selected video via the YouTube IFrame API so we can auto-close the
+  // modal the moment playback finishes ("after watching").
+  const ytPlayerRef = useRef<{ destroy?: () => void } | null>(null);
+  useEffect(() => {
+    if (!videoModal) return;
+    let cancelled = false;
+
+    const loadApi = (): Promise<void> =>
+      new Promise((resolve) => {
+        const w = window as unknown as {
+          YT?: { Player: unknown };
+          onYouTubeIframeAPIReady?: () => void;
+        };
+        if (w.YT && w.YT.Player) {
+          resolve();
+          return;
+        }
+        if (!document.getElementById("youtube-iframe-api")) {
+          const tag = document.createElement("script");
+          tag.id = "youtube-iframe-api";
+          tag.src = "https://www.youtube.com/iframe_api";
+          document.body.appendChild(tag);
+        }
+        const prev = w.onYouTubeIframeAPIReady;
+        w.onYouTubeIframeAPIReady = () => {
+          prev?.();
+          resolve();
+        };
+      });
+
+    loadApi().then(() => {
+      if (cancelled) return;
+      const YT = (window as unknown as { YT: { Player: new (el: string, opts: unknown) => { destroy?: () => void } } }).YT;
+      ytPlayerRef.current = new YT.Player("yt-player-host", {
+        width: "100%",
+        height: "100%",
+        videoId: videoModal,
+        playerVars: { autoplay: 1, rel: 0 },
+        events: {
+          onStateChange: (e: { data: number }) => {
+            // 0 === YT.PlayerState.ENDED
+            if (e.data === 0) setVideoModal(null);
+          },
+        },
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      ytPlayerRef.current?.destroy?.();
+      ytPlayerRef.current = null;
+    };
   }, [videoModal]);
 
   // Live updates: subscribe to the API's Server-Sent Events stream so any change
@@ -335,13 +389,7 @@ export default function App() {
             </button>
             {videoModal ? (
               <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", background: "#000" }}>
-                <iframe
-                  src={`https://www.youtube.com/embed/${videoModal}?autoplay=1`}
-                  title="School video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-                />
+                <div id="yt-player-host" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
               </div>
             ) : (
               <div style={{ background: GREEN_DARK, borderRadius: 12, padding: "48px 32px", textAlign: "center" }}>
