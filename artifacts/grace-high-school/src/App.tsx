@@ -47,6 +47,15 @@ const OFF_WHITE   = "#F5FAF7";
 const GOLD        = "#C9A24B";
 const GOLD_LIGHT  = "#E6C66E";
 
+const HERO_SLIDES = [
+  img_campus_hero,
+  img_campus,
+  img_assembly1,
+  img_garden,
+  img_alevel,
+  img_mdd,
+];
+
 const API = "/api";
 
 interface Resource {
@@ -80,12 +89,19 @@ export default function App() {
   const [formSent, setFormSent]       = useState(false);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
+  const [heroSlide, setHeroSlide]     = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setHeroSlide(i => (i + 1) % HERO_SLIDES.length), 5000);
+    return () => clearInterval(id);
   }, []);
 
   const loadResources = async () => {
@@ -427,13 +443,17 @@ export default function App() {
         display: "flex", alignItems: "center", justifyContent: "center",
         position: "relative", overflow: "hidden", padding: "130px 5% 70px",
       }}>
-        {/* Background image */}
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(${img_campus_hero})`,
-          backgroundSize: "cover", backgroundPosition: "center top",
-          transform: "scale(1.05)",
-        }} />
+        {/* Background image slideshow — crossfades between campus photos */}
+        {HERO_SLIDES.map((src, i) => (
+          <div key={i} style={{
+            position: "absolute", inset: 0,
+            backgroundImage: `url(${src})`,
+            backgroundSize: "cover", backgroundPosition: "center",
+            transform: i === heroSlide ? "scale(1.08)" : "scale(1.0)",
+            opacity: i === heroSlide ? 1 : 0,
+            transition: "opacity 1.4s ease-in-out, transform 6s ease-out",
+          }} />
+        ))}
         {/* Cinematic scrim — balanced for a centered headline */}
         <div style={{
           position: "absolute", inset: 0,
@@ -901,14 +921,16 @@ export default function App() {
             ))}
           </div>
 
-          {/* Gallery grid */}
-          <div className="gallery-grid">
-            {filtered.map((item, i) => (
-              <div key={i} className={`gallery-item${item.wide ? " wide" : ""}`} onClick={() => setLightbox(item.src)}>
-                <img src={item.src} alt={item.label} />
-                <div className="gallery-caption">{item.label}</div>
-              </div>
-            ))}
+          {/* Sliding photo carousel — moves continuously, pauses on hover */}
+          <div className="marquee">
+            <div className="marquee-track" style={{ animationDuration: `${Math.max(filtered.length * 5, 24)}s` }}>
+              {[...filtered, ...filtered].map((item, i) => (
+                <div key={i} className="marquee-card" onClick={() => setLightbox(item.src)}>
+                  <img src={item.src} alt={item.label} />
+                  <div className="gallery-caption">{item.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

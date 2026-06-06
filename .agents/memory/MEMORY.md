@@ -3,3 +3,4 @@
 - [Drizzle push vs session table](drizzle-push-session-table.md) — `db run push` hangs (TTY prompt) because connect-pg-simple's `session` table isn't in schema; add single tables via SQL. Also: admin password only bootstraps when staff_users is empty.
 - [connect-pg-simple bundling](connect-pg-simple-bundling.md) — esbuild bundle omits its `table.sql`, so create the `session` table manually instead of `createTableIfMissing`.
 - [Inline style vs Tailwind](inline-style-vs-tailwind.md) — inline `style` beats Tailwind `hidden md:flex`; don't set the same property both ways or responsive show/hide silently fails.
+- [Seamless CSS marquee](seamless-marquee.md) — duplicate the list + animate translateX 0→-50%; use margin-right on cards, NOT flex `gap`, or the seam jumps.
