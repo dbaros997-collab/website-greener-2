@@ -1040,35 +1040,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Department highlights */}
-          <div className="staff-depts">
-            {[
-              { icon: "🔬", dept: "Sciences",     desc: "Biology, Chemistry, Physics — hands-on lab teaching" },
-              { icon: "📐", dept: "Mathematics",  desc: "Pure Maths, Applied Maths and Statistics" },
-              { icon: "📖", dept: "Humanities",   desc: "English, History, Geography, CRE, SST" },
-              { icon: "💼", dept: "Business & ICT", desc: "Entrepreneurship, Economics, Computer Studies" },
-            ].map((d, i) => (
-              <div key={i} style={{
-                padding: "22px 20px", background: OFF_WHITE, borderRadius: 10,
-                borderTop: `3px solid ${GREEN_MAIN}`, transition: "transform 0.2s, box-shadow 0.2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-              >
-                <span style={{ fontSize: 28, display: "block", marginBottom: 10 }}>{d.icon}</span>
-                <h4 style={{ fontSize: 14, fontWeight: 700, color: GREEN_DARK, marginBottom: 6 }}>{d.dept}</h4>
-                <p style={{ fontSize: 13, color: "#5A5A5A", lineHeight: 1.55 }}>{d.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 28, background: GREEN_LIGHT, borderRadius: 10, padding: "18px 24px", display: "flex", alignItems: "center", gap: 14 }}>
-            <span style={{ fontSize: 22 }}>📌</span>
-            <p style={{ fontSize: 14, color: GREEN_DARK, lineHeight: 1.6 }}>
-              To view the full staff list or enquire about specific departments, contact the school directly at{" "}
-              <strong>gracehighschool2000@gmail.com</strong>
-            </p>
-          </div>
         </div>
       </section>
 
