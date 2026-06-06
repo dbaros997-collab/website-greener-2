@@ -25,7 +25,6 @@ import img_assembly2 from "@assets/484133260_1154995782986843_267018506690018726
 import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
-import img_dorm from "@assets/481469630_1149892456830509_9107022341216219801_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
 import img_waterfilter from "@assets/481698095_1150000593486362_595453668791169278_n_1780398909149.jpg";
 import img_sewing from "@assets/481774229_1150000706819684_3856748495753883636_n_1780398909150.jpg";
@@ -167,7 +166,6 @@ export default function App() {
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
-    { src: img_dorm,        label: "Dormitory — Boarding Facilities",        cat: "campus" },
     { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
     { src: img_welding,     label: "Vocational Skills — Metal Welding",      cat: "vocational", wide: true },
@@ -1260,11 +1258,6 @@ export default function App() {
               <p style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, margin: 0 }}>
                 <strong style={{ color: WHITE }}>Admissions are open</strong> for all classes (S1–S6) for the 2025/2026 academic year. Apply early to secure a place.
               </p>
-            </div>
-
-            {/* Boarding image */}
-            <div style={{ borderRadius: 10, overflow: "hidden", marginTop: 28, height: 180 }}>
-              <img src={img_dorm} alt="Dormitory" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
           </div>
 
