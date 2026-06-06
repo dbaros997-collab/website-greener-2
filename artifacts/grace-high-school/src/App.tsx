@@ -106,24 +106,22 @@ export default function App() {
     return () => clearInterval(id);
   }, []);
 
-  // Scroll-reveal: fade/slide sections into view as the user scrolls down.
-  // The .reveal section wrappers are all static in the JSX (only their inner
-  // content is data-driven), so a single observer set up on mount is enough.
+  // Scroll-reveal: fade/slide sections into view every time they enter the
+  // viewport, and reset them when they leave so the animation replays on each
+  // scroll-down. The .reveal section wrappers are all static in the JSX, so a
+  // single observer set up on mount is enough.
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
-          }
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
         });
       },
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
     document
-      .querySelectorAll<HTMLElement>(".reveal:not(.is-visible)")
+      .querySelectorAll<HTMLElement>(".reveal")
       .forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
