@@ -80,6 +80,8 @@ const formatSize = (bytes: number | null): string => {
 export default function App() {
   const [scrolled, setScrolled]       = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
+  const [openGroup, setOpenGroup]     = useState<string | null>(null);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [lightbox, setLightbox]       = useState<string | null>(null);
   const [videoModal, setVideoModal]   = useState<string | null>(null);
   const [testitIdx, setTestiIdx]      = useState(0);
@@ -127,7 +129,37 @@ export default function App() {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
+    setOpenGroup(null);
+    setOpenMobileGroup(null);
   };
+
+  const goHome = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setMenuOpen(false);
+    setOpenGroup(null);
+    setOpenMobileGroup(null);
+  };
+
+  const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string }[] }[] = [
+    { label: "Home", id: "__home" },
+    { label: "About", children: [
+      { label: "About Us", id: "about" },
+      { label: "Campus Gallery", id: "campus" },
+    ] },
+    { label: "Academics", children: [
+      { label: "Programmes", id: "programmes" },
+      { label: "Student Resources", id: "resources" },
+      { label: "Videos", id: "videos" },
+    ] },
+    { label: "School Life", children: [
+      { label: "News & Events", id: "news" },
+      { label: "Updates", id: "updates" },
+    ] },
+    { label: "Admissions", id: "admissions" },
+    { label: "Contact", id: "contact" },
+  ];
+
+  const navGo = (id: string) => (id === "__home" ? goHome() : scrollTo(id));
 
   const galleryItems = [
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
@@ -351,19 +383,50 @@ export default function App() {
         </a>
 
         {/* Desktop nav */}
-        <ul style={{ gap: "1.6rem", listStyle: "none", alignItems: "center" }}
+        <ul style={{ gap: "1.4rem", listStyle: "none", alignItems: "center" }}
             className="hidden md:flex">
-          {["about","programmes","news","updates","resources","campus","videos","admissions","contact"].map(id => (
-            <li key={id}>
-              <button onClick={() => scrollTo(id)} style={{
+          {NAV_GROUPS.map(group => (
+            <li key={group.label} style={{ position: "relative" }}
+              onMouseEnter={() => group.children && setOpenGroup(group.label)}
+              onMouseLeave={() => group.children && setOpenGroup(null)}
+            >
+              <button onClick={() => !group.children && group.id && navGo(group.id)} style={{
                 background: "none", border: "none", cursor: "pointer",
-                color: GREEN_DARK, fontSize: 14, fontWeight: 600,
-                letterSpacing: "0.01em", textTransform: "capitalize",
-                transition: "color 0.2s",
+                color: openGroup === group.label ? GOLD : GREEN_DARK, fontSize: 14, fontWeight: 600,
+                letterSpacing: "0.01em", transition: "color 0.2s",
+                display: "inline-flex", alignItems: "center", gap: 5,
               }}
               onMouseEnter={e => (e.currentTarget.style.color = GOLD)}
-              onMouseLeave={e => (e.currentTarget.style.color = GREEN_DARK)}
-              >{id.charAt(0).toUpperCase() + id.slice(1)}</button>
+              onMouseLeave={e => (e.currentTarget.style.color = openGroup === group.label ? GOLD : GREEN_DARK)}
+              >
+                {group.label}
+                {group.children && (
+                  <span style={{ fontSize: 9, transition: "transform 0.2s", transform: openGroup === group.label ? "rotate(180deg)" : "none", display: "inline-block" }}>▼</span>
+                )}
+              </button>
+              {group.children && openGroup === group.label && (
+                <div style={{
+                  position: "absolute", top: "100%", left: 0, paddingTop: 12,
+                }}>
+                  <div style={{
+                    background: WHITE, borderRadius: 8, minWidth: 210,
+                    boxShadow: "0 12px 32px rgba(10,64,32,0.18)",
+                    border: `1px solid ${GREEN_LIGHT}`, overflow: "hidden",
+                    display: "flex", flexDirection: "column", padding: "6px 0",
+                  }}>
+                    {group.children.map(child => (
+                      <button key={child.id} onClick={() => scrollTo(child.id)} style={{
+                        background: "none", border: "none", cursor: "pointer",
+                        color: GREEN_DARK, fontSize: 13.5, fontWeight: 500,
+                        textAlign: "left", padding: "10px 18px", transition: "background 0.15s, color 0.15s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = GREEN_LIGHT; e.currentTarget.style.color = GREEN_MAIN; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = GREEN_DARK; }}
+                      >{child.label}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </li>
           ))}
           <li>
@@ -399,13 +462,33 @@ export default function App() {
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
         }}>
-          {["about","programmes","news","updates","resources","campus","videos","admissions","contact"].map(id => (
-            <button key={id} onClick={() => scrollTo(id)} style={{
-              background: "none", border: "none", cursor: "pointer",
-              color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500,
-              padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.07)",
-              textAlign: "left", textTransform: "capitalize",
-            }}>{id.charAt(0).toUpperCase() + id.slice(1)}</button>
+          {NAV_GROUPS.map(group => (
+            <div key={group.label}>
+              <button
+                onClick={() => group.children ? setOpenMobileGroup(openMobileGroup === group.label ? null : group.label) : (group.id && navGo(group.id))}
+                style={{
+                  width: "100%", background: "none", border: "none", cursor: "pointer",
+                  color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500,
+                  padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                {group.label}
+                {group.children && (
+                  <span style={{ fontSize: 10, transition: "transform 0.2s", transform: openMobileGroup === group.label ? "rotate(180deg)" : "none" }}>▼</span>
+                )}
+              </button>
+              {group.children && openMobileGroup === group.label && (
+                <div style={{ display: "flex", flexDirection: "column", paddingLeft: 14 }}>
+                  {group.children.map(child => (
+                    <button key={child.id} onClick={() => scrollTo(child.id)} style={{
+                      background: "none", border: "none", cursor: "pointer",
+                      color: "#8EEDC0", fontSize: 14.5, fontWeight: 500,
+                      padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", textAlign: "left",
+                    }}>{child.label}</button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
           <button onClick={() => scrollTo("admissions")} style={{
             background: "#4CAF82", color: GREEN_DARK, border: "none",
