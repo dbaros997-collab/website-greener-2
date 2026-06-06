@@ -34,14 +34,14 @@ const SITE_TEXT_BLOCKS: SiteTextBlock[] = [
     label: "About — Vision statement",
     multiline: true,
     defaultValue:
-      "To be a centre of excellence that raises God-fearing, visionary leaders who make a lasting difference in their communities and the world.",
+      "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.",
   },
   {
     key: "about_mission",
     label: "About — Mission statement",
     multiline: true,
     defaultValue:
-      "Producing students who are morally upright and Christ-like leaders of tomorrow.",
+      "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.",
   },
   {
     key: "programmes_heading",

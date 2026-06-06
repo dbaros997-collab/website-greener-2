@@ -567,12 +567,18 @@ export default function App() {
             {/* Vision & Mission */}
             <div style={{ display: "grid", gap: 16, marginBottom: 28 }}>
               <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
-                <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: GOLD_LIGHT, marginBottom: 8 }}>Our Vision</p>
-                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "To be a centre of excellence that raises God-fearing, visionary leaders who make a lasting difference in their communities and the world.")}"</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                  <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.18)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🌍</div>
+                  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: GOLD_LIGHT, margin: 0 }}>Our Vision</p>
+                </div>
+                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
               </div>
               <div style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)`, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid #4CAF82` }}>
-                <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 8 }}>Our Mission</p>
-                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "Producing students who are morally upright and Christ-like leaders of tomorrow.")}"</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                  <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(76,175,130,0.18)", border: "1px solid #4CAF82", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✝️</div>
+                  <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8EEDC0", margin: 0 }}>Our Mission</p>
+                </div>
+                <p style={{ fontSize: 15, color: WHITE, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
                 <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>📍 Gayaza-Kasangati, Uganda</span>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>✝️ Christian-Founded</span>
