@@ -829,44 +829,24 @@ export default function App() {
             {text("programmes_intro", "A comprehensive National Curriculum across O-Level and A-Level, complemented by vocational programmes that prepare students for life beyond school.")}
           </p>
 
-          <div className="programmes-grid">
-            {programmeItems.map((p, i) => {
-              const badge = p.title.includes("Ordinary")
-                ? "UCE Accredited"
-                : p.title.includes("Advanced")
-                ? "UACE Accredited"
-                : "Skills & Talent";
-              return (
-                <div key={i} className="programme-card">
-                  <div className="programme-card-img">
-                    <img src={p.img} alt={p.title} />
-                    <span style={{ position: "absolute", top: 14, left: 14, fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_DARK, background: "rgba(255,255,255,0.92)", padding: "6px 12px", borderRadius: 100, backdropFilter: "blur(4px)" }}>{p.tag}</span>
-                  </div>
-                  <div className="programme-card-body">
-                    <div style={{ display: "inline-flex", alignSelf: "flex-start", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: GREEN_MAIN, background: GREEN_LIGHT, padding: "5px 11px", borderRadius: 100, marginBottom: 14 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: GOLD, display: "block" }} />{badge}
-                    </div>
-                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: GREEN_DARK, lineHeight: 1.25, marginBottom: 10 }}>{p.title}</h3>
-                    <p style={{ fontSize: 14, color: "#5A5A5A", lineHeight: 1.65, marginBottom: 18 }}>{p.desc}</p>
-                    <ul className="programme-card-list">
-                      {p.subjects.slice(0, 5).map(s => (
-                        <li key={s}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                            <circle cx="12" cy="12" r="11" fill={GREEN_LIGHT} />
-                            <path d="M7 12.5l3 3 7-7" stroke={GREEN_MAIN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="programme-card-actions">
-                      <button onClick={() => scrollTo("admissions")} style={{ flex: 1, minWidth: 120, fontSize: 13, fontWeight: 600, color: WHITE, background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, border: "none", padding: "11px 16px", borderRadius: 100, cursor: "pointer" }}>Apply Now</button>
-                      <button onClick={() => scrollTo("contact")} style={{ flex: 1, minWidth: 110, fontSize: 13, fontWeight: 600, color: GREEN_DARK, background: "transparent", border: `1.5px solid ${GREEN_MAIN}`, padding: "11px 16px", borderRadius: 100, cursor: "pointer" }}>Learn More</button>
-                    </div>
+          <div className="programmes-rows">
+            {programmeItems.map((p, i) => (
+              <div key={i} className={`programme-row${i % 2 === 1 ? " programme-row--reverse" : ""}`}>
+                <div className="programme-row-img" style={{ overflow: "hidden", borderRadius: 12, minHeight: 300 }}>
+                  <img src={p.img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div className="programme-row-body" style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "8px 4px" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>{p.title}</h3>
+                  <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 18 }}>{p.desc}</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {p.subjects.map(s => (
+                      <span key={s} style={{ fontSize: 12, fontWeight: 500, background: GREEN_LIGHT, color: GREEN_DARK, padding: "4px 12px", borderRadius: 100 }}>{s}</span>
+                    ))}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
