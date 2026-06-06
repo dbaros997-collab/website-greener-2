@@ -54,6 +54,12 @@ const HERO_SLIDES = [
   img_alevel,
 ];
 
+const HERO_TAGLINES = [
+  "Faith, Vision & Excellence",
+  "Shaping Tomorrow's Leaders",
+  "A Foundation for a Bright Future",
+];
+
 const API = "/api";
 
 interface Resource {
@@ -586,6 +592,13 @@ export default function App() {
             <br />at Grace High School
           </h1>
 
+          <div key={heroSlide} className="hero-tagline" style={{
+            fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontWeight: 600,
+            fontSize: "clamp(1.05rem, 2.2vw, 1.5rem)", marginBottom: 22,
+            background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`,
+            WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>{HERO_TAGLINES[heroSlide % HERO_TAGLINES.length]}</div>
+
           <p style={{ fontSize: 17, lineHeight: 1.8, color: "rgba(255,255,255,0.88)", marginBottom: 38, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}>
             A Christian-founded mixed secondary school on a 28-acre campus in Gayaza — producing morally upright, academically excellent, Christ-like leaders of tomorrow.
           </p>
@@ -649,6 +662,47 @@ export default function App() {
           ))}
         </div>
       </div>
+
+      {/* ===== WELCOME ===== */}
+      <section id="welcome" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+        <div className="welcome-grid">
+          <div className="welcome-media" style={{ position: "relative" }}>
+            <div style={{ position: "absolute", inset: -10, borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.18))`, zIndex: 0 }} />
+            <img src={img_assembly1} alt="Grace High School community" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 430, objectFit: "cover", borderRadius: 14, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
+            <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
+              <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Run With a Vision</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ display: "block", width: 28, height: 2, background: GREEN_MAIN }} />
+              Welcome Message
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 18 }}>
+              Welcome to Grace High School
+            </h2>
+            <p style={{ fontSize: 15.5, color: "#5A5A5A", lineHeight: 1.8, marginBottom: 16 }}>
+              Thank you for your interest in Grace High School &ndash; Gayaza. Since our founding, we have been dedicated to nurturing young people who are academically excellent, morally upright, and grounded in Christian values.
+            </p>
+            <p style={{ fontSize: 15.5, color: "#5A5A5A", lineHeight: 1.8, marginBottom: 16 }}>
+              On our 28-acre campus near Kasangati, students learn in a safe, supportive environment guided by passionate teachers. We offer both O-Level and A-Level programmes, alongside vocational skills and a vibrant co-curricular life that helps every learner discover their God-given potential.
+            </p>
+            <p style={{ fontSize: 15.5, color: "#5A5A5A", lineHeight: 1.8, marginBottom: 24 }}>
+              We warmly invite you to join the Grace family and partner with us in shaping a bright future for your child.
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 18, borderTop: `1px solid ${GREEN_LIGHT}` }}>
+              <div style={{ width: 44, height: 44, flexShrink: 0, borderRadius: "50%", background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /></svg>
+              </div>
+              <div>
+                <p style={{ fontSize: 15, fontWeight: 700, color: GREEN_DARK, margin: 0 }}>The Head Teacher</p>
+                <p style={{ fontSize: 13, color: GREEN_MAIN, margin: 0 }}>Grace High School, Gayaza</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ===== ABOUT ===== */}
       <section id="about" style={{ background: WHITE, padding: "56px 5%" }}>
@@ -747,6 +801,37 @@ export default function App() {
                 <blockquote style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontStyle: "italic", color: GREEN_DARK, fontWeight: 700, margin: 0 }}>"Run With a Vision"</blockquote>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== ACHIEVEMENTS ===== */}
+      <section id="achievements" style={{ background: GREEN_DARK, padding: "64px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
+              Our Achievements
+              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, lineHeight: 1.2, marginBottom: 14 }}>A Tradition of Excellence</h2>
+            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.72)", lineHeight: 1.7 }}>Year after year, our students excel in the classroom and beyond — growing into confident, capable, and Christ-like leaders.</p>
+          </div>
+          <div className="achv-grid">
+            {[
+              { icon: <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></>, title: "Consistent Results", desc: "Strong first-grade performances at O-Level and solid A-Level passes, term after term." },
+              { icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>, title: "University Pathways", desc: "A-Level graduates progressing to universities and tertiary institutions at home and abroad." },
+              { icon: <><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></>, title: "Beyond the Classroom", desc: "Achievements in sports, music, dance & drama, debate, and student leadership." },
+              { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, title: "Christ-Centred Character", desc: "Graduates who are disciplined, morally upright, and God-fearing." },
+            ].map((a, i) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "26px 22px", textAlign: "center" }}>
+                <div style={{ width: 56, height: 56, margin: "0 auto 16px", borderRadius: 14, background: "rgba(142,237,192,0.12)", border: "1px solid rgba(142,237,192,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#8EEDC0" }}>
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{a.icon}</svg>
+                </div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: WHITE, marginBottom: 8 }}>{a.title}</h3>
+                <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.6 }}>{a.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
