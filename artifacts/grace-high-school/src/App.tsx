@@ -51,9 +51,7 @@ const HERO_SLIDES = [
   img_campus_hero,
   img_campus,
   img_assembly1,
-  img_garden,
   img_alevel,
-  img_mdd,
 ];
 
 const API = "/api";
@@ -136,24 +134,14 @@ export default function App() {
     { src: img_science,     label: "Science Students — Lab Coats & Study",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
-    { src: img_alevel,    label: "A-Level Students — S5 & S6 Class", cat: "campus", wide: true },
-    { src: img_campus_hero, label: "Campus Grounds — 28-Acre Campus, Gayaza", cat: "campus", wide: true },
-    { src: img_assembly1, label: "School Assembly — Students Gathered", cat: "events", wide: true },
-    { src: img_mdd,       label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
-    { src: img_lab,       label: "Chemistry Lab — Practical Session",   cat: "academics" },
-    { src: img_sewing,    label: "Vocational Skills — Tailoring Class", cat: "vocational" },
-    { src: img_exam,      label: "Examinations — Silent Study Hall",    cat: "academics" },
-    { src: img_welding,   label: "Vocational Skills — Metal Welding",   cat: "vocational", wide: true },
-    { src: img_campus,    label: "Campus Grounds — 28 Acres of Green",  cat: "campus" },
-    { src: img_trophy,    label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
-    { src: img_dorm,      label: "Dormitory — Boarding Facilities",     cat: "campus" },
-    { src: img_waterfilter,label:"Science Outreach — Water Filter Demo",cat: "academics" },
-    { src: img_conference, label:"Renewable Energy Conference 2023",    cat: "achievements" },
-    { src: img_garden,    label: "Agriculture — Students in the Farm",  cat: "vocational" },
-    { src: img_food,      label: "Dining — Wholesome School Meals",     cat: "campus" },
-    { src: img_assembly3, label: "Inter-School Event — Gayaza Zone",   cat: "events", wide: true },
-    { src: img_excursion, label: "School Trip — Semuliki Hot Springs",  cat: "events" },
-    { src: img_media,     label: "Spark TV Feature — Extra-Curricular",cat: "achievements" },
+    { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
+    { src: img_campus,      label: "Campus Grounds — 28 Acres of Green",     cat: "campus" },
+    { src: img_dorm,        label: "Dormitory — Boarding Facilities",        cat: "campus" },
+    { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
+    { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
+    { src: img_welding,     label: "Vocational Skills — Metal Welding",      cat: "vocational", wide: true },
+    { src: img_garden,      label: "Agriculture — Students in the Farm",     cat: "vocational" },
+    { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
   ];
 
   const schoolVideos = [
