@@ -134,61 +134,54 @@ body {
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 220px;
-  gap: 12px;
+  grid-auto-rows: 230px;
+  gap: 14px;
 }
-.gallery-item { border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s; }
-.gallery-item:hover { transform: scale(1.03); box-shadow: 0 18px 40px rgba(10,64,32,0.28); z-index: 2; }
+.gallery-item {
+  border-radius: 14px; overflow: hidden; position: relative; cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.35s;
+  box-shadow: 0 4px 16px rgba(10,64,32,0.08);
+}
+.gallery-item:hover,
+.gallery-item:focus-visible { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(10,64,32,0.28); z-index: 2; }
+.gallery-item:focus-visible { outline: 3px solid #C9A24B; outline-offset: 3px; }
 .gallery-item.wide { grid-column: span 2; }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.6s cubic-bezier(0.2,0.7,0.2,1), filter 0.4s;
+}
+.gallery-item:hover img,
+.gallery-item:focus-visible img { transform: scale(1.07); filter: saturate(1.08) brightness(0.92); }
+.gallery-cat {
+  position: absolute; top: 12px; left: 12px; z-index: 2;
+  background: rgba(255,255,255,0.92); color: #0A4020;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 5px 11px; border-radius: 100px;
+  backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(10,64,32,0.15);
+}
+.gallery-zoom {
+  position: absolute; top: 50%; left: 50%; z-index: 2;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,0.95); color: #1A6B3C;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 0 6px 18px rgba(10,64,32,0.3);
+}
+.gallery-item:hover .gallery-zoom,
+.gallery-item:focus-visible .gallery-zoom { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 .gallery-caption {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(10,64,32,0.85));
-  padding: 24px 14px 10px; color: white; font-size: 12px; font-weight: 500;
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
+  background: linear-gradient(transparent, rgba(10,64,32,0.92));
+  padding: 32px 16px 14px; color: white; font-size: 13px; font-weight: 600; line-height: 1.4;
+  transform: translateY(6px); opacity: 0.92; transition: transform 0.35s, opacity 0.35s;
 }
-
-/* ========== PHOTO MARQUEE (sliding gallery) ========== */
-.marquee {
-  overflow: hidden;
-  width: 100%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation-name: marquee-scroll;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-.marquee:hover .marquee-track { animation-play-state: paused; }
-.marquee-card {
-  position: relative;
-  flex: 0 0 auto;
-  width: 340px;
-  height: 230px;
-  margin-right: 16px;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(10,64,32,0.12);
-}
-.marquee-card img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.08) contrast(1.04); transition: transform 0.5s ease; }
-.marquee-card:hover img { transform: scale(1.06); }
-@keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@media (max-width: 580px) {
-  .marquee-card { width: 260px; height: 180px; margin-right: 12px; }
-}
+.gallery-item:hover .gallery-caption,
+.gallery-item:focus-visible .gallery-caption { transform: translateY(0); opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .marquee {
-    overflow-x: auto;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-  .marquee-track { animation: none; }
+  .gallery-item, .gallery-item img, .gallery-zoom, .gallery-caption { transition: none; }
+  .gallery-item:hover, .gallery-item:focus-visible { transform: none; }
+  .gallery-item:hover img, .gallery-item:focus-visible img { transform: none; }
 }
 
 /* ========== TESTIMONIALS ========== */

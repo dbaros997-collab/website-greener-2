@@ -285,6 +285,8 @@ export default function App() {
   const filtered = galleryFilter === "all"
     ? galleryViewItems
     : galleryViewItems.filter((g) => g.cat === galleryFilter);
+  const catLabel = (cat: string) =>
+    ({ campus: "Campus", academics: "Academics", vocational: "Vocational", events: "Events", achievements: "Achievements" } as Record<string, string>)[cat] ?? cat;
 
   const navBg = scrolled
     ? `rgba(255,255,255,0.98)`
@@ -878,36 +880,52 @@ export default function App() {
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 560, marginBottom: 24 }}>Our 28-acre campus near Kasangati, Gayaza provides a serene, green environment ideal for learning, worship, and growth.</p>
 
           {/* Filter buttons */}
-          <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 10, marginBottom: 26, flexWrap: "wrap" }}>
             {[
-              { key: "all",          label: "All Photos" },
-              { key: "campus",       label: "🏫 Campus" },
-              { key: "academics",    label: "📚 Academics" },
-              { key: "vocational",   label: "🔧 Vocational" },
-              { key: "events",       label: "🎉 Events" },
-              { key: "achievements", label: "🏆 Achievements" },
-            ].map(btn => (
-              <button key={btn.key} onClick={() => setGalFilter(btn.key)} style={{
-                padding: "8px 18px", borderRadius: 100, fontSize: 13, fontWeight: 600,
-                cursor: "pointer",
-                background: galleryFilter === btn.key ? GREEN_DARK : "transparent",
-                color: galleryFilter === btn.key ? WHITE : "#5A5A5A",
-                border: `1.5px solid ${galleryFilter === btn.key ? GREEN_DARK : "rgba(0,0,0,0.1)"}`,
-                transition: "all 0.2s",
-              }}>{btn.label}</button>
-            ))}
+              { key: "all",          label: "All Photos",   icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></> },
+              { key: "campus",       label: "Campus",       icon: <><path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-3" /><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01" /></> },
+              { key: "academics",    label: "Academics",    icon: <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></> },
+              { key: "vocational",   label: "Vocational",   icon: <><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></> },
+              { key: "events",       label: "Events",       icon: <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></> },
+              { key: "achievements", label: "Achievements", icon: <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></> },
+            ].map(btn => {
+              const active = galleryFilter === btn.key;
+              return (
+                <button key={btn.key} onClick={() => setGalFilter(btn.key)} style={{
+                  display: "inline-flex", alignItems: "center", gap: 7,
+                  padding: "9px 18px", borderRadius: 100, fontSize: 13, fontWeight: 600,
+                  cursor: "pointer",
+                  background: active ? `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})` : WHITE,
+                  color: active ? WHITE : "#4A5A50",
+                  border: `1.5px solid ${active ? "transparent" : "rgba(10,64,32,0.12)"}`,
+                  boxShadow: active ? "0 8px 20px rgba(10,64,32,0.22)" : "none",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={e => { if (!active) { e.currentTarget.style.borderColor = GREEN_MAIN; e.currentTarget.style.color = GREEN_MAIN; } }}
+                onMouseLeave={e => { if (!active) { e.currentTarget.style.borderColor = "rgba(10,64,32,0.12)"; e.currentTarget.style.color = "#4A5A50"; } }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{btn.icon}</svg>
+                  {btn.label}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Sliding photo carousel — moves continuously, pauses on hover */}
-          <div className="marquee">
-            <div className="marquee-track" style={{ animationDuration: `${Math.max(filtered.length * 5, 24)}s` }}>
-              {[...filtered, ...filtered].map((item, i) => (
-                <div key={i} className="marquee-card" onClick={() => setLightbox(item.src)}>
-                  <img src={item.src} alt={item.label} />
-                  <div className="gallery-caption">{item.label}</div>
-                </div>
-              ))}
-            </div>
+          {/* Modern masonry gallery grid */}
+          <div className="gallery-grid">
+            {filtered.map((item, i) => (
+              <div key={i} className={`gallery-item${item.wide ? " wide" : ""}`}
+                role="button" tabIndex={0} aria-label={`View photo: ${item.label}`}
+                onClick={() => setLightbox(item.src)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setLightbox(item.src); } }}>
+                <img src={item.src} alt={item.label} />
+                <span className="gallery-cat">{catLabel(item.cat)}</span>
+                <span className="gallery-zoom" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3M11 8v6M8 11h6" /></svg>
+                </span>
+                <div className="gallery-caption">{item.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
