@@ -481,7 +481,7 @@ export default function App() {
         boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "none",
         transition: "height 0.3s, background 0.3s, box-shadow 0.3s",
       }}>
-        <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+        <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none", alignSelf: "flex-start", marginTop: scrolled ? 6 : 8 }}>
           <img
             src={schoolLogo}
             alt="Grace High School Logo"
@@ -490,8 +490,7 @@ export default function App() {
               width: "auto",
               objectFit: "contain",
               flexShrink: 0,
-              marginTop: scrolled ? 18 : 30,
-              transition: "height 0.3s, margin-top 0.3s",
+              transition: "height 0.3s",
               filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.45))",
             }}
           />
