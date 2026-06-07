@@ -389,9 +389,9 @@ export default function App() {
     ({ campus: "Campus", academics: "Academics", vocational: "Vocational", events: "Events", achievements: "Achievements" } as Record<string, string>)[cat] ?? cat;
 
   const navBg = scrolled
-    ? `rgba(255,255,255,0.98)`
+    ? `rgba(10,64,32,0.45)`
     : `transparent`;
-  const navText = scrolled ? GREEN_DARK : WHITE;
+  const navText = WHITE;
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: OFF_WHITE, color: "#1A1A1A", overflowX: "hidden" }}>
@@ -440,9 +440,10 @@ export default function App() {
       {/* ===== UTILITY BAR ===== */}
       <div className={scrolled ? "nav-drop" : undefined} style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 1001,
-        background: scrolled ? "#062C15" : "transparent", height: 36, padding: "0 5%",
+        background: scrolled ? "rgba(6,44,21,0.35)" : "transparent", height: 36, padding: "0 5%",
+        backdropFilter: scrolled ? "blur(10px)" : "none",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
         transition: "background 0.3s",
       }}>
         <div className="utility-links" style={{ display: "flex", alignItems: "center", gap: 22 }}>
@@ -477,8 +478,8 @@ export default function App() {
         background: navBg, backdropFilter: scrolled ? "blur(10px)" : "none",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: `0 5%`, height: scrolled ? "62px" : "74px",
-        borderBottom: scrolled ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
-        boxShadow: scrolled ? "0 4px 20px rgba(10,64,32,0.12)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
+        boxShadow: scrolled ? "0 8px 30px rgba(10,64,32,0.18)" : "none",
         transition: "height 0.3s, background 0.3s, box-shadow 0.3s",
       }}>
         <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none", alignSelf: "flex-start", marginTop: scrolled ? 6 : 8 }}>
@@ -508,7 +509,7 @@ export default function App() {
                 background: "none", border: "none", cursor: "pointer",
                 color: openGroup === group.label ? GOLD : navText, fontSize: 14, fontWeight: 600,
                 letterSpacing: "0.01em", transition: "color 0.2s",
-                textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.35)",
+                textShadow: "0 1px 6px rgba(0,0,0,0.35)",
                 display: "inline-flex", alignItems: "center", gap: 5,
               }}
               onMouseEnter={e => (e.currentTarget.style.color = GOLD)}
