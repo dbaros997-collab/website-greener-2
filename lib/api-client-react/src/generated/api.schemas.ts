@@ -78,6 +78,93 @@ export interface ErrorEnvelope {
   error: string;
 }
 
+/**
+ * enquiry or application.
+ */
+export type SubmissionType = typeof SubmissionType[keyof typeof SubmissionType];
+
+
+export const SubmissionType = {
+  enquiry: 'enquiry',
+  application: 'application',
+} as const;
+
+/**
+ * new or read.
+ */
+export type SubmissionStatus = typeof SubmissionStatus[keyof typeof SubmissionStatus];
+
+
+export const SubmissionStatus = {
+  new: 'new',
+  read: 'read',
+} as const;
+
+export interface Submission {
+  id: number;
+  /** enquiry or application. */
+  type: SubmissionType;
+  firstName: string;
+  lastName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  /** Class the applicant is applying for (e.g. S1). */
+  level?: string | null;
+  message?: string | null;
+  /** new or read. */
+  status: SubmissionStatus;
+  createdAt: string;
+}
+
+export type SubmissionList = Submission[];
+
+/**
+ * enquiry or application. Defaults to enquiry.
+ */
+export type CreateSubmissionInputType = typeof CreateSubmissionInputType[keyof typeof CreateSubmissionInputType];
+
+
+export const CreateSubmissionInputType = {
+  enquiry: 'enquiry',
+  application: 'application',
+} as const;
+
+export interface CreateSubmissionInput {
+  /** enquiry or application. Defaults to enquiry. */
+  type?: CreateSubmissionInputType;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  firstName: string;
+  /** @maxLength 120 */
+  lastName?: string | null;
+  /** @maxLength 200 */
+  email?: string | null;
+  /** @maxLength 40 */
+  phone?: string | null;
+  /** @maxLength 40 */
+  level?: string | null;
+  /** @maxLength 2000 */
+  message?: string | null;
+}
+
+/**
+ * new or read.
+ */
+export type UpdateSubmissionInputStatus = typeof UpdateSubmissionInputStatus[keyof typeof UpdateSubmissionInputStatus];
+
+
+export const UpdateSubmissionInputStatus = {
+  new: 'new',
+  read: 'read',
+} as const;
+
+export interface UpdateSubmissionInput {
+  /** new or read. */
+  status: UpdateSubmissionInputStatus;
+}
+
 export interface NewsItem {
   id: number;
   message: string;

@@ -13,7 +13,9 @@ tags:
   - name: Storage
     description: Object storage upload and serving endpoints.
   - name: Resources
-    description: Student resources (past papers and holiday work).
+    description: Student resources (past papers, holiday work, and application forms).
+  - name: Submissions
+    description: Enquiry / application form submissions captured from the public site.
 paths:
   /healthz:
     get:
@@ -194,6 +196,112 @@ paths:
           description: Resource deleted.
         '404':
           description: Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /submissions:
+    get:
+      tags: [Submissions]
+      operationId: listSubmissions
+      summary: List form submissions
+      description: Admin-only. Returns enquiry / application submissions, newest first.
+      responses:
+        '200':
+          description: List of submissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionList'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+    post:
+      tags: [Submissions]
+      operationId: createSubmission
+      summary: Submit an enquiry / application
+      description: Public endpoint. Captures a form submission from the website.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubmissionInput'
+      responses:
+        '201':
+          description: Submission created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /submissions/{id}:
+    patch:
+      tags: [Submissions]
+      operationId: updateSubmission
+      summary: Update a submission's status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Submission id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubmissionInput'
+      responses:
+        '200':
+          description: Submission updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Submission not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+    delete:
+      tags: [Submissions]
+      operationId: deleteSubmission
+      summary: Delete a submission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Submission id.
+      responses:
+        '204':
+          description: Submission deleted.
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Submission not found.
           content:
             application/json:
               schema:
@@ -1482,6 +1590,85 @@ components:
       properties:
         error:
           type: string
+    Submission:
+      type: object
+      required: [id, type, firstName, status, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [enquiry, application]
+          description: enquiry or application.
+        firstName:
+          type: string
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        level:
+          type: string
+          nullable: true
+          description: Class the applicant is applying for (e.g. S1).
+        message:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [new, read]
+          description: new or read.
+        createdAt:
+          type: string
+          format: date-time
+    SubmissionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Submission'
+    CreateSubmissionInput:
+      type: object
+      required: [firstName]
+      properties:
+        type:
+          type: string
+          enum: [enquiry, application]
+          description: enquiry or application. Defaults to enquiry.
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        lastName:
+          type: string
+          nullable: true
+          maxLength: 120
+        email:
+          type: string
+          nullable: true
+          maxLength: 200
+        phone:
+          type: string
+          nullable: true
+          maxLength: 40
+        level:
+          type: string
+          nullable: true
+          maxLength: 40
+        message:
+          type: string
+          nullable: true
+          maxLength: 2000
+    UpdateSubmissionInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [new, read]
+          description: new or read.
     NewsItem:
       type: object
       required: [id, message, isVisible, sortOrder, createdAt]

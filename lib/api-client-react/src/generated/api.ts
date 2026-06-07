@@ -26,6 +26,7 @@ import type {
   AdmissionStepPatch,
   AuthUser,
   CreateResourceInput,
+  CreateSubmissionInput,
   ErrorEnvelope,
   GalleryImage,
   GalleryImageInput,
@@ -65,10 +66,13 @@ import type {
   StatInput,
   StatList,
   StatPatch,
+  Submission,
+  SubmissionList,
   Testimonial,
   TestimonialInput,
   TestimonialList,
   TestimonialPatch,
+  UpdateSubmissionInput,
   UploadUrlRequest,
   UploadUrlResponse,
   Video,
@@ -628,6 +632,298 @@ export const useDeleteResource = <TError = ErrorType<ErrorEnvelope>,
         TContext
       > => {
       return useMutation(getDeleteResourceMutationOptions(options));
+    }
+
+export const getListSubmissionsUrl = () => {
+
+
+
+
+  return `/api/submissions`
+}
+
+/**
+ * Admin-only. Returns enquiry / application submissions, newest first.
+ * @summary List form submissions
+ */
+export const listSubmissions = async ( options?: RequestInit): Promise<SubmissionList> => {
+
+  return customFetch<SubmissionList>(getListSubmissionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSubmissionsQueryKey = () => {
+    return [
+    `/api/submissions`
+    ] as const;
+    }
+
+
+export const getListSubmissionsQueryOptions = <TData = Awaited<ReturnType<typeof listSubmissions>>, TError = ErrorType<ErrorEnvelope>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSubmissionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubmissions>>> = ({ signal }) => listSubmissions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSubmissions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSubmissionsQueryResult = NonNullable<Awaited<ReturnType<typeof listSubmissions>>>
+export type ListSubmissionsQueryError = ErrorType<ErrorEnvelope>
+
+
+/**
+ * @summary List form submissions
+ */
+
+export function useListSubmissions<TData = Awaited<ReturnType<typeof listSubmissions>>, TError = ErrorType<ErrorEnvelope>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSubmissionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSubmissionUrl = () => {
+
+
+
+
+  return `/api/submissions`
+}
+
+/**
+ * Public endpoint. Captures a form submission from the website.
+ * @summary Submit an enquiry / application
+ */
+export const createSubmission = async (createSubmissionInput: CreateSubmissionInput, options?: RequestInit): Promise<Submission> => {
+
+  return customFetch<Submission>(getCreateSubmissionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSubmissionInput,)
+  }
+);}
+
+
+
+
+export const getCreateSubmissionMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubmission>>, TError,{data: BodyType<CreateSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubmission>>, TError,{data: BodyType<CreateSubmissionInput>}, TContext> => {
+
+const mutationKey = ['createSubmission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubmission>>, {data: BodyType<CreateSubmissionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSubmission(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubmissionMutationResult = NonNullable<Awaited<ReturnType<typeof createSubmission>>>
+    export type CreateSubmissionMutationBody = BodyType<CreateSubmissionInput>
+    export type CreateSubmissionMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Submit an enquiry / application
+ */
+export const useCreateSubmission = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubmission>>, TError,{data: BodyType<CreateSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSubmission>>,
+        TError,
+        {data: BodyType<CreateSubmissionInput>},
+        TContext
+      > => {
+      return useMutation(getCreateSubmissionMutationOptions(options));
+    }
+
+export const getUpdateSubmissionUrl = (id: number,) => {
+
+
+
+
+  return `/api/submissions/${id}`
+}
+
+/**
+ * @summary Update a submission's status
+ */
+export const updateSubmission = async (id: number,
+    updateSubmissionInput: UpdateSubmissionInput, options?: RequestInit): Promise<Submission> => {
+
+  return customFetch<Submission>(getUpdateSubmissionUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSubmissionInput,)
+  }
+);}
+
+
+
+
+export const getUpdateSubmissionMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubmission>>, TError,{id: number;data: BodyType<UpdateSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubmission>>, TError,{id: number;data: BodyType<UpdateSubmissionInput>}, TContext> => {
+
+const mutationKey = ['updateSubmission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubmission>>, {id: number;data: BodyType<UpdateSubmissionInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSubmission(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubmissionMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubmission>>>
+    export type UpdateSubmissionMutationBody = BodyType<UpdateSubmissionInput>
+    export type UpdateSubmissionMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Update a submission's status
+ */
+export const useUpdateSubmission = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubmission>>, TError,{id: number;data: BodyType<UpdateSubmissionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubmission>>,
+        TError,
+        {id: number;data: BodyType<UpdateSubmissionInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateSubmissionMutationOptions(options));
+    }
+
+export const getDeleteSubmissionUrl = (id: number,) => {
+
+
+
+
+  return `/api/submissions/${id}`
+}
+
+/**
+ * @summary Delete a submission
+ */
+export const deleteSubmission = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteSubmissionUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteSubmissionMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubmission>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSubmission>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteSubmission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSubmission>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteSubmission(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSubmissionMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSubmission>>>
+
+    export type DeleteSubmissionMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Delete a submission
+ */
+export const useDeleteSubmission = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubmission>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSubmission>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteSubmissionMutationOptions(options));
     }
 
 export const getListNewsItemsUrl = (params?: ListNewsItemsParams,) => {

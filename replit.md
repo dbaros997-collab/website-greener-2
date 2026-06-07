@@ -24,9 +24,9 @@ _Replace the heading above with the project's name, and this line with one sente
 
 - Website UI: `artifacts/grace-high-school/src/App.tsx` (single-file sections; nav links live in two identical arrays) + `src/index.css` (responsive grids). Content sections read from the public GET APIs via generated hooks and fall back to in-file static arrays (`*_FALLBACK`) when the API is empty/unreachable. `src/main.tsx` provides the `QueryClientProvider`.
 - Admin dashboard: `artifacts/admin/` (slug `admin`, preview `/admin/`). `src/pages/Login.tsx` + `Dashboard.tsx`, `src/lib/auth.tsx` (session-backed auth context), `src/components/ContentSection.tsx` (generic CRUD/reorder/visibility panel; supports text/textarea/array/boolean fields + gallery image upload), `src/components/SiteTextSection.tsx` ("Section Text" tab — edits fixed section headings/paragraphs via GET/PATCH per key).
-- API server: `artifacts/api-server/src/routes/` — `storage.ts` (presigned uploads + object serving), `resources.ts` (past papers / holiday work CRUD), `content.ts` (generic CRUD factory for the 8 content tables), `site-text.ts` (editable fixed section copy; canonical blocks defined in-route), `auth.ts` (login/logout/me, scrypt + pg sessions), wired in `routes/index.ts`.
+- API server: `artifacts/api-server/src/routes/` — `storage.ts` (presigned uploads + object serving), `resources.ts` (past papers / holiday work / application forms CRUD), `content.ts` (generic CRUD factory for the 8 content tables), `site-text.ts` (editable fixed section copy; canonical blocks defined in-route), `submissions.ts` (public POST + authed GET/PATCH/DELETE for enquiry/application form submissions; in-route per-IP rate limit + `website` honeypot), `auth.ts` (login/logout/me, scrypt + pg sessions), wired in `routes/index.ts`.
 - API contract (source of truth): `lib/api-spec/openapi.yaml` → run codegen to regenerate hooks + zod schemas.
-- DB schema: `lib/db/src/schema/` — `resources.ts` (downloadable resources), `content.ts` (8 content tables + `site_text` key/value table for editable fixed section copy), `staffUsers.ts` (admin accounts).
+- DB schema: `lib/db/src/schema/` — `resources.ts` (downloadable resources), `content.ts` (8 content tables + `site_text` key/value table for editable fixed section copy), `submissions.ts` (`form_submissions` table with `type`/`status` CHECK constraints), `staffUsers.ts` (admin accounts).
 - Seed: `scripts/src/seed.ts` — idempotent admin account + seeds content tables from App.tsx data when empty (gallery left empty).
 - Object storage helpers: `artifacts/api-server/src/lib/objectStorage.ts`.
 
@@ -47,6 +47,8 @@ A staff-only **Admin Dashboard** (preview `/admin/`) lets staff manage all edita
 
 ## Recent changes
 
+- **Form submissions ("Enquire / Apply Now" → admin).** The public enquiry form now POSTs to `POST /api/submissions` (public) and stores rows in the `form_submissions` table. Staff view, mark read/new, delete, and **export CSV** from a new **"Enquiries" tab** in the Admin Dashboard (`SubmissionsSection.tsx`); GET/PATCH/DELETE are behind `requireAuth`. `type` (`enquiry`/`application`) and `status` (`new`/`read`) are enforced as enums end-to-end (OpenAPI → generated Zod → route validation → DB CHECK constraints). The public POST is abuse-hardened: in-memory per-IP rate limit (5/min → 429), a hidden `website` honeypot field (silently accepted, never stored), and `maxLength` guards on all free-text fields. Staff can also upload downloadable **S1/S5 application forms** via the new `application_form` resource category (renders as an "Application Forms" group on the public site alongside past papers / holiday work).
+
 - **Above-the-fold restyled to mirror St. Joseph of Nazareth HS (jonahs.ac.ug) layout**, adapted to Grace's green+gold branding (no red). Hero now uses an italic eyebrow ("Be Part of Our Story") + a heavy Inter-800 rotating headline `[word] to Create the Future.` (word cycles from the `HERO_WORDS` const in sync with `heroSlide`) + a single green "Enroll Now" CTA and an outline "Read Our Story" (the old serif "Run With a Vision" h1, `HERO_TAGLINES`, and 3 gold buttons were removed). A new **service-cards row** (`.service-grid`, 4 clickable cards → scroll to admissions/about/achievements/resources) sits right after the stats bar. A circular gold "25+ Years of Experience" badge was added to the welcome/Headteacher media block. Hero heavy weight needs Inter 800 (added to the Google Fonts link in `index.html`). NOTE: Programmes intentionally kept as alternating rows (not jonahs-style cards) per the documented revert below.
 - **Testimonials removed from the public site.** The testimonials section and all its supporting front-end code (query hook, carousel state/refs, CSS) were deleted from `artifacts/grace-high-school`. Testimonials still exist as a content type in the API, DB, and the Admin Dashboard (so staff can still manage them), but nothing renders them on the public site. Re-adding the public section would mean re-wiring the hook + UI, not new backend work.
 - **Achievements section** (`id="achievements"`) is styled on a light-green (`GREEN_LIGHT`) background with white cards, soft shadows, and gradient icon badges (`GREEN_MAIN → GREEN_DARK`). Layout class `.achv-grid` (collapses to 2 columns ≤900px).
@@ -59,7 +61,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- **`pnpm --filter @workspace/db run push` is interactive-only here** — drizzle-kit prompts for confirmation on a TTY that isn't available to the agent, so it hangs. For schema changes, apply the equivalent raw DDL via `executeSql` (CREATE TABLE / ALTER TABLE … ADD CONSTRAINT) to match the Drizzle schema, then keep the schema file as the source of truth.
+- **After adding/removing a route file, restart the API Server workflow** — new Express routes aren't picked up by hot reload; the route 404s until `artifacts/api-server: API Server` is restarted.
 
 ## Pointers
 

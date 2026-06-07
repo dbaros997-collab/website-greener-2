@@ -131,6 +131,87 @@ export const DeleteResourceParams = zod.object({
 
 
 /**
+ * Admin-only. Returns enquiry / application submissions, newest first.
+ * @summary List form submissions
+ */
+export const ListSubmissionsResponseItem = zod.object({
+  "id": zod.number(),
+  "type": zod.enum(['enquiry', 'application']).describe('enquiry or application.'),
+  "firstName": zod.string(),
+  "lastName": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "level": zod.string().nullish().describe('Class the applicant is applying for (e.g. S1).'),
+  "message": zod.string().nullish(),
+  "status": zod.enum(['new', 'read']).describe('new or read.'),
+  "createdAt": zod.coerce.date()
+})
+export const ListSubmissionsResponse = zod.array(ListSubmissionsResponseItem)
+
+
+/**
+ * Public endpoint. Captures a form submission from the website.
+ * @summary Submit an enquiry / application
+ */
+export const createSubmissionBodyFirstNameMax = 120;
+
+export const createSubmissionBodyLastNameMax = 120;
+
+export const createSubmissionBodyEmailMax = 200;
+
+export const createSubmissionBodyPhoneMax = 40;
+
+export const createSubmissionBodyLevelMax = 40;
+
+export const createSubmissionBodyMessageMax = 2000;
+
+
+
+export const CreateSubmissionBody = zod.object({
+  "type": zod.enum(['enquiry', 'application']).optional().describe('enquiry or application. Defaults to enquiry.'),
+  "firstName": zod.string().min(1).max(createSubmissionBodyFirstNameMax),
+  "lastName": zod.string().max(createSubmissionBodyLastNameMax).nullish(),
+  "email": zod.string().max(createSubmissionBodyEmailMax).nullish(),
+  "phone": zod.string().max(createSubmissionBodyPhoneMax).nullish(),
+  "level": zod.string().max(createSubmissionBodyLevelMax).nullish(),
+  "message": zod.string().max(createSubmissionBodyMessageMax).nullish()
+})
+
+
+/**
+ * @summary Update a submission's status
+ */
+export const UpdateSubmissionParams = zod.object({
+  "id": zod.coerce.number().describe('Submission id.')
+})
+
+export const UpdateSubmissionBody = zod.object({
+  "status": zod.enum(['new', 'read']).describe('new or read.')
+})
+
+export const UpdateSubmissionResponse = zod.object({
+  "id": zod.number(),
+  "type": zod.enum(['enquiry', 'application']).describe('enquiry or application.'),
+  "firstName": zod.string(),
+  "lastName": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "level": zod.string().nullish().describe('Class the applicant is applying for (e.g. S1).'),
+  "message": zod.string().nullish(),
+  "status": zod.enum(['new', 'read']).describe('new or read.'),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a submission
+ */
+export const DeleteSubmissionParams = zod.object({
+  "id": zod.coerce.number().describe('Submission id.')
+})
+
+
+/**
  * @summary List News
  */
 export const ListNewsItemsQueryParams = zod.object({

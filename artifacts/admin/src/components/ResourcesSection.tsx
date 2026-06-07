@@ -34,6 +34,7 @@ const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/
 const CATEGORIES = [
   { value: "past_paper", label: "Past Paper" },
   { value: "holiday_work", label: "Holiday Work" },
+  { value: "application_form", label: "Application Form" },
 ];
 const LEVELS = ["All", "O-Level", "A-Level", "S1", "S2", "S3", "S4", "S5", "S6"];
 

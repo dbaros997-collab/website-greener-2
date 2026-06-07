@@ -62,7 +62,7 @@ interface Resource {
   id: number;
   title: string;
   subject: string;
-  category: "past_paper" | "holiday_work";
+  category: "past_paper" | "holiday_work" | "application_form";
   level: string;
   term: string | null;
   objectPath: string;
@@ -90,6 +90,8 @@ export default function App() {
   const [galleryFilter, setGalFilter] = useState("all");
   const [admSlide, setAdmSlide]       = useState(0);
   const [formSent, setFormSent]       = useState(false);
+  const [formSending, setFormSending] = useState(false);
+  const [formError, setFormError]     = useState(false);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
   const [heroSlide, setHeroSlide]     = useState(0);
@@ -1183,6 +1185,7 @@ export default function App() {
             ([
               { key: "past_paper" as const, label: "Past Papers", icon: "📄" },
               { key: "holiday_work" as const, label: "Holiday Work", icon: "📝" },
+              { key: "application_form" as const, label: "Application Forms", icon: "🗂️" },
             ]).map(group => {
               const items = resources.filter(r => r.category === group.key);
               return (
@@ -1485,12 +1488,53 @@ export default function App() {
                 ✅ Thank you! We'll be in touch within 1–2 business days.
               </div>
             ) : (
-              <form onSubmit={e => { e.preventDefault(); setFormSent(true); }}>
+              <form onSubmit={async e => {
+                e.preventDefault();
+                const fd = new FormData(e.currentTarget);
+                const firstName = (fd.get("firstName") as string)?.trim();
+                if (!firstName) return;
+                setFormSending(true);
+                try {
+                  const res = await fetch(`${API}/submissions`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      type: "enquiry",
+                      firstName,
+                      lastName: (fd.get("lastName") as string)?.trim() || null,
+                      phone: (fd.get("phone") as string)?.trim() || null,
+                      email: (fd.get("email") as string)?.trim() || null,
+                      level: (fd.get("level") as string) || null,
+                      message: (fd.get("message") as string)?.trim() || null,
+                      website: (fd.get("website") as string) || "",
+                    }),
+                  });
+                  if (!res.ok) throw new Error(`Request failed (${res.status})`);
+                  setFormSent(true);
+                } catch {
+                  setFormError(true);
+                } finally {
+                  setFormSending(false);
+                }
+              }}>
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                />
+                {formError ? (
+                  <div style={{ background: "#FFF4E5", border: "1px solid #E6A23C", borderRadius: 8, padding: 12, marginBottom: 14, fontSize: 13, color: "#8A5A00" }}>
+                    Sorry, something went wrong sending your message. Please try again, or contact the school office directly.
+                  </div>
+                ) : null}
                 <div className="form-name-row">
-                  {[["First Name","text"],["Surname","text"]].map(([lbl, type]) => (
+                  {[["First Name","text","firstName"],["Surname","text","lastName"]].map(([lbl, type, name]) => (
                     <div key={lbl} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                       <label style={{ fontSize: 12, fontWeight: 600, color: "#5A5A5A", letterSpacing: "0.05em", textTransform: "uppercase" }}>{lbl}</label>
-                      <input required type={type} placeholder={lbl} style={{
+                      <input required={name === "firstName"} name={name} type={type} placeholder={lbl} style={{
                         padding: "11px 14px", border: "1.5px solid rgba(0,0,0,0.1)", borderRadius: 6,
                         fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#1A1A1A",
                         background: OFF_WHITE, outline: "none",
@@ -1502,12 +1546,12 @@ export default function App() {
                   ))}
                 </div>
                 {[
-                  ["Phone / WhatsApp", "tel",   "E.g. +256 700 000000"],
-                  ["Email Address",    "email", "yourname@example.com"],
-                ].map(([lbl, type, ph]) => (
+                  ["Phone / WhatsApp", "tel",   "E.g. +256 700 000000", "phone"],
+                  ["Email Address",    "email", "yourname@example.com", "email"],
+                ].map(([lbl, type, ph, name]) => (
                   <div key={lbl} style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
                     <label style={{ fontSize: 12, fontWeight: 600, color: "#5A5A5A", letterSpacing: "0.05em", textTransform: "uppercase" }}>{lbl}</label>
-                    <input type={type} placeholder={ph as string} style={{
+                    <input name={name} type={type} placeholder={ph as string} style={{
                       padding: "11px 14px", border: "1.5px solid rgba(0,0,0,0.1)", borderRadius: 6,
                       fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#1A1A1A",
                       background: OFF_WHITE, outline: "none",
@@ -1519,7 +1563,7 @@ export default function App() {
                 ))}
                 <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#5A5A5A", letterSpacing: "0.05em", textTransform: "uppercase" }}>Applying For</label>
-                  <select required style={{
+                  <select name="level" required style={{
                     padding: "11px 14px", border: "1.5px solid rgba(0,0,0,0.1)", borderRadius: 6,
                     fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#1A1A1A",
                     background: OFF_WHITE, outline: "none",
@@ -1533,7 +1577,7 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 20 }}>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#5A5A5A", letterSpacing: "0.05em", textTransform: "uppercase" }}>Message (Optional)</label>
-                  <textarea rows={3} placeholder="Any questions for us?" style={{
+                  <textarea name="message" rows={3} placeholder="Any questions for us?" style={{
                     padding: "11px 14px", border: "1.5px solid rgba(0,0,0,0.1)", borderRadius: 6,
                     fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#1A1A1A",
                     background: OFF_WHITE, outline: "none", resize: "vertical",
@@ -1542,14 +1586,15 @@ export default function App() {
                   onBlur={e => (e.target.style.borderColor = "rgba(0,0,0,0.1)")}
                   />
                 </div>
-                <button type="submit" style={{
+                <button type="submit" disabled={formSending} style={{
                   width: "100%", background: GREEN_MAIN, color: WHITE,
                   padding: 14, border: "none", borderRadius: 6, fontWeight: 700, fontSize: 15,
-                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "background 0.2s",
+                  cursor: formSending ? "not-allowed" : "pointer", opacity: formSending ? 0.7 : 1,
+                  fontFamily: "'DM Sans', sans-serif", transition: "background 0.2s",
                 }}
                 onMouseEnter={e => (e.currentTarget.style.background = GREEN_DARK)}
                 onMouseLeave={e => (e.currentTarget.style.background = GREEN_MAIN)}
-                >Submit Enquiry</button>
+                >{formSending ? "Sending…" : "Submit Enquiry"}</button>
               </form>
             )}
           </div>

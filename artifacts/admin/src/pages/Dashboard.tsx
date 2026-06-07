@@ -1,6 +1,7 @@
 import { useAuth } from "@/lib/auth";
 import { ContentSection, type FieldDef } from "@/components/ContentSection";
 import { ResourcesSection } from "@/components/ResourcesSection";
+import { SubmissionsSection } from "@/components/SubmissionsSection";
 import { SiteTextSection } from "@/components/SiteTextSection";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,6 +62,7 @@ const TABS: { value: string; label: string }[] = [
   { value: "admissions", label: "Admission Steps" },
   { value: "section-text", label: "Section Text" },
   { value: "resources", label: "Resources" },
+  { value: "enquiries", label: "Enquiries" },
 ];
 
 export default function Dashboard() {
@@ -316,6 +318,10 @@ export default function Dashboard() {
 
           <TabsContent value="resources">
             <ResourcesSection />
+          </TabsContent>
+
+          <TabsContent value="enquiries">
+            <SubmissionsSection />
           </TabsContent>
         </Tabs>
       </main>

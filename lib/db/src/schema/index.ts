@@ -20,3 +20,4 @@
 export * from "./resources";
 export * from "./content";
 export * from "./staff";
+export * from "./submissions";
