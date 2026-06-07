@@ -486,13 +486,13 @@ export default function App() {
             src={schoolLogo}
             alt="Grace High School Logo"
             style={{
-              height: scrolled ? 104 : 140,
+              height: scrolled ? 120 : 164,
               width: "auto",
               objectFit: "contain",
               flexShrink: 0,
-              marginTop: scrolled ? 16 : 26,
+              marginTop: scrolled ? 18 : 30,
               transition: "height 0.3s, margin-top 0.3s",
-              filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.3))",
+              filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.45))",
             }}
           />
         </a>
