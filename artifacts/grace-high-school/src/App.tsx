@@ -21,7 +21,6 @@ import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
 import img_vision_watermark from "@assets/3@_(7)_1780733151190.JPG";
 import img_science from "@assets/IMG_0144_-_Copy_1780654332068.jpg";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
-import img_garden from "@assets/505593050_3139476362884117_3169080199463829847_n_1780398909147.jpg";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
@@ -285,7 +284,6 @@ export default function App() {
     { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
     { src: img_welding,     label: "Vocational Skills — Metal Welding",      cat: "vocational", wide: true },
-    { src: img_garden,      label: "Agriculture — Students in the Farm",     cat: "vocational" },
     { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
   ];
 
