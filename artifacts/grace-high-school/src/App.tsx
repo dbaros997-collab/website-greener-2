@@ -1190,9 +1190,9 @@ export default function App() {
             </div>
           ) : (
             ([
-              { key: "past_paper" as const, label: "Past Papers", icon: "📄", blurb: "Revision papers from previous examinations." },
-              { key: "holiday_work" as const, label: "Holiday Work", icon: "📝", blurb: "Assignments to keep learning over the break." },
-              { key: "application_form" as const, label: "Application Forms", icon: "🗂️", blurb: "Forms for new student admissions." },
+              { key: "past_paper" as const, label: "Past Papers", icon: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" /><path d="M8 9h2" /></>, blurb: "Revision papers from previous examinations." },
+              { key: "holiday_work" as const, label: "Holiday Work", icon: <><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" /></>, blurb: "Assignments to keep learning over the break." },
+              { key: "application_form" as const, label: "Application Forms", icon: <><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /><path d="m9 14 2 2 4-4" /></>, blurb: "Forms for new student admissions." },
             ]).map(group => {
               const items = resources.filter(r => r.category === group.key);
               return (
@@ -1202,9 +1202,9 @@ export default function App() {
                     <span style={{
                       flexShrink: 0, width: 52, height: 52, borderRadius: 14,
                       background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
-                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+                      display: "flex", alignItems: "center", justifyContent: "center", color: WHITE,
                       boxShadow: "0 8px 22px rgba(10,64,32,0.22)",
-                    }}>{group.icon}</span>
+                    }}><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.35rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 2 }}>{group.label}</h3>
                       <p style={{ fontSize: 13, color: "#7A8A80" }}>{group.blurb}</p>
@@ -1226,8 +1226,8 @@ export default function App() {
                     }}>
                       <span style={{
                         width: 56, height: 56, borderRadius: "50%", background: GREEN_LIGHT,
-                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 14, opacity: 0.85,
-                      }}>{group.icon}</span>
+                        display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN, marginBottom: 14,
+                      }}><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
                       <p style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>Nothing here yet</p>
                       <p style={{ fontSize: 13, color: "#8A958F", maxWidth: 320 }}>No {group.label.toLowerCase()} have been uploaded yet — please check back soon.</p>
                     </div>
@@ -1252,8 +1252,8 @@ export default function App() {
                             <span style={{
                               width: 44, height: 44, borderRadius: 12, flexShrink: 0,
                               background: GREEN_LIGHT, color: GREEN_DARK,
-                              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
-                            }}>{group.icon}</span>
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                            }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
                             <span style={{
                               fontSize: 11, fontWeight: 700, letterSpacing: "0.03em",
                               padding: "4px 11px", borderRadius: 999,
