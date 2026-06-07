@@ -647,17 +647,6 @@ export default function App() {
                         radial-gradient(ellipse 120% 90% at 50% 50%, transparent 38%, rgba(8,16,12,0.5) 100%)`,
         }} />
 
-        {/* Scroll cue */}
-        <div className="scroll-cue" style={{
-          position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",
-          zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-        }}>
-          <span style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.85)", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Scroll</span>
-          <span style={{ width: 22, height: 36, borderRadius: 12, border: "1.5px solid rgba(255,255,255,0.4)", display: "flex", justifyContent: "center", paddingTop: 6 }}>
-            <span style={{ width: 3, height: 7, borderRadius: 2, background: GOLD_LIGHT, display: "block" }} />
-          </span>
-        </div>
-
         <div className="hero-center" style={{
           maxWidth: 880, margin: "0 auto", textAlign: "center",
           position: "relative", zIndex: 1,

@@ -115,13 +115,6 @@ body {
 }
 .fade-up { animation: fadeUp 0.6s ease both; }
 
-/* ========== SCROLL CUE ========== */
-@keyframes scroll-bob {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50%      { transform: translateY(6px); opacity: 1; }
-}
-.scroll-cue > span:last-child > span { animation: scroll-bob 2.2s ease-in-out infinite; }
-@media (max-width: 900px) { .scroll-cue { display: none !important; } }
 @media (max-width: 768px) { .utility-links { display: none !important; } }
 
 /* ========== CREST FLOAT ========== */
