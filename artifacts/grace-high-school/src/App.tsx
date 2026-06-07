@@ -1165,32 +1165,72 @@ export default function App() {
       </section>
 
       {/* ===== RESOURCES ===== */}
-      <section id="resources" className="reveal" style={{ background: WHITE, padding: "56px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section id="resources" className="reveal" style={{ background: OFF_WHITE, padding: "72px 5%", position: "relative", overflow: "hidden" }}>
+        {/* soft decorative blobs */}
+        <div aria-hidden style={{ position: "absolute", top: -120, right: -120, width: 360, height: 360, borderRadius: "50%", background: GREEN_LIGHT, opacity: 0.6, filter: "blur(10px)", pointerEvents: "none" }} />
+        <div aria-hidden style={{ position: "absolute", bottom: -140, left: -100, width: 320, height: 320, borderRadius: "50%", background: "rgba(201,162,75,0.10)", pointerEvents: "none" }} />
+        <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Student Resources
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Past Papers &amp; Holiday Work</h2>
-          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 40 }}>
-            Download past examination papers and holiday assignments shared by the school. Click any item to download it to your device.
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Download Centre</h2>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 44 }}>
+            Past examination papers, holiday assignments, and application forms shared by the school — all in one place. Tap any file to download it straight to your device.
           </p>
 
           {resLoading ? (
-            <p style={{ color: "#5A5A5A" }}>Loading resources…</p>
+            <div className="resources-grid">
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ background: WHITE, borderRadius: 18, padding: 22, border: "1px solid rgba(10,64,32,0.07)", height: 150, opacity: 0.6 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: 12, background: GREEN_LIGHT, marginBottom: 16 }} />
+                  <div style={{ width: "70%", height: 12, borderRadius: 6, background: GREEN_LIGHT, marginBottom: 10 }} />
+                  <div style={{ width: "45%", height: 12, borderRadius: 6, background: GREEN_LIGHT }} />
+                </div>
+              ))}
+            </div>
           ) : (
             ([
-              { key: "past_paper" as const, label: "Past Papers", icon: "📄" },
-              { key: "holiday_work" as const, label: "Holiday Work", icon: "📝" },
-              { key: "application_form" as const, label: "Application Forms", icon: "🗂️" },
+              { key: "past_paper" as const, label: "Past Papers", icon: "📄", blurb: "Revision papers from previous examinations." },
+              { key: "holiday_work" as const, label: "Holiday Work", icon: "📝", blurb: "Assignments to keep learning over the break." },
+              { key: "application_form" as const, label: "Application Forms", icon: "🗂️", blurb: "Forms for new student admissions." },
             ]).map(group => {
               const items = resources.filter(r => r.category === group.key);
               return (
-                <div key={group.key} style={{ marginBottom: 44 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: GREEN_DARK, marginBottom: 18, display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: 22 }}>{group.icon}</span>{group.label}
-                  </h3>
+                <div key={group.key} style={{ marginBottom: 40 }}>
+                  {/* group header */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 22, flexWrap: "wrap" }}>
+                    <span style={{
+                      flexShrink: 0, width: 52, height: 52, borderRadius: 14,
+                      background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
+                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+                      boxShadow: "0 8px 22px rgba(10,64,32,0.22)",
+                    }}>{group.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.35rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 2 }}>{group.label}</h3>
+                      <p style={{ fontSize: 13, color: "#7A8A80" }}>{group.blurb}</p>
+                    </div>
+                    <span style={{
+                      flexShrink: 0, fontSize: 12, fontWeight: 700, letterSpacing: "0.03em",
+                      padding: "6px 14px", borderRadius: 999,
+                      background: items.length ? GREEN_LIGHT : "rgba(0,0,0,0.04)",
+                      color: items.length ? GREEN_DARK : "#9AA5A0",
+                      whiteSpace: "nowrap",
+                    }}>{items.length ? `${items.length} file${items.length > 1 ? "s" : ""}` : "Coming soon"}</span>
+                  </div>
+
                   {items.length === 0 ? (
-                    <p style={{ fontSize: 14, color: "#8A8A8A", fontStyle: "italic" }}>No {group.label.toLowerCase()} have been uploaded yet. Please check back soon.</p>
+                    <div style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                      textAlign: "center", padding: "40px 24px", borderRadius: 18,
+                      background: WHITE, border: `1.5px dashed rgba(26,107,60,0.28)`,
+                    }}>
+                      <span style={{
+                        width: 56, height: 56, borderRadius: "50%", background: GREEN_LIGHT,
+                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 14, opacity: 0.85,
+                      }}>{group.icon}</span>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>Nothing here yet</p>
+                      <p style={{ fontSize: 13, color: "#8A958F", maxWidth: 320 }}>No {group.label.toLowerCase()} have been uploaded yet — please check back soon.</p>
+                    </div>
                   ) : (
                     <div className="resources-grid">
                       {items.map(r => (
@@ -1200,21 +1240,35 @@ export default function App() {
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            display: "block", background: OFF_WHITE, borderRadius: 12, padding: 20,
-                            border: "1px solid rgba(0,0,0,0.08)", textDecoration: "none",
+                            display: "flex", flexDirection: "column", background: WHITE, borderRadius: 18, padding: 22,
+                            border: "1px solid rgba(10,64,32,0.08)", textDecoration: "none",
+                            boxShadow: "0 4px 18px rgba(10,64,32,0.05)",
                             transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
                           }}
-                          onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(10,64,32,0.12)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
-                          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)"; }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 16px 44px rgba(10,64,32,0.16)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 18px rgba(10,64,32,0.05)"; e.currentTarget.style.borderColor = "rgba(10,64,32,0.08)"; }}
                         >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN }}>{r.subject}</span>
-                            <span style={{ fontSize: 11, color: "#8A8A8A", whiteSpace: "nowrap" }}>{r.level}</span>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+                            <span style={{
+                              width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                              background: GREEN_LIGHT, color: GREEN_DARK,
+                              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
+                            }}>{group.icon}</span>
+                            <span style={{
+                              fontSize: 11, fontWeight: 700, letterSpacing: "0.03em",
+                              padding: "4px 11px", borderRadius: 999,
+                              background: "rgba(201,162,75,0.16)", color: "#8A6A1E", whiteSpace: "nowrap",
+                            }}>{r.level}</span>
                           </div>
-                          <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: GREEN_DARK, lineHeight: 1.3, marginBottom: 12 }}>{r.title}</h4>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: GREEN_MAIN }}>⬇ Download</span>
-                            <span style={{ fontSize: 11, color: "#A0A0A0" }}>{[r.term, formatSize(r.fileSize)].filter(Boolean).join(" · ")}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{r.subject}</span>
+                          <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.12rem", color: GREEN_DARK, lineHeight: 1.3, marginBottom: 18 }}>{r.title}</h4>
+                          <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, paddingTop: 14, borderTop: "1px solid rgba(10,64,32,0.07)" }}>
+                            <span style={{
+                              display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 700, color: WHITE,
+                              background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
+                              padding: "8px 16px", borderRadius: 999,
+                            }}>⬇ Download</span>
+                            <span style={{ fontSize: 11, color: "#A0AAA4", textAlign: "right" }}>{[r.term, formatSize(r.fileSize)].filter(Boolean).join(" · ")}</span>
                           </div>
                         </a>
                       ))}
