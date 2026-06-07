@@ -490,7 +490,7 @@ export default function App() {
               width: "auto",
               objectFit: "contain",
               flexShrink: 0,
-              marginTop: scrolled ? 6 : 12,
+              marginTop: scrolled ? 16 : 26,
               transition: "height 0.3s, margin-top 0.3s",
               filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.3))",
             }}
