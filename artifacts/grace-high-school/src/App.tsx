@@ -488,7 +488,7 @@ export default function App() {
             src={schoolLogo}
             alt="Grace High School Logo"
             style={{
-              height: scrolled ? 88 : 120,
+              height: scrolled ? 104 : 140,
               width: "auto",
               objectFit: "contain",
               flexShrink: 0,
