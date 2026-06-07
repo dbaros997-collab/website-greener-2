@@ -297,8 +297,16 @@ body {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
+/* Sticky header drop-in (mirrors jonahs.ac.ug sticky behaviour) */
+.nav-drop { animation: navDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes navDrop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .adm-slide-body { animation: none; }
   .hero-tagline { animation: none; }
   .hero-word { animation: none; }
+  .nav-drop { animation: none; }
 }

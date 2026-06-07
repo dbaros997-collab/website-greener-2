@@ -438,7 +438,7 @@ export default function App() {
       )}
 
       {/* ===== UTILITY BAR ===== */}
-      <div style={{
+      <div className={scrolled ? "nav-drop" : undefined} style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 1001,
         background: scrolled ? "#062C15" : "transparent", height: 36, padding: "0 5%",
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -472,7 +472,7 @@ export default function App() {
       </div>
 
       {/* ===== NAV ===== */}
-      <nav style={{
+      <nav className={scrolled ? "nav-drop" : undefined} style={{
         position: "fixed", top: 36, left: 0, right: 0, zIndex: 1000,
         background: navBg, backdropFilter: scrolled ? "blur(10px)" : "none",
         display: "flex", alignItems: "center", justifyContent: "space-between",
