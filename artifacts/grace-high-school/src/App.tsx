@@ -13,7 +13,6 @@ import {
 import schoolLogo from "@assets/school_logo_transparent.png";
 import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
-import img_staff from "@assets/480812359_1141749094311512_4566229955265803529_n_1780400736314.jpg";
 import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_about_group from "@assets/Gemini_Generated_Image_sdzh7psdzh7psdzh_1780738486562.png";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
@@ -282,7 +281,6 @@ export default function App() {
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_science,     label: "Science Students — Lab Coats & Study",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
-    { src: img_staff,       label: "Our Teaching Staff — Grace High School", cat: "campus", wide: true },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
     { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
@@ -1244,39 +1242,32 @@ export default function App() {
             Grace High School is powered by a committed team of qualified teachers and support staff who pour heart and knowledge into every student's journey.
           </p>
 
-          {/* Staff group photo */}
-          <div style={{ borderRadius: 14, overflow: "hidden", marginBottom: 40, position: "relative" }}>
-            <img
-              src={img_staff}
-              alt="Grace High School Staff"
-              style={{ width: "100%", height: 420, objectFit: "cover", objectPosition: "center top", display: "block" }}
-            />
-            <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0,
-              background: `linear-gradient(transparent, rgba(10,64,32,0.88))`,
-              padding: "48px 32px 28px",
-              display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
-            }}>
-              <div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE, marginBottom: 4 }}>
-                  Our Teaching Team
-                </h3>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.75)" }}>
-                  Qualified, passionate educators — Gayaza campus
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 20 }}>
-                {[
-                  { num: "12+", label: "Teaching Staff" },
-                  { num: "100%", label: "Qualified" },
-                  { num: "S1–S6", label: "All Levels" },
-                ].map((s, i) => (
-                  <div key={i} style={{ textAlign: "center" }}>
-                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#8EEDC0", display: "block", lineHeight: 1 }}>{s.num}</span>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Staff stats */}
+          <div style={{
+            borderRadius: 14, marginBottom: 40,
+            background: `linear-gradient(135deg, ${GREEN_DARK}, ${GREEN_MAIN})`,
+            padding: "32px", display: "flex", alignItems: "center",
+            justifyContent: "space-between", flexWrap: "wrap", gap: 24,
+          }}>
+            <div>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE, marginBottom: 4 }}>
+                Our Teaching Team
+              </h3>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.75)" }}>
+                Qualified, passionate educators — Gayaza campus
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: 28 }}>
+              {[
+                { num: "12+", label: "Teaching Staff" },
+                { num: "100%", label: "Qualified" },
+                { num: "S1–S6", label: "All Levels" },
+              ].map((s, i) => (
+                <div key={i} style={{ textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#8EEDC0", display: "block", lineHeight: 1 }}>{s.num}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 
