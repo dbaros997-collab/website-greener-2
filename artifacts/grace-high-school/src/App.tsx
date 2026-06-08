@@ -908,7 +908,6 @@ export default function App() {
                   { icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>, label: "Levels Offered", val: "O-Level (S1–S4) & A-Level (S5–S6)" },
                   { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, label: "Foundation", val: "Christian" },
                   { icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>, label: "Admissions", val: "Open — All Classes" },
-                  { icon: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></>, label: "Email", val: "gracehighschoolgayaza@gmail.com" },
                 ].map((row, i) => (
                   <div key={i} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
