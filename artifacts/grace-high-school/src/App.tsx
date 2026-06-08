@@ -13,7 +13,6 @@ import {
 import schoolLogo from "@assets/school_logo_transparent.png";
 import img_computerlab from "@assets/481077779_1149890966830658_5041740680217479426_n_1780399993019.jpg";
 import img_library from "@assets/481080206_1149891370163951_6952293395059892096_n_1780400223690.jpg";
-import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_about_group from "@assets/Gemini_Generated_Image_sdzh7psdzh7psdzh_1780738486562.png";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
@@ -48,7 +47,6 @@ const GOLD_LIGHT  = "#E6C66E";
 
 const HERO_SLIDES = [
   img_campus_hero,
-  img_assembly1,
   img_alevel,
 ];
 
@@ -284,7 +282,6 @@ export default function App() {
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
-    { src: img_assembly1,   label: "School Assembly — Students Gathered",    cat: "events", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
     { src: img_welding,     label: "Vocational Skills — Metal Welding",      cat: "vocational", wide: true },
     { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
