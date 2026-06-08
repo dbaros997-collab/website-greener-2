@@ -796,7 +796,7 @@ export default function App() {
         <div className="welcome-grid">
           <div className="welcome-media" style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: -10, borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.18))`, zIndex: 0 }} />
-            <img src={img_about_group} alt="The Head Teacher, Grace High School" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 430, objectFit: "cover", objectPosition: "top", borderRadius: 14, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
+            <img src={img_about_group} alt="The Head Teacher, Grace High School" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 470, objectFit: "contain", objectPosition: "center top", borderRadius: 14, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.12))`, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
             <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
               <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
               <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Grace High School</span>
