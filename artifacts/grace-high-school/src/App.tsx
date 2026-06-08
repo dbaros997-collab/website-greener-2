@@ -801,7 +801,7 @@ export default function App() {
             <img src={img_about_group} alt="Grace High School community" style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", maxHeight: 430, objectFit: "cover", borderRadius: 14, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
             <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
               <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Run With a Vision</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Grace High School</span>
             </div>
             {/* Years-of-experience badge */}
             <div style={{ position: "absolute", zIndex: 3, top: -18, right: -14, width: 96, height: 96, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", boxShadow: "0 12px 28px rgba(201,162,75,0.4)", border: "3px solid #FFFFFF" }}>
@@ -923,18 +923,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Motto */}
-            <div style={{ position: "relative", overflow: "hidden", borderRadius: 8, marginTop: 20, border: `1px solid ${GREEN_LIGHT}` }}>
-              <img src={img_vision_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.2 }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(232,245,238,0.93) 0%, rgba(232,245,238,0.86) 100%)" }} />
-              <div style={{ position: "relative", padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, color: "#9A7A2E" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7 7h4v6c0 2.2-1.8 4-4 4v-2c1.1 0 2-.9 2-2H7zM15 7h4v6c0 2.2-1.8 4-4 4v-2c1.1 0 2-.9 2-2h-2z" /></svg>
-                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>School Motto</p>
-                </div>
-                <blockquote style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontStyle: "italic", color: GREEN_DARK, fontWeight: 700, margin: 0 }}>"Run With a Vision"</blockquote>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -1872,7 +1860,6 @@ export default function App() {
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>© {new Date().getFullYear()} Grace High School – Gayaza. All rights reserved.</p>
             <div style={{ textAlign: "right" }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#8EEDC0", marginBottom: 2 }}>Grace High School — Education For A Bright Future</p>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontStyle: "italic" }}>"Run With a Vision" — Isaiah 40:31</p>
             </div>
           </div>
         </div>
