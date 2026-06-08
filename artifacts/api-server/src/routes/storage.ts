@@ -11,6 +11,91 @@ import { requireAuth } from "../lib/auth";
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
 
+const APP_UPLOAD_WINDOW_MS = 60_000;
+const APP_UPLOAD_MAX = 8;
+const appUploadHits = new Map<string, number[]>();
+
+function isAppUploadRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (appUploadHits.get(ip) ?? []).filter(
+    (t) => now - t < APP_UPLOAD_WINDOW_MS,
+  );
+  if (recent.length >= APP_UPLOAD_MAX) {
+    appUploadHits.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  appUploadHits.set(ip, recent);
+  return false;
+}
+
+const ALLOWED_APP_UPLOAD_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+const MAX_APP_UPLOAD_BYTES = 15 * 1024 * 1024;
+
+/**
+ * POST /storage/application-uploads/request-url
+ *
+ * Public (no auth) presigned-upload for prospective students submitting their
+ * completed S1/S5 application form. Rate-limited per IP and restricted to common
+ * document/image types and a max size.
+ */
+router.post(
+  "/storage/application-uploads/request-url",
+  async (req: Request, res: Response) => {
+    const ip = req.ip ?? "unknown";
+    if (isAppUploadRateLimited(ip)) {
+      req.log.warn({ ip }, "Application upload rate limit exceeded");
+      res
+        .status(429)
+        .json({ error: "Too many uploads. Please try again in a minute." });
+      return;
+    }
+
+    const parsed = RequestUploadUrlBody.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Missing or invalid required fields" });
+      return;
+    }
+
+    const { name, size, contentType } = parsed.data;
+    if (!ALLOWED_APP_UPLOAD_TYPES.has(contentType)) {
+      res.status(400).json({
+        error: "Unsupported file type. Please upload a PDF, image, or Word document.",
+      });
+      return;
+    }
+    if (size > MAX_APP_UPLOAD_BYTES) {
+      res
+        .status(400)
+        .json({ error: "File is too large. Maximum size is 15 MB." });
+      return;
+    }
+
+    try {
+      const uploadURL = await objectStorageService.getApplicationUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      res.json(
+        RequestUploadUrlResponse.parse({
+          uploadURL,
+          objectPath,
+          metadata: { name, size, contentType },
+        }),
+      );
+    } catch (error) {
+      req.log.error({ err: error }, "Error generating application upload URL");
+      res.status(500).json({ error: "Failed to generate upload URL" });
+    }
+  },
+);
+
 /**
  * POST /storage/uploads/request-url
  *
@@ -89,6 +174,13 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
   try {
     const raw = req.params.path;
     const wildcardPath = Array.isArray(raw) ? raw.join("/") : raw;
+
+    // Application-form uploads contain applicant PII — staff-only.
+    if (wildcardPath.startsWith("applications/") && !req.session.userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+
     const objectPath = `/objects/${wildcardPath}`;
     const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
 

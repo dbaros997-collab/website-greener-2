@@ -51,6 +51,40 @@ export const RequestUploadUrlResponse = zod.object({
 
 
 /**
+ * Public (no auth). Used by prospective students to upload their completed
+S1/S5 application form. Rate-limited per IP and restricted to common
+document/image types. Returns a presigned GCS URL for direct upload.
+
+ * @summary Request a presigned URL for a public application-form upload
+ */
+
+
+
+
+
+export const RequestApplicationUploadUrlBody = zod.object({
+  "name": zod.string().min(1).describe('Original file name.'),
+  "size": zod.number().min(1).describe('File size in bytes.'),
+  "contentType": zod.string().min(1).describe('MIME type of the file (e.g. `image\/jpeg`).')
+})
+
+
+
+
+
+
+export const RequestApplicationUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url().describe('Presigned GCS URL for PUT upload.'),
+  "objectPath": zod.string().describe('Normalized object path (e.g. `\/objects\/uploads\/uuid`). Store this in your database.'),
+  "metadata": zod.object({
+  "name": zod.string().min(1).describe('Original file name.'),
+  "size": zod.number().min(1).describe('File size in bytes.'),
+  "contentType": zod.string().min(1).describe('MIME type of the file (e.g. `image\/jpeg`).')
+}).optional()
+})
+
+
+/**
  * Unconditionally public — no authentication or ACL checks.
 Searches PUBLIC_OBJECT_SEARCH_PATHS for the given file path.
 
@@ -143,6 +177,8 @@ export const ListSubmissionsResponseItem = zod.object({
   "phone": zod.string().nullish(),
   "level": zod.string().nullish().describe('Class the applicant is applying for (e.g. S1).'),
   "message": zod.string().nullish(),
+  "fileUrl": zod.string().nullish().describe('Object path of the applicant\'s uploaded completed form, if any.'),
+  "fileName": zod.string().nullish().describe('Original file name of the uploaded completed form.'),
   "status": zod.enum(['new', 'read']).describe('new or read.'),
   "createdAt": zod.coerce.date()
 })
@@ -165,6 +201,10 @@ export const createSubmissionBodyLevelMax = 40;
 
 export const createSubmissionBodyMessageMax = 2000;
 
+export const createSubmissionBodyFileUrlMax = 500;
+
+export const createSubmissionBodyFileNameMax = 260;
+
 
 
 export const CreateSubmissionBody = zod.object({
@@ -174,7 +214,9 @@ export const CreateSubmissionBody = zod.object({
   "email": zod.string().max(createSubmissionBodyEmailMax).nullish(),
   "phone": zod.string().max(createSubmissionBodyPhoneMax).nullish(),
   "level": zod.string().max(createSubmissionBodyLevelMax).nullish(),
-  "message": zod.string().max(createSubmissionBodyMessageMax).nullish()
+  "message": zod.string().max(createSubmissionBodyMessageMax).nullish(),
+  "fileUrl": zod.string().max(createSubmissionBodyFileUrlMax).nullish().describe('Object path returned by the application-form upload flow.'),
+  "fileName": zod.string().max(createSubmissionBodyFileNameMax).nullish().describe('Original file name of the uploaded completed form.')
 })
 
 
@@ -198,6 +240,8 @@ export const UpdateSubmissionResponse = zod.object({
   "phone": zod.string().nullish(),
   "level": zod.string().nullish().describe('Class the applicant is applying for (e.g. S1).'),
   "message": zod.string().nullish(),
+  "fileUrl": zod.string().nullish().describe('Object path of the applicant\'s uploaded completed form, if any.'),
+  "fileName": zod.string().nullish().describe('Original file name of the uploaded completed form.'),
   "status": zod.enum(['new', 'read']).describe('new or read.'),
   "createdAt": zod.coerce.date()
 })

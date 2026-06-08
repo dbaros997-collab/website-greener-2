@@ -1,1 +1,2 @@
 - [Grace site preview quirks](grace-preview-quirks.md) — app_preview screenshots render from document top (ignore hash scroll); 88vh hero makes lower sections hard to capture in one shot.
+- [Storage object access tiers](storage-object-access.md) — `uploads/` prefix is public, `applications/` prefix is staff-only PII; same serving route gated by path prefix.

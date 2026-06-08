@@ -17,7 +17,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Mail, Phone, Trash2 } from "lucide-react";
+import { Download, FileText, Mail, Phone, Trash2 } from "lucide-react";
+
+const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -45,6 +47,7 @@ function downloadCsv(items: Submission[]) {
     "Phone",
     "Applying For",
     "Message",
+    "Attached File",
     "Status",
   ];
   const rows = items.map((s) =>
@@ -57,6 +60,7 @@ function downloadCsv(items: Submission[]) {
       s.phone,
       s.level,
       s.message,
+      s.fileName ?? (s.fileUrl ? "attached" : ""),
       s.status,
     ]
       .map(csvCell)
@@ -139,8 +143,10 @@ export function SubmissionsSection() {
             ) : null}
           </CardTitle>
           <CardDescription>
-            Messages submitted through the website&apos;s &ldquo;Enquire / Apply
-            Now&rdquo; form. Download them as a spreadsheet for your records.
+            Enquiries from the &ldquo;Enquire / Apply Now&rdquo; form and completed
+            application forms students upload via &ldquo;Submit Your Completed
+            Form&rdquo;. Open any attached form, or download everything as a
+            spreadsheet for your records.
           </CardDescription>
         </div>
         <Button
@@ -214,6 +220,18 @@ export function SubmissionsSection() {
                   <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">
                     {s.message}
                   </p>
+                ) : null}
+
+                {s.fileUrl ? (
+                  <a
+                    href={`${STORAGE_PREFIX}${s.fileUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
+                  >
+                    <FileText className="h-3.5 w-3.5" />
+                    {s.fileName ?? "Download completed form"}
+                  </a>
                 ) : null}
 
                 <div className="mt-2 flex items-center gap-2">

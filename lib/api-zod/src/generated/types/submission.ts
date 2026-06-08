@@ -19,6 +19,10 @@ export interface Submission {
   /** Class the applicant is applying for (e.g. S1). */
   level?: string | null;
   message?: string | null;
+  /** Object path of the applicant's uploaded completed form, if any. */
+  fileUrl?: string | null;
+  /** Original file name of the uploaded completed form. */
+  fileName?: string | null;
   /** new or read. */
   status: SubmissionStatus;
   createdAt: Date;

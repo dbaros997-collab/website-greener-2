@@ -245,6 +245,81 @@ export const useRequestUploadUrl = <TError = ErrorType<ErrorEnvelope>,
       return useMutation(getRequestUploadUrlMutationOptions(options));
     }
 
+export const getRequestApplicationUploadUrlUrl = () => {
+
+
+
+
+  return `/api/storage/application-uploads/request-url`
+}
+
+/**
+ * Public (no auth). Used by prospective students to upload their completed
+S1/S5 application form. Rate-limited per IP and restricted to common
+document/image types. Returns a presigned GCS URL for direct upload.
+
+ * @summary Request a presigned URL for a public application-form upload
+ */
+export const requestApplicationUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: RequestInit): Promise<UploadUrlResponse> => {
+
+  return customFetch<UploadUrlResponse>(getRequestApplicationUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      uploadUrlRequest,)
+  }
+);}
+
+
+
+
+export const getRequestApplicationUploadUrlMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestApplicationUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestApplicationUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext> => {
+
+const mutationKey = ['requestApplicationUploadUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestApplicationUploadUrl>>, {data: BodyType<UploadUrlRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestApplicationUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestApplicationUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestApplicationUploadUrl>>>
+    export type RequestApplicationUploadUrlMutationBody = BodyType<UploadUrlRequest>
+    export type RequestApplicationUploadUrlMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Request a presigned URL for a public application-form upload
+ */
+export const useRequestApplicationUploadUrl = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestApplicationUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestApplicationUploadUrl>>,
+        TError,
+        {data: BodyType<UploadUrlRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestApplicationUploadUrlMutationOptions(options));
+    }
+
 export const getGetPublicObjectUrl = (filePath: string,) => {
 
 

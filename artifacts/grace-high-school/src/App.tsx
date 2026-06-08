@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListNewsItems,
@@ -90,6 +90,10 @@ export default function App() {
   const [formSent, setFormSent]       = useState(false);
   const [formSending, setFormSending] = useState(false);
   const [formError, setFormError]     = useState(false);
+  const [submitFile, setSubmitFile]   = useState<File | null>(null);
+  const [submitSending, setSubmitSending] = useState(false);
+  const [submitSent, setSubmitSent]   = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [resources, setResources]     = useState<Resource[]>([]);
   const [resLoading, setResLoading]   = useState(true);
   const [heroSlide, setHeroSlide]     = useState(0);
@@ -294,6 +298,12 @@ export default function App() {
   // ===== Dynamic content (DB-backed, with the static content above as a
   // graceful fallback whenever the API is empty or unreachable). =====
   const storageUrl = (objectPath: string) => `${API}/storage${objectPath}`;
+
+  const sfInput: CSSProperties = {
+    padding: "11px 14px", border: "1.5px solid rgba(255,255,255,0.18)", borderRadius: 6,
+    fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: WHITE,
+    background: "rgba(255,255,255,0.06)", outline: "none", width: "100%",
+  };
 
   const newsQ = useListNewsItems();
   const statsQ = useListStats();
@@ -1481,7 +1491,7 @@ export default function App() {
             {/* Download application forms */}
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginTop: 32, marginBottom: 6 }}>Download Application Form</h3>
             <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, marginBottom: 16 }}>
-              Print, fill in, and return the completed form to the school office. Choose the form for your entry class.
+              Choose the form for your entry class, print and fill it in — then send the completed form straight to the school using the <strong style={{ color: GOLD_LIGHT }}>“Submit Your Completed Form”</strong> box below.
             </p>
             <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {([
@@ -1509,6 +1519,121 @@ export default function App() {
                   </span>
                 </button>
               ))}
+            </div>
+
+            {/* Submit completed form */}
+            <div style={{
+              marginTop: 26, background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, padding: 22,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                <span style={{
+                  flexShrink: 0, width: 34, height: 34, borderRadius: 8,
+                  background: `linear-gradient(135deg, ${GOLD}, ${GOLD_LIGHT})`, color: GREEN_DARK,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                </span>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, margin: 0 }}>Submit Your Completed Form</h3>
+              </div>
+              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, marginBottom: 16 }}>
+                Finished filling in the form? Scan or photograph it and send it straight to the admissions office here — no email needed. We accept PDF, photos, or Word documents (max 15&nbsp;MB).
+              </p>
+              {submitSent ? (
+                <div style={{ background: "rgba(142,237,192,0.14)", border: "1px solid rgba(142,237,192,0.4)", borderRadius: 8, padding: 18, textAlign: "center", fontSize: 14, color: "#8EEDC0", fontWeight: 500 }}>
+                  ✅ Form received! The admissions office will review it and contact you soon.
+                </div>
+              ) : (
+                <form onSubmit={async e => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const firstName = (fd.get("sfFirstName") as string)?.trim();
+                  if (!firstName) { setSubmitError("Please enter your name."); return; }
+                  if (!submitFile) { setSubmitError("Please choose your completed form file."); return; }
+                  setSubmitSending(true);
+                  setSubmitError(null);
+                  try {
+                    const contentType = submitFile.type || "application/octet-stream";
+                    const up = await fetch(`${API}/storage/application-uploads/request-url`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ name: submitFile.name, size: submitFile.size, contentType }),
+                    });
+                    if (!up.ok) {
+                      const body = await up.json().catch(() => null);
+                      throw new Error(body?.error || `Upload failed (${up.status})`);
+                    }
+                    const { uploadURL, objectPath } = await up.json();
+                    const put = await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": contentType }, body: submitFile });
+                    if (!put.ok) throw new Error(`Upload failed (${put.status})`);
+                    const res = await fetch(`${API}/submissions`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        type: "application",
+                        firstName,
+                        lastName: (fd.get("sfLastName") as string)?.trim() || null,
+                        phone: (fd.get("sfPhone") as string)?.trim() || null,
+                        email: (fd.get("sfEmail") as string)?.trim() || null,
+                        level: (fd.get("sfLevel") as string) || null,
+                        fileUrl: objectPath,
+                        fileName: submitFile.name,
+                        website: "",
+                      }),
+                    });
+                    if (!res.ok) throw new Error(`Submission failed (${res.status})`);
+                    setSubmitSent(true);
+                    setSubmitFile(null);
+                  } catch (err) {
+                    setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+                  } finally {
+                    setSubmitSending(false);
+                  }
+                }}>
+                  {submitError ? (
+                    <div style={{ background: "rgba(230,162,60,0.15)", border: "1px solid rgba(230,162,60,0.5)", borderRadius: 8, padding: 12, marginBottom: 14, fontSize: 13, color: "#F0C36B" }}>
+                      {submitError}
+                    </div>
+                  ) : null}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                    {[["First Name", "sfFirstName", true], ["Surname", "sfLastName", false]].map(([lbl, name, req]) => (
+                      <input key={name as string} name={name as string} required={req as boolean} placeholder={lbl as string} style={sfInput} />
+                    ))}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                    <input name="sfPhone" type="tel" placeholder="Phone / WhatsApp" style={sfInput} />
+                    <select name="sfLevel" defaultValue="" style={sfInput}>
+                      <option value="">Applying for…</option>
+                      {["S1", "S5"].map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <input name="sfEmail" type="email" placeholder="Email (optional)" style={{ ...sfInput, marginBottom: 12 }} />
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+                    background: "rgba(255,255,255,0.05)", border: "1.5px dashed rgba(255,255,255,0.25)",
+                    borderRadius: 8, padding: "12px 14px", marginBottom: 16,
+                  }}>
+                    <span style={{ flexShrink: 0, color: GOLD_LIGHT }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
+                    </span>
+                    <span style={{ fontSize: 13.5, color: submitFile ? WHITE : "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {submitFile ? submitFile.name : "Choose your completed form (PDF, photo or Word)"}
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,image/*"
+                      onChange={e => { setSubmitFile(e.target.files?.[0] ?? null); setSubmitError(null); }}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                  <button type="submit" disabled={submitSending} style={{
+                    width: "100%", background: `linear-gradient(135deg, ${GOLD}, ${GOLD_LIGHT})`, color: GREEN_DARK,
+                    padding: 14, border: "none", borderRadius: 6, fontWeight: 800, fontSize: 15,
+                    cursor: submitSending ? "not-allowed" : "pointer", opacity: submitSending ? 0.7 : 1,
+                    fontFamily: "'DM Sans', sans-serif", transition: "opacity 0.2s",
+                  }}>{submitSending ? "Sending…" : "Send to School"}</button>
+                </form>
+              )}
             </div>
           </div>
 

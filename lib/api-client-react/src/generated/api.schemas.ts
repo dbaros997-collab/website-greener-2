@@ -111,6 +111,10 @@ export interface Submission {
   /** Class the applicant is applying for (e.g. S1). */
   level?: string | null;
   message?: string | null;
+  /** Object path of the applicant's uploaded completed form, if any. */
+  fileUrl?: string | null;
+  /** Original file name of the uploaded completed form. */
+  fileName?: string | null;
   /** new or read. */
   status: SubmissionStatus;
   createdAt: string;
@@ -147,6 +151,16 @@ export interface CreateSubmissionInput {
   level?: string | null;
   /** @maxLength 2000 */
   message?: string | null;
+  /**
+     * Object path returned by the application-form upload flow.
+     * @maxLength 500
+     */
+  fileUrl?: string | null;
+  /**
+     * Original file name of the uploaded completed form.
+     * @maxLength 260
+     */
+  fileName?: string | null;
 }
 
 /**

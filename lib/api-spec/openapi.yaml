@@ -63,6 +63,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /storage/application-uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestApplicationUploadUrl
+      summary: Request a presigned URL for a public application-form upload
+      description: |
+        Public (no auth). Used by prospective students to upload their completed
+        S1/S5 application form. Rate-limited per IP and restricted to common
+        document/image types. Returns a presigned GCS URL for direct upload.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+        '400':
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: Too many uploads from this IP.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Failed to generate upload URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /storage/public-objects/{filePath}:
     get:
       tags: [Storage]
@@ -1618,6 +1658,14 @@ components:
         message:
           type: string
           nullable: true
+        fileUrl:
+          type: string
+          nullable: true
+          description: Object path of the applicant's uploaded completed form, if any.
+        fileName:
+          type: string
+          nullable: true
+          description: Original file name of the uploaded completed form.
         status:
           type: string
           enum: [new, read]
@@ -1661,6 +1709,16 @@ components:
           type: string
           nullable: true
           maxLength: 2000
+        fileUrl:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Object path returned by the application-form upload flow.
+        fileName:
+          type: string
+          nullable: true
+          maxLength: 260
+          description: Original file name of the uploaded completed form.
     UpdateSubmissionInput:
       type: object
       required: [status]

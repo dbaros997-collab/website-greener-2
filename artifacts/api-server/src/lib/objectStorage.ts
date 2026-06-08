@@ -128,6 +128,24 @@ export class ObjectStorageService {
     });
   }
 
+  /**
+   * Presigned PUT URL for a public application-form submission. Stored under a
+   * distinct `applications/` prefix so serving can be gated behind staff auth
+   * (these files contain applicant PII), unlike the public `uploads/` prefix.
+   */
+  async getApplicationUploadURL(): Promise<string> {
+    const privateObjectDir = this.getPrivateObjectDir();
+    const objectId = randomUUID();
+    const fullPath = `${privateObjectDir}/applications/${objectId}`;
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    return signObjectURL({
+      bucketName,
+      objectName,
+      method: "PUT",
+      ttlSec: 900,
+    });
+  }
+
   async getObjectEntityFile(objectPath: string): Promise<File> {
     if (!objectPath.startsWith("/objects/")) {
       throw new ObjectNotFoundError();

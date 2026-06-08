@@ -14,6 +14,8 @@ export const submissionsTable = pgTable(
     phone: text("phone"),
     level: text("level"),
     message: text("message"),
+    fileUrl: text("file_url"),
+    fileName: text("file_name"),
     status: text("status").notNull().default("new"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

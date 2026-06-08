@@ -60,6 +60,14 @@ router.post("/submissions", async (req, res): Promise<void> => {
     return;
   }
 
+  // Only accept an attachment that came from the application-upload flow.
+  const fileUrl = parsed.data.fileUrl ?? null;
+  if (fileUrl !== null && !/^\/objects\/applications\/[\w-]+$/.test(fileUrl)) {
+    req.log.warn({ ip }, "Submission rejected: invalid fileUrl");
+    res.status(400).json({ error: "Invalid file reference." });
+    return;
+  }
+
   const [submission] = await db
     .insert(submissionsTable)
     .values({
@@ -70,6 +78,8 @@ router.post("/submissions", async (req, res): Promise<void> => {
       phone: parsed.data.phone ?? null,
       level: parsed.data.level ?? null,
       message: parsed.data.message ?? null,
+      fileUrl,
+      fileName: fileUrl ? parsed.data.fileName ?? null : null,
       status: "new",
     })
     .returning();
