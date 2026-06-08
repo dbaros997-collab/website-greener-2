@@ -17,6 +17,7 @@ import img_assembly1 from "@assets/483102123_1154996392986782_697232213751179497
 import img_about_group from "@assets/Gemini_Generated_Image_sdzh7psdzh7psdzh_1780738486562.png";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
+import img_admissions_watermark from "@assets/IMG_9926_1780917530721.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
 import img_vision_watermark from "@assets/3@_(7)_1780733151190.JPG";
 import img_science from "@assets/IMG_0144_-_Copy_1780654332068.jpg";
@@ -1281,8 +1282,10 @@ export default function App() {
       </section>
 
       {/* ===== ADMISSIONS ===== */}
-      <section id="admissions" className="reveal" style={{ background: GREEN_DARK, padding: "56px 5%" }}>
-        <div className="admissions-grid">
+      <section id="admissions" className="reveal" style={{ position: "relative", overflow: "hidden", background: GREEN_DARK, padding: "56px 5%" }}>
+        <img src={img_admissions_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18 }} />
+        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, rgba(10,64,32,0.92) 0%, rgba(10,64,32,0.82) 100%)` }} />
+        <div className="admissions-grid" style={{ position: "relative" }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8EEDC0", display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Admissions
@@ -1593,7 +1596,7 @@ export default function App() {
           </div>
 
           {/* Contact form */}
-          <div style={{ background: WHITE, borderRadius: 12, padding: 32 }}>
+          <div style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: 32 }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: GREEN_DARK, marginBottom: 24 }}>Enquire / Apply Now</h3>
             {formSent ? (
               <div style={{ background: GREEN_LIGHT, border: `1px solid ${GREEN_MAIN}`, borderRadius: 8, padding: 20, textAlign: "center", fontSize: 14, color: GREEN_MAIN, fontWeight: 500 }}>
