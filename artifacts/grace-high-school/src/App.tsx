@@ -473,7 +473,7 @@ export default function App() {
           ))}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschool2000@gmail.com</span>
+          <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschoolgayaza@gmail.com</span>
           <a href="/admin/" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             color: GOLD_LIGHT, fontSize: 12, fontWeight: 600, textDecoration: "none",
@@ -908,7 +908,7 @@ export default function App() {
                   { icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>, label: "Levels Offered", val: "O-Level (S1–S4) & A-Level (S5–S6)" },
                   { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, label: "Foundation", val: "Christian" },
                   { icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>, label: "Admissions", val: "Open — All Classes" },
-                  { icon: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></>, label: "Email", val: "gracehighschool2000@gmail.com" },
+                  { icon: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></>, label: "Email", val: "gracehighschoolgayaza@gmail.com" },
                 ].map((row, i) => (
                   <div key={i} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
@@ -1792,7 +1792,7 @@ export default function App() {
             <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 18 }}>
               Grace High School is located near Kasangati Town along Namavundu Road, Gayaza, in Wakiso District. Our 28-acre campus is easily accessible from Kampala via Gayaza Road.
             </p>
-            <a href="mailto:gracehighschool2000@gmail.com" style={{
+            <a href="mailto:gracehighschoolgayaza@gmail.com" style={{
               display: "inline-block", background: "#4CAF82", color: GREEN_DARK,
               padding: "11px 24px", borderRadius: 6, fontWeight: 700, fontSize: 14,
               textDecoration: "none",
@@ -1863,7 +1863,7 @@ export default function App() {
                 <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>Near Kasangati Town</li>
                 <li style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, marginTop: 4 }}>
                   Email:<br />
-                  <a href="mailto:gracehighschool2000@gmail.com" style={{ color: "#8EEDC0", textDecoration: "none" }}>gracehighschool2000@gmail.com</a>
+                  <a href="mailto:gracehighschoolgayaza@gmail.com" style={{ color: "#8EEDC0", textDecoration: "none" }}>gracehighschoolgayaza@gmail.com</a>
                 </li>
               </ul>
             </div>

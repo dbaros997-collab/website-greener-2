@@ -9,7 +9,7 @@ const GREY: [number, number, number] = [90, 90, 90];
 const SCHOOL_NAME = "GRACE HIGH SCHOOL";
 const SCHOOL_TAGLINE = "Run With a Vision";
 const SCHOOL_LOCATION = "Namavundu Road, Gayaza, Wakiso District (near Kasangati), Uganda";
-const SCHOOL_EMAIL = "gracehighschool2000@gmail.com";
+const SCHOOL_EMAIL = "gracehighschoolgayaza@gmail.com";
 
 export function generateApplicationForm(level: Level) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
