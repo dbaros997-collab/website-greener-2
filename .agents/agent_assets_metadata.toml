@@ -12,3 +12,9 @@ id = "HzwpdhNOXPOXj1DSRn7V0"
 uri = "file://artifacts/grace-high-school/grace-high-school-website.zip"
 type = "unspecified"
 title = "Grace High School Website — grace-high-school-website.zip"
+
+[[outputs]]
+id = "fAyzeTLeCsS79l4ANUDin"
+uri = "file://artifacts/grace-high-school/Grace-High-School-Website-Content.md"
+type = "text"
+title = "Grace High School — Full Website Content"
