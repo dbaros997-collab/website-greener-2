@@ -97,6 +97,9 @@ export default function App() {
   // page's dark hero band instead of a transparent bar over light content).
   const scrolled = scrolledY || !isHome;
   const pendingScroll = useRef<string | null>(null);
+  // Remembers the home-page scroll position from just before a detail page was
+  // opened, so "Back" (and the browser back button) returns there instead of top.
+  const homeScrollY = useRef<number | null>(null);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [openGroup, setOpenGroup]     = useState<string | null>(null);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
@@ -204,12 +207,15 @@ export default function App() {
   useEffect(() => {
     if (!isHome) return;
     const target = pendingScroll.current;
-    if (!target) return;
+    const savedY = homeScrollY.current;
     pendingScroll.current = null;
+    homeScrollY.current = null;
+    if (!target && savedY == null) return;
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
         if (target === "__top") window.scrollTo({ top: 0 });
-        else document.getElementById(target)?.scrollIntoView({ behavior: "smooth" });
+        else if (target) document.getElementById(target)?.scrollIntoView({ behavior: "smooth" });
+        else if (savedY != null) window.scrollTo(0, savedY);
       }),
     );
   }, [isHome]);
@@ -310,6 +316,22 @@ export default function App() {
       pendingScroll.current = "__top";
       navigate("/");
     }
+  };
+
+  // Open a detail page, remembering where on the home page we were so the user
+  // can be returned to that exact spot when they go back.
+  const openDetail = (path: string) => {
+    closeMenus();
+    homeScrollY.current = window.scrollY;
+    navigate(path);
+  };
+
+  // Return to the home page at the scroll position the user came from (falls
+  // back to the top on a direct/deep link where no position was recorded).
+  const goBack = () => {
+    closeMenus();
+    if (homeScrollY.current == null) pendingScroll.current = "__top";
+    navigate("/");
   };
 
   const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string; desc: string }[] }[] = [
@@ -624,7 +646,7 @@ export default function App() {
         <div style={{ maxWidth: 880, margin: "0 auto", padding: "44px 5% 64px" }}>
           {opts.children}
           <div style={{ marginTop: 40 }}>
-            <button onClick={goHome} style={{
+            <button onClick={goBack} style={{
               display: "inline-flex", alignItems: "center", gap: 9, cursor: "pointer",
               background: opts.dark ? "rgba(255,255,255,0.08)" : GREEN_LIGHT,
               color: opts.dark ? WHITE : GREEN_DARK,
@@ -632,7 +654,7 @@ export default function App() {
               borderRadius: 100, padding: "11px 22px", fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
-              Back to Home
+              Back
             </button>
           </div>
         </div>
@@ -1162,7 +1184,7 @@ export default function App() {
             </p>
 
             {/* Vision & Mission — opens its own dedicated page */}
-            <button onClick={() => navigate("/about/vision-mission")} style={{
+            <button onClick={() => openDetail("/about/vision-mission")} style={{
               display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 28, cursor: "pointer",
               background: GREEN_LIGHT, border: `1px solid ${GREEN_MAIN}33`, borderRadius: 100,
               padding: "12px 14px 12px 16px", fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
@@ -1238,7 +1260,7 @@ export default function App() {
                   <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
                   <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>{p.title}</h3>
                   <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 18 }}>{p.desc}</p>
-                  <button onClick={() => navigate(`/programmes/${slugify(p.title)}`)} style={{
+                  <button onClick={() => openDetail(`/programmes/${slugify(p.title)}`)} style={{
                     alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 9, cursor: "pointer",
                     background: GREEN_MAIN, color: WHITE, border: "none", borderRadius: 100,
                     padding: "10px 20px", fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
@@ -1591,7 +1613,7 @@ export default function App() {
             {/* Admissions info — compact tiles, each opening its own page */}
             <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {admissionSlides.map((s, i) => (
-                <button key={i} onClick={() => navigate(`/admissions/${slugify(s.title)}`)} style={{
+                <button key={i} onClick={() => openDetail(`/admissions/${slugify(s.title)}`)} style={{
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
                   background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
                   padding: "18px 18px", color: WHITE, fontFamily: "'DM Sans', sans-serif",
