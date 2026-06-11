@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { useLocation, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListNewsItems,
@@ -76,15 +77,31 @@ const formatSize = (bytes: number | null): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 export default function App() {
   const queryClient = useQueryClient();
-  const [scrolled, setScrolled]       = useState(false);
+  const [location, navigate] = useLocation();
+  const isHome = location === "/";
+  const [, vmParams] = useRoute("/about/vision-mission");
+  const [, progRoute] = useRoute("/programmes/:slug");
+  const [, admRoute] = useRoute("/admissions/:slug");
+  const [scrolledY, setScrolledY]     = useState(false);
+  // The header switches to its "solid" treatment when the user scrolls OR
+  // whenever we are on a detail page (so white nav text stays readable over the
+  // page's dark hero band instead of a transparent bar over light content).
+  const scrolled = scrolledY || !isHome;
+  const pendingScroll = useRef<string | null>(null);
   const [menuOpen, setMenuOpen]       = useState(false);
   const [openGroup, setOpenGroup]     = useState<string | null>(null);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [lightbox, setLightbox]       = useState<string | null>(null);
   const [videoModal, setVideoModal]   = useState<string | null>(null);
-  const [modal, setModal]             = useState<{ title: string; body: React.ReactNode; dark?: boolean } | null>(null);
   const [galleryFilter, setGalFilter] = useState("all");
   const [formSent, setFormSent]       = useState(false);
   const [formSending, setFormSending] = useState(false);
@@ -105,7 +122,7 @@ export default function App() {
       const y = window.scrollY;
       scrollDir.current = y >= lastScrollY.current ? "down" : "up";
       lastScrollY.current = y;
-      setScrolled(y > 40);
+      setScrolledY(y > 40);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -147,7 +164,9 @@ export default function App() {
       .querySelectorAll<HTMLElement>(".reveal")
       .forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+    // Re-run when returning to the home page so the freshly-remounted section
+    // wrappers get re-observed (otherwise they stay stuck at opacity 0).
+  }, [isHome]);
 
   const loadResources = async () => {
     try {
@@ -175,15 +194,25 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [videoModal]);
 
-  // Close the info popup when the Escape key is pressed.
+  // Scroll to the top whenever we land on a detail page.
   useEffect(() => {
-    if (modal === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setModal(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [modal]);
+    if (!isHome) window.scrollTo(0, 0);
+  }, [location, isHome]);
+
+  // After navigating back to the home page from a detail page, scroll to the
+  // section the user asked for (stashed in pendingScroll before navigating).
+  useEffect(() => {
+    if (!isHome) return;
+    const target = pendingScroll.current;
+    if (!target) return;
+    pendingScroll.current = null;
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (target === "__top") window.scrollTo({ top: 0 });
+        else document.getElementById(target)?.scrollIntoView({ behavior: "smooth" });
+      }),
+    );
+  }, [isHome]);
 
   // Play the selected video via the YouTube IFrame API so we can auto-close the
   // modal the moment playback finishes ("after watching").
@@ -255,18 +284,32 @@ export default function App() {
     };
   }, [queryClient]);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  const closeMenus = () => {
     setMenuOpen(false);
     setOpenGroup(null);
     setOpenMobileGroup(null);
   };
 
+  const scrollTo = (id: string) => {
+    if (id === "__home") return goHome();
+    closeMenus();
+    if (isHome) {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // On a detail page: remember where to land, then return to the home page.
+      pendingScroll.current = id;
+      navigate("/");
+    }
+  };
+
   const goHome = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setMenuOpen(false);
-    setOpenGroup(null);
-    setOpenMobileGroup(null);
+    closeMenus();
+    if (isHome) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      pendingScroll.current = "__top";
+      navigate("/");
+    }
   };
 
   const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string; desc: string }[] }[] = [
@@ -385,6 +428,261 @@ export default function App() {
     ? admissionsQ.data.map((a, i) => ({ step: i + 1, title: a.title, desc: a.description }))
     : ADMISSIONS_FALLBACK;
 
+  // ===== Detail-page bodies =====
+  // These three blocks used to live inside click-to-open popups. They now power
+  // dedicated detail pages (their own URLs) and are reused by the link buttons
+  // on the home page. They are plain values/functions in App scope so the
+  // pages get the live API/site_text data without duplicating any fetch logic.
+  const visionMissionBody = (
+    <div style={{ display: "grid", gap: 16 }}>
+      <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+          <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.16)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#9A7A2E" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+          </div>
+          <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9A7A2E", margin: 0 }}>Our Vision</p>
+        </div>
+        <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
+      </div>
+      <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GREEN_MAIN}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+          <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(26,107,60,0.12)", border: `1px solid ${GREEN_MAIN}`, display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
+          </div>
+          <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>Our Mission</p>
+        </div>
+        <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
+        <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+            Gayaza-Kasangati, Uganda
+          </span>
+          <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></svg>
+            Christian-Founded
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const programmeBody = (p: { tag: string; title: string; desc: string; subjects: string[] }) => (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
+      <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 20 }}>{p.desc}</p>
+      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_DARK, marginBottom: 12 }}>Subjects Offered</p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {p.subjects.map(s => (
+          <span key={s} style={{ fontSize: 13, fontWeight: 500, background: GREEN_LIGHT, color: GREEN_DARK, padding: "6px 14px", borderRadius: 100 }}>{s}</span>
+        ))}
+      </div>
+    </div>
+  );
+
+  const admissionSlides: { title: string; subtitle: string; body: React.ReactNode }[] = [
+    {
+      title: "How to Apply",
+      subtitle: "Step-by-step guide to enrolling your child",
+      body: (
+        <div style={{ display: "grid", gap: 12 }}>
+          {admissionItems.map(s => (
+            <div key={s.step} style={{
+              display: "flex", gap: 16, alignItems: "flex-start", padding: "16px 18px",
+              background: "rgba(255,255,255,0.05)", borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}>
+              <div style={{
+                width: 32, height: 32, flexShrink: 0, background: "#4CAF82", color: GREEN_DARK,
+                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 700, fontSize: 14,
+              }}>{s.step}</div>
+              <div>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: WHITE, marginBottom: 3 }}>{s.title}</h4>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: "Entry Points",
+      subtitle: "Classes you can join and their requirements",
+      body: (
+        <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {[
+            { tag: "O-Level", cls: "Senior 1 – Senior 4", req: "Direct entry into S1 for candidates who have sat PLE. Transfers into S2–S4 are considered subject to vacancies and a short placement assessment." },
+            { tag: "A-Level", cls: "Senior 5 – Senior 6", req: "Open to candidates whose UCE results meet the requirements for their chosen subject combination. S6 transfers considered on available space." },
+          ].map(e => (
+            <div key={e.tag} style={{
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8, padding: "18px 20px",
+            }}>
+              <span style={{
+                display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                textTransform: "uppercase", color: GREEN_DARK, background: "#8EEDC0",
+                borderRadius: 100, padding: "3px 12px", marginBottom: 10,
+              }}>{e.tag}</span>
+              <h4 style={{ fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 6 }}>{e.cls}</h4>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{e.req}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: "What to Bring",
+      subtitle: "Documents to carry on admission day",
+      body: (
+        <div style={{
+          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 8, padding: "22px 24px", display: "grid", gap: 13,
+        }}>
+          {[
+            "A completed Grace High School application form",
+            "Photocopy of the PLE results slip (S1) or UCE results (S5)",
+            "Report cards or academic records from the previous school",
+            "Two recent passport-size photographs of the student",
+            "A copy of the student's birth certificate",
+            "A transfer letter from the former school (transfers only)",
+          ].map((r, i) => (
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span style={{ flexShrink: 0, marginTop: 1, color: "#8EEDC0" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              </span>
+              <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{r}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: "Good to Know",
+      subtitle: "Helpful tips before you apply",
+      body: (
+        <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {[
+            { icon: <><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" /><path d="M9 20v-6h6v6" /></>, title: "Boarding & Day", desc: "We offer both boarding and day options, with safe, well-supervised dormitories on our 28-acre campus." },
+            { icon: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>, title: "Fees & Payment", desc: "A detailed fees structure is provided on application. School fees are payable per term before reporting." },
+          ].map((g, i) => (
+            <div key={i} style={{
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8, padding: "18px 20px",
+            }}>
+              <span style={{ display: "block", color: "#8EEDC0", marginBottom: 10 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{g.icon}</svg>
+              </span>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 5 }}>{g.title}</h4>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>{g.desc}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  // ===== Detail-page layout =====
+  // Shared chrome for the three detail pages: a GREEN_DARK hero band with a
+  // clickable breadcrumb + title + optional subtitle, then a content area
+  // (light by default, dark for the admissions pages whose bodies are styled
+  // for a dark background). Called as a function (not <Component>) so it shares
+  // App state without remounting.
+  const detailLayout = (opts: {
+    sectionLabel: string;
+    sectionId: string;
+    title: string;
+    subtitle?: string;
+    dark?: boolean;
+    children: React.ReactNode;
+  }) => {
+    const crumbBtn: React.CSSProperties = {
+      background: "none", border: "none", cursor: "pointer", padding: 0,
+      color: "rgba(255,255,255,0.6)", fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+      transition: "color 0.2s",
+    };
+    return (
+      <main style={{ background: opts.dark ? GREEN_DARK : OFF_WHITE, minHeight: "70vh" }}>
+        {/* Hero band — padding-top clears the fixed logo/nav overhang */}
+        <div style={{ position: "relative", background: GREEN_DARK, padding: "170px 5% 56px", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 0%, rgba(26,107,60,0.5), transparent 60%)" }} />
+          <div style={{ position: "relative", maxWidth: 880, margin: "0 auto" }}>
+            <nav style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 18 }}>
+              <button onClick={goHome} style={crumbBtn}
+                onMouseEnter={e => (e.currentTarget.style.color = GOLD_LIGHT)} onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}>Home</button>
+              <span style={{ color: "rgba(255,255,255,0.35)" }}>/</span>
+              <button onClick={() => scrollTo(opts.sectionId)} style={crumbBtn}
+                onMouseEnter={e => (e.currentTarget.style.color = GOLD_LIGHT)} onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}>{opts.sectionLabel}</button>
+              <span style={{ color: "rgba(255,255,255,0.35)" }}>/</span>
+              <span style={{ color: "#8EEDC0", fontSize: 13 }}>{opts.title}</span>
+            </nav>
+            <div style={{ width: 44, height: 3, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, borderRadius: 2, marginBottom: 18 }} />
+            <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 4vw, 3rem)", color: WHITE, lineHeight: 1.15, margin: 0 }}>{opts.title}</h1>
+            {opts.subtitle && <p style={{ fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, marginTop: 14, maxWidth: 620 }}>{opts.subtitle}</p>}
+          </div>
+        </div>
+        {/* Content area */}
+        <div style={{ maxWidth: 880, margin: "0 auto", padding: "44px 5% 64px" }}>
+          {opts.children}
+          <div style={{ marginTop: 40 }}>
+            <button onClick={goHome} style={{
+              display: "inline-flex", alignItems: "center", gap: 9, cursor: "pointer",
+              background: opts.dark ? "rgba(255,255,255,0.08)" : GREEN_LIGHT,
+              color: opts.dark ? WHITE : GREEN_DARK,
+              border: opts.dark ? "1px solid rgba(255,255,255,0.18)" : `1px solid ${GREEN_MAIN}33`,
+              borderRadius: 100, padding: "11px 22px", fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  };
+
+  const notFoundPage = (sectionLabel: string, sectionId: string) =>
+    detailLayout({
+      sectionLabel, sectionId, title: "Page Not Found",
+      subtitle: "We couldn't find what you were looking for.",
+      children: (
+        <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7 }}>
+          The page you requested doesn't exist or may have moved. Use the link below to return to the home page.
+        </p>
+      ),
+    });
+
+  // Pick the detail page body based on the active route. Programme/admission
+  // lookups slugify the live data so DB-driven items resolve too.
+  const renderDetailPage = () => {
+    if (vmParams) {
+      return detailLayout({
+        sectionLabel: "About", sectionId: "about",
+        title: "Our Vision & Mission",
+        subtitle: "What we strive for and the promise behind a Grace education.",
+        children: visionMissionBody,
+      });
+    }
+    if (progRoute) {
+      const prog = programmeItems.find(p => slugify(p.title) === progRoute.slug);
+      if (!prog) return notFoundPage("Programmes", "programmes");
+      return detailLayout({
+        sectionLabel: "Programmes", sectionId: "programmes",
+        title: prog.title,
+        children: programmeBody(prog),
+      });
+    }
+    if (admRoute) {
+      const slide = admissionSlides.find(s => slugify(s.title) === admRoute.slug);
+      if (!slide) return notFoundPage("Admissions", "admissions");
+      return detailLayout({
+        sectionLabel: "Admissions", sectionId: "admissions",
+        title: slide.title, subtitle: slide.subtitle, dark: true,
+        children: slide.body,
+      });
+    }
+    return notFoundPage("Home", "__home");
+  };
+
   const videoThumb = (youtubeId: string) =>
     schoolVideos.find((v) => v.youtubeId === youtubeId)?.thumb ??
     `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
@@ -450,34 +748,6 @@ export default function App() {
                 <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 380, margin: "0 auto" }}>This video will be available shortly. Check back soon to watch it here.</p>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* ===== INFO POPUP ===== */}
-      {modal !== null && (
-        <div className="lightbox-overlay" onClick={() => setModal(null)} style={{ padding: "5%" }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            position: "relative", width: "100%", maxWidth: 720, maxHeight: "86vh", overflowY: "auto",
-            background: modal.dark ? GREEN_DARK : WHITE, borderRadius: 16,
-            padding: "30px clamp(20px, 4vw, 36px) 32px", boxShadow: "0 30px 80px rgba(0,0,0,0.45)",
-          }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 1.9rem)", color: modal.dark ? WHITE : GREEN_DARK, lineHeight: 1.2, margin: 0 }}>{modal.title}</h3>
-              <button
-                onClick={() => setModal(null)}
-                aria-label="Close"
-                style={{
-                  flexShrink: 0, width: 38, height: 38, borderRadius: "50%", border: "none", cursor: "pointer",
-                  background: modal.dark ? "rgba(255,255,255,0.12)" : GREEN_LIGHT, color: modal.dark ? WHITE : GREEN_DARK,
-                  fontSize: 18, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
-                  transition: "background 0.2s",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = GOLD)}
-                onMouseLeave={e => (e.currentTarget.style.background = modal.dark ? "rgba(255,255,255,0.12)" : GREEN_LIGHT)}
-              >✕</button>
-            </div>
-            <div>{modal.body}</div>
           </div>
         </div>
       )}
@@ -663,6 +933,8 @@ export default function App() {
         </div>
       )}
 
+      {/* ===== HOME PAGE (all sections below render only on "/") ===== */}
+      {isHome && (<>
       {/* ===== HERO ===== */}
       <section style={{
         minHeight: "88vh", background: GREEN_DARK,
@@ -889,59 +1161,23 @@ export default function App() {
               {text("about_body", "Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.")}
             </p>
 
-            {/* Vision & Mission — opens in a popup to keep the section tidy */}
-            {(() => {
-              const visionMissionBody = (
-                <div style={{ display: "grid", gap: 16 }}>
-                  <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                      <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.16)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#9A7A2E" }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                      </div>
-                      <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9A7A2E", margin: 0 }}>Our Vision</p>
-                    </div>
-                    <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
-                  </div>
-                  <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GREEN_MAIN}` }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                      <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(26,107,60,0.12)", border: `1px solid ${GREEN_MAIN}`, display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
-                      </div>
-                      <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>Our Mission</p>
-                    </div>
-                    <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
-                    <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                        Gayaza-Kasangati, Uganda
-                      </span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></svg>
-                        Christian-Founded
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-              return (
-                <button onClick={() => setModal({ title: "Our Vision & Mission", body: visionMissionBody })} style={{
-                  display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 28, cursor: "pointer",
-                  background: GREEN_LIGHT, border: `1px solid ${GREEN_MAIN}33`, borderRadius: 100,
-                  padding: "12px 14px 12px 16px", fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 26px rgba(10,64,32,0.14)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                >
-                  <span style={{ flexShrink: 0, width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                  </span>
-                  <span style={{ fontSize: 14.5, fontWeight: 700, color: GREEN_DARK }}>View our Vision &amp; Mission</span>
-                  <span style={{ flexShrink: 0, color: GREEN_MAIN, display: "inline-flex" }}>
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                  </span>
-                </button>
-              );
-            })()}
+            {/* Vision & Mission — opens its own dedicated page */}
+            <button onClick={() => navigate("/about/vision-mission")} style={{
+              display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 28, cursor: "pointer",
+              background: GREEN_LIGHT, border: `1px solid ${GREEN_MAIN}33`, borderRadius: 100,
+              padding: "12px 14px 12px 16px", fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 26px rgba(10,64,32,0.14)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+            >
+              <span style={{ flexShrink: 0, width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+              </span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: GREEN_DARK }}>View our Vision &amp; Mission</span>
+              <span style={{ flexShrink: 0, color: GREEN_MAIN, display: "inline-flex" }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </button>
 
           </div>
 
@@ -1002,21 +1238,7 @@ export default function App() {
                   <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
                   <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>{p.title}</h3>
                   <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 18 }}>{p.desc}</p>
-                  <button onClick={() => setModal({
-                    title: p.title,
-                    body: (
-                      <div>
-                        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
-                        <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 20 }}>{p.desc}</p>
-                        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_DARK, marginBottom: 12 }}>Subjects Offered</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                          {p.subjects.map(s => (
-                            <span key={s} style={{ fontSize: 13, fontWeight: 500, background: GREEN_LIGHT, color: GREEN_DARK, padding: "6px 14px", borderRadius: 100 }}>{s}</span>
-                          ))}
-                        </div>
-                      </div>
-                    ),
-                  })} style={{
+                  <button onClick={() => navigate(`/programmes/${slugify(p.title)}`)} style={{
                     alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 9, cursor: "pointer",
                     background: GREEN_MAIN, color: WHITE, border: "none", borderRadius: 100,
                     padding: "10px 20px", fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
@@ -1366,136 +1588,29 @@ export default function App() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>{text("admissions_heading", "Join the Grace Family")}</h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>{text("admissions_intro", "Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.")}</p>
 
-            {/* Admissions info — compact tiles that open each topic in a popup */}
-            {(() => {
-              const slides: { title: string; body: React.ReactNode }[] = [
-                {
-                  title: "How to Apply",
-                  body: (
-                    <div style={{ display: "grid", gap: 12 }}>
-                      {admissionItems.map(s => (
-                        <div key={s.step} style={{
-                          display: "flex", gap: 16, alignItems: "flex-start", padding: "16px 18px",
-                          background: "rgba(255,255,255,0.05)", borderRadius: 8,
-                          border: "1px solid rgba(255,255,255,0.08)",
-                        }}>
-                          <div style={{
-                            width: 32, height: 32, flexShrink: 0, background: "#4CAF82", color: GREEN_DARK,
-                            borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                            fontWeight: 700, fontSize: 14,
-                          }}>{s.step}</div>
-                          <div>
-                            <h4 style={{ fontSize: 14, fontWeight: 600, color: WHITE, marginBottom: 3 }}>{s.title}</h4>
-                            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ),
-                },
-                {
-                  title: "Entry Points",
-                  body: (
-                    <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                      {[
-                        { tag: "O-Level", cls: "Senior 1 – Senior 4", req: "Direct entry into S1 for candidates who have sat PLE. Transfers into S2–S4 are considered subject to vacancies and a short placement assessment." },
-                        { tag: "A-Level", cls: "Senior 5 – Senior 6", req: "Open to candidates whose UCE results meet the requirements for their chosen subject combination. S6 transfers considered on available space." },
-                      ].map(e => (
-                        <div key={e.tag} style={{
-                          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                          borderRadius: 8, padding: "18px 20px",
-                        }}>
-                          <span style={{
-                            display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                            textTransform: "uppercase", color: GREEN_DARK, background: "#8EEDC0",
-                            borderRadius: 100, padding: "3px 12px", marginBottom: 10,
-                          }}>{e.tag}</span>
-                          <h4 style={{ fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 6 }}>{e.cls}</h4>
-                          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{e.req}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ),
-                },
-                {
-                  title: "What to Bring",
-                  body: (
-                    <div style={{
-                      background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 8, padding: "22px 24px", display: "grid", gap: 13,
-                    }}>
-                      {[
-                        "A completed Grace High School application form",
-                        "Photocopy of the PLE results slip (S1) or UCE results (S5)",
-                        "Report cards or academic records from the previous school",
-                        "Two recent passport-size photographs of the student",
-                        "A copy of the student's birth certificate",
-                        "A transfer letter from the former school (transfers only)",
-                      ].map((r, i) => (
-                        <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                          <span style={{ flexShrink: 0, marginTop: 1, color: "#8EEDC0" }}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                          </span>
-                          <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{r}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ),
-                },
-                {
-                  title: "Good to Know",
-                  body: (
-                    <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                      {[
-                        { icon: <><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" /><path d="M9 20v-6h6v6" /></>, title: "Boarding & Day", desc: "We offer both boarding and day options, with safe, well-supervised dormitories on our 28-acre campus." },
-                        { icon: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>, title: "Fees & Payment", desc: "A detailed fees structure is provided on application. School fees are payable per term before reporting." },
-                      ].map((g, i) => (
-                        <div key={i} style={{
-                          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                          borderRadius: 8, padding: "18px 20px",
-                        }}>
-                          <span style={{ display: "block", color: "#8EEDC0", marginBottom: 10 }}>
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{g.icon}</svg>
-                          </span>
-                          <h4 style={{ fontSize: 14, fontWeight: 700, color: WHITE, marginBottom: 5 }}>{g.title}</h4>
-                          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>{g.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ),
-                },
-              ];
-              const subtitles = [
-                "Step-by-step guide to enrolling your child",
-                "Classes you can join and their requirements",
-                "Documents to carry on admission day",
-                "Helpful tips before you apply",
-              ];
-              return (
-                <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                  {slides.map((s, i) => (
-                    <button key={i} onClick={() => setModal({ title: s.title, body: s.body, dark: true })} style={{
-                      display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
-                      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
-                      padding: "18px 18px", color: WHITE, fontFamily: "'DM Sans', sans-serif",
-                      transition: "background 0.2s, transform 0.2s, border-color 0.2s",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.borderColor = "rgba(142,237,192,0.4)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                    >
-                      <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "rgba(142,237,192,0.14)", border: "1px solid rgba(142,237,192,0.4)", color: "#8EEDC0", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
-                      <span style={{ flex: 1 }}>
-                        <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 2 }}>{s.title}</span>
-                        <span style={{ display: "block", fontSize: 12.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.45 }}>{subtitles[i]}</span>
-                      </span>
-                      <span style={{ flexShrink: 0, color: "#8EEDC0", display: "inline-flex" }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              );
-            })()}
+            {/* Admissions info — compact tiles, each opening its own page */}
+            <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {admissionSlides.map((s, i) => (
+                <button key={i} onClick={() => navigate(`/admissions/${slugify(s.title)}`)} style={{
+                  display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
+                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+                  padding: "18px 18px", color: WHITE, fontFamily: "'DM Sans', sans-serif",
+                  transition: "background 0.2s, transform 0.2s, border-color 0.2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.borderColor = "rgba(142,237,192,0.4)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                >
+                  <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "rgba(142,237,192,0.14)", border: "1px solid rgba(142,237,192,0.4)", color: "#8EEDC0", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 2 }}>{s.title}</span>
+                    <span style={{ display: "block", fontSize: 12.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.45 }}>{s.subtitle}</span>
+                  </span>
+                  <span style={{ flexShrink: 0, color: "#8EEDC0", display: "inline-flex" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </span>
+                </button>
+              ))}
+            </div>
 
             {/* Intake banner */}
             <div style={{
@@ -1823,6 +1938,10 @@ export default function App() {
           </div>
         </div>
       </section>
+      </>)}
+
+      {/* ===== DETAIL PAGES (own URLs; chrome above/below is shared) ===== */}
+      {!isHome && renderDetailPage()}
 
       {/* ===== FOOTER ===== */}
       <footer style={{ position: "relative", background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px", overflow: "hidden" }}>
