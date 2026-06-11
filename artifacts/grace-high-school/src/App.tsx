@@ -19,7 +19,6 @@ import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_admissions_watermark from "@assets/IMG_9926_1780917530721.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
-import img_vision_watermark from "@assets/3@_(7)_1780733151190.JPG";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
@@ -85,8 +84,8 @@ export default function App() {
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [lightbox, setLightbox]       = useState<string | null>(null);
   const [videoModal, setVideoModal]   = useState<string | null>(null);
+  const [modal, setModal]             = useState<{ title: string; body: React.ReactNode; dark?: boolean } | null>(null);
   const [galleryFilter, setGalFilter] = useState("all");
-  const [admSlide, setAdmSlide]       = useState(0);
   const [formSent, setFormSent]       = useState(false);
   const [formSending, setFormSending] = useState(false);
   const [formError, setFormError]     = useState(false);
@@ -175,6 +174,16 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [videoModal]);
+
+  // Close the info popup when the Escape key is pressed.
+  useEffect(() => {
+    if (modal === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setModal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modal]);
 
   // Play the selected video via the YouTube IFrame API so we can auto-close the
   // modal the moment playback finishes ("after watching").
@@ -441,6 +450,34 @@ export default function App() {
                 <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 380, margin: "0 auto" }}>This video will be available shortly. Check back soon to watch it here.</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ===== INFO POPUP ===== */}
+      {modal !== null && (
+        <div className="lightbox-overlay" onClick={() => setModal(null)} style={{ padding: "5%" }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            position: "relative", width: "100%", maxWidth: 720, maxHeight: "86vh", overflowY: "auto",
+            background: modal.dark ? GREEN_DARK : WHITE, borderRadius: 16,
+            padding: "30px clamp(20px, 4vw, 36px) 32px", boxShadow: "0 30px 80px rgba(0,0,0,0.45)",
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 1.9rem)", color: modal.dark ? WHITE : GREEN_DARK, lineHeight: 1.2, margin: 0 }}>{modal.title}</h3>
+              <button
+                onClick={() => setModal(null)}
+                aria-label="Close"
+                style={{
+                  flexShrink: 0, width: 38, height: 38, borderRadius: "50%", border: "none", cursor: "pointer",
+                  background: modal.dark ? "rgba(255,255,255,0.12)" : GREEN_LIGHT, color: modal.dark ? WHITE : GREEN_DARK,
+                  fontSize: 18, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = GOLD)}
+                onMouseLeave={e => (e.currentTarget.style.background = modal.dark ? "rgba(255,255,255,0.12)" : GREEN_LIGHT)}
+              >✕</button>
+            </div>
+            <div>{modal.body}</div>
           </div>
         </div>
       )}
@@ -852,41 +889,59 @@ export default function App() {
               {text("about_body", "Grace High School – Gayaza is a Christian-founded school focused on producing students who are morally upright and Christ-like leaders of tomorrow.")}
             </p>
 
-            {/* Vision & Mission */}
-            <div style={{ position: "relative", overflow: "hidden", borderRadius: 12, marginBottom: 28, border: `1px solid ${GREEN_LIGHT}` }}>
-              <img src={img_vision_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.2 }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(232,245,238,0.93) 0%, rgba(232,245,238,0.85) 100%)" }} />
-              <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, padding: 18, alignItems: "stretch" }}>
-                <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.16)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#9A7A2E" }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+            {/* Vision & Mission — opens in a popup to keep the section tidy */}
+            {(() => {
+              const visionMissionBody = (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GOLD}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                      <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(201,162,75,0.16)", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#9A7A2E" }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                      </div>
+                      <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9A7A2E", margin: 0 }}>Our Vision</p>
                     </div>
-                    <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9A7A2E", margin: 0 }}>Our Vision</p>
+                    <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
                   </div>
-                  <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_vision", "A centre of excellence that shapes exceptional individuals who will make a defining difference in our world.")}"</p>
-                </div>
-                <div style={{ background: "rgba(255,255,255,0.72)", borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GREEN_MAIN}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(26,107,60,0.12)", border: `1px solid ${GREEN_MAIN}`, display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
+                  <div style={{ background: GREEN_LIGHT, borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${GREEN_MAIN}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                      <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "rgba(26,107,60,0.12)", border: `1px solid ${GREEN_MAIN}`, display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
+                      </div>
+                      <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>Our Mission</p>
                     </div>
-                    <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>Our Mission</p>
-                  </div>
-                  <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic" }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
-                  <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                      Gayaza-Kasangati, Uganda
-                    </span>
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></svg>
-                      Christian-Founded
-                    </span>
+                    <p style={{ fontSize: 15, color: GREEN_DARK, lineHeight: 1.7, fontStyle: "italic", margin: 0 }}>"{text("about_mission", "To create unique learners who are socially functional, analytically precise, financially savvy and very creative in all areas of life for the glorification of God.")}"</p>
+                    <div style={{ display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                        Gayaza-Kasangati, Uganda
+                      </span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: "#4A5A50" }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></svg>
+                        Christian-Founded
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              );
+              return (
+                <button onClick={() => setModal({ title: "Our Vision & Mission", body: visionMissionBody })} style={{
+                  display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 28, cursor: "pointer",
+                  background: GREEN_LIGHT, border: `1px solid ${GREEN_MAIN}33`, borderRadius: 100,
+                  padding: "12px 14px 12px 16px", fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 26px rgba(10,64,32,0.14)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <span style={{ flexShrink: 0, width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                  </span>
+                  <span style={{ fontSize: 14.5, fontWeight: 700, color: GREEN_DARK }}>View our Vision &amp; Mission</span>
+                  <span style={{ flexShrink: 0, color: GREEN_MAIN, display: "inline-flex" }}>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </span>
+                </button>
+              );
+            })()}
 
           </div>
 
@@ -947,11 +1002,32 @@ export default function App() {
                   <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
                   <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>{p.title}</h3>
                   <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 18 }}>{p.desc}</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {p.subjects.map(s => (
-                      <span key={s} style={{ fontSize: 12, fontWeight: 500, background: GREEN_LIGHT, color: GREEN_DARK, padding: "4px 12px", borderRadius: 100 }}>{s}</span>
-                    ))}
-                  </div>
+                  <button onClick={() => setModal({
+                    title: p.title,
+                    body: (
+                      <div>
+                        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
+                        <p style={{ fontSize: 15, color: "#5A5A5A", lineHeight: 1.7, marginBottom: 20 }}>{p.desc}</p>
+                        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_DARK, marginBottom: 12 }}>Subjects Offered</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                          {p.subjects.map(s => (
+                            <span key={s} style={{ fontSize: 13, fontWeight: 500, background: GREEN_LIGHT, color: GREEN_DARK, padding: "6px 14px", borderRadius: 100 }}>{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ),
+                  })} style={{
+                    alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 9, cursor: "pointer",
+                    background: GREEN_MAIN, color: WHITE, border: "none", borderRadius: 100,
+                    padding: "10px 20px", fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
+                    transition: "background 0.2s, transform 0.2s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = GREEN_MAIN; e.currentTarget.style.transform = "translateY(0)"; }}
+                  >
+                    View Subjects &amp; Details
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </button>
                 </div>
               </div>
             ))}
@@ -1290,7 +1366,7 @@ export default function App() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: WHITE, marginBottom: 12 }}>{text("admissions_heading", "Join the Grace Family")}</h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, marginBottom: 36 }}>{text("admissions_intro", "Admissions are currently open for all classes — S1 through S6. We welcome students and families who share our commitment to faith, excellence, and vision.")}</p>
 
-            {/* Admissions info slider */}
+            {/* Admissions info — compact tiles that open each topic in a popup */}
             {(() => {
               const slides: { title: string; body: React.ReactNode }[] = [
                 {
@@ -1389,42 +1465,34 @@ export default function App() {
                   ),
                 },
               ];
-              const idx = ((admSlide % slides.length) + slides.length) % slides.length;
-              const active = slides[idx];
-              const go = (d: number) => setAdmSlide(((idx + d) % slides.length + slides.length) % slides.length);
-              const arrowBtn = {
-                width: 36, height: 36, borderRadius: "50%", cursor: "pointer",
-                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)",
-                color: WHITE, display: "flex", alignItems: "center", justifyContent: "center",
-              } as React.CSSProperties;
+              const subtitles = [
+                "Step-by-step guide to enrolling your child",
+                "Classes you can join and their requirements",
+                "Documents to carry on admission day",
+                "Helpful tips before you apply",
+              ];
               return (
-                <div style={{
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 12, padding: "24px 24px 20px",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18 }}>
-                    <div>
-                      <span style={{ display: "block", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8EEDC0", marginBottom: 4 }}>{idx + 1} / {slides.length}</span>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", color: WHITE, margin: 0 }}>{active.title}</h3>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                      <button onClick={() => go(-1)} aria-label="Previous" style={arrowBtn}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-                      </button>
-                      <button onClick={() => go(1)} aria-label="Next" style={arrowBtn}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div key={idx} className="adm-slide-body" style={{ minHeight: 300 }}>{active.body}</div>
-                  <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 20 }}>
-                    {slides.map((s, i) => (
-                      <button key={i} onClick={() => setAdmSlide(i)} aria-label={`Go to ${s.title}`} aria-current={i === idx} style={{
-                        width: i === idx ? 26 : 9, height: 9, borderRadius: 100, cursor: "pointer", border: "none", padding: 0,
-                        background: i === idx ? "#8EEDC0" : "rgba(255,255,255,0.22)", transition: "width 0.25s, background 0.25s",
-                      }} />
-                    ))}
-                  </div>
+                <div className="entry-points-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  {slides.map((s, i) => (
+                    <button key={i} onClick={() => setModal({ title: s.title, body: s.body, dark: true })} style={{
+                      display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
+                      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+                      padding: "18px 18px", color: WHITE, fontFamily: "'DM Sans', sans-serif",
+                      transition: "background 0.2s, transform 0.2s, border-color 0.2s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.borderColor = "rgba(142,237,192,0.4)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                    >
+                      <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "rgba(142,237,192,0.14)", border: "1px solid rgba(142,237,192,0.4)", color: "#8EEDC0", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                      <span style={{ flex: 1 }}>
+                        <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: WHITE, marginBottom: 2 }}>{s.title}</span>
+                        <span style={{ display: "block", fontSize: 12.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.45 }}>{subtitles[i]}</span>
+                      </span>
+                      <span style={{ flexShrink: 0, color: "#8EEDC0", display: "inline-flex" }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                      </span>
+                    </button>
+                  ))}
                 </div>
               );
             })()}
