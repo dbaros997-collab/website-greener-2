@@ -91,6 +91,7 @@ export default function App() {
   const [, vmParams] = useRoute("/about/vision-mission");
   const [, progRoute] = useRoute("/programmes/:slug");
   const [, admRoute] = useRoute("/admissions/:slug");
+  const [isUpdates] = useRoute("/updates");
   const [scrolledY, setScrolledY]     = useState(false);
   // The header switches to its "solid" treatment when the user scrolls OR
   // whenever we are on a detail page (so white nav text stays readable over the
@@ -603,8 +604,60 @@ export default function App() {
     },
   ];
 
+  // Parent noticeboard items (static). Shown as a short teaser on the home page;
+  // the full list lives on the dedicated /updates page so the home stays short.
+  const updateItems = [
+    { date: "02 Jun 2026", cat: "Programmes", tag: "PROGRAMME", title: "Term II Co-Curricular Programme Released", body: "The full schedule for Music, Dance & Drama, sports, and the vocational skills exhibition is now available. Parents are encouraged to support their children's participation." },
+    { date: "28 May 2026", cat: "Fees", tag: "FEES", title: "Term II Fees Payment Reminder", body: "Kindly clear all outstanding school fees before the mid-term break. Bank details and payment plans are available at the bursar's office." },
+    { date: "20 May 2026", cat: "Academics", tag: "ACADEMICS", title: "Mid-Term Examinations Timetable", body: "Mid-term assessments for all classes (S1–S6) will run during the third week. The detailed timetable has been shared with class teachers." },
+    { date: "12 May 2026", cat: "Events", tag: "EVENT", title: "Parents' Visitation Day — Save the Date", body: "Our next Visitation Day is scheduled for the first Saturday of next month. Come meet your child's teachers and tour the campus." },
+    { date: "05 May 2026", cat: "General", tag: "GENERAL", title: "New Library Resources & Science Equipment", body: "Thanks to your continued support, the school has acquired new textbooks and laboratory equipment to enrich our students' learning experience." },
+  ];
+
+  const updateCard = (u: { date: string; cat: string; tag: string; title: string; body: string }, i: number) => (
+    <div key={i} style={{
+      background: WHITE, borderRadius: 12, padding: "22px 26px",
+      border: "1px solid rgba(0,0,0,0.06)", borderLeft: `4px solid ${GREEN_MAIN}`,
+      display: "flex", gap: 20, alignItems: "flex-start",
+      transition: "transform 0.2s, box-shadow 0.2s",
+    }}
+    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.1)"; }}
+    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+    >
+      <div style={{ flexShrink: 0, textAlign: "center", minWidth: 64 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN }}>{u.date.split(" ")[1]}</div>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: GREEN_DARK, lineHeight: 1 }}>{u.date.split(" ")[0]}</div>
+        <div style={{ fontSize: 11, color: "#7A8A80" }}>{u.date.split(" ")[2]}</div>
+      </div>
+      <div style={{ flex: 1 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: GREEN_LIGHT, color: GREEN_DARK, padding: "3px 10px", borderRadius: 100 }}>{u.tag}</span>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", color: GREEN_DARK, margin: "10px 0 6px" }}>{u.title}</h3>
+        <p style={{ fontSize: 14, color: "#5A5A5A", lineHeight: 1.6 }}>{u.body}</p>
+      </div>
+    </div>
+  );
+
+  // Full noticeboard body for the dedicated /updates page.
+  const updatesBody = (
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {updateItems.map((u, i) => updateCard(u, i))}
+      </div>
+      <div style={{ marginTop: 32, background: GREEN_DARK, borderRadius: 12, padding: "24px 28px", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginBottom: 4 }}>Never miss an update</h4>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>For direct enquiries, contact the school office and we'll keep you informed.</p>
+        </div>
+        <button onClick={() => scrollTo("contact")} style={{
+          background: "#4CAF82", color: GREEN_DARK, padding: "12px 28px",
+          borderRadius: 6, fontWeight: 600, border: "none", cursor: "pointer", fontSize: 15,
+        }}>Contact the Office</button>
+      </div>
+    </>
+  );
+
   // ===== Detail-page layout =====
-  // Shared chrome for the three detail pages: a GREEN_DARK hero band with a
+  // Shared chrome for the detail pages: a GREEN_DARK hero band with a
   // clickable breadcrumb + title + optional subtitle, then a content area
   // (light by default, dark for the admissions pages whose bodies are styled
   // for a dark background). Called as a function (not <Component>) so it shares
@@ -700,6 +753,14 @@ export default function App() {
         sectionLabel: "Admissions", sectionId: "admissions",
         title: slide.title, subtitle: slide.subtitle, dark: true,
         children: slide.body,
+      });
+    }
+    if (isUpdates) {
+      return detailLayout({
+        sectionLabel: "Updates", sectionId: "updates",
+        title: "School Updates & Announcements",
+        subtitle: "Our official noticeboard for parents and guardians — programmes, fees, term dates, and important announcements.",
+        children: updatesBody,
       });
     }
     return notFoundPage("Home", "__home");
@@ -1290,46 +1351,24 @@ export default function App() {
             This is our official noticeboard for parents and guardians. Check here regularly for the latest information on school programmes, fees, term dates, and important announcements.
           </p>
 
+          {/* Compact teaser — the two most recent notices; full list on /updates */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {[
-              { date: "02 Jun 2026", cat: "Programmes", tag: "PROGRAMME", title: "Term II Co-Curricular Programme Released", body: "The full schedule for Music, Dance & Drama, sports, and the vocational skills exhibition is now available. Parents are encouraged to support their children's participation." },
-              { date: "28 May 2026", cat: "Fees", tag: "FEES", title: "Term II Fees Payment Reminder", body: "Kindly clear all outstanding school fees before the mid-term break. Bank details and payment plans are available at the bursar's office." },
-              { date: "20 May 2026", cat: "Academics", tag: "ACADEMICS", title: "Mid-Term Examinations Timetable", body: "Mid-term assessments for all classes (S1–S6) will run during the third week. The detailed timetable has been shared with class teachers." },
-              { date: "12 May 2026", cat: "Events", tag: "EVENT", title: "Parents' Visitation Day — Save the Date", body: "Our next Visitation Day is scheduled for the first Saturday of next month. Come meet your child's teachers and tour the campus." },
-              { date: "05 May 2026", cat: "General", tag: "GENERAL", title: "New Library Resources & Science Equipment", body: "Thanks to your continued support, the school has acquired new textbooks and laboratory equipment to enrich our students' learning experience." },
-            ].map((u, i) => (
-              <div key={i} style={{
-                background: WHITE, borderRadius: 12, padding: "22px 26px",
-                border: "1px solid rgba(0,0,0,0.06)", borderLeft: `4px solid ${GREEN_MAIN}`,
-                display: "flex", gap: 20, alignItems: "flex-start",
-                transition: "transform 0.2s, box-shadow 0.2s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-              >
-                <div style={{ flexShrink: 0, textAlign: "center", minWidth: 64 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN }}>{u.date.split(" ")[1]}</div>
-                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: GREEN_DARK, lineHeight: 1 }}>{u.date.split(" ")[0]}</div>
-                  <div style={{ fontSize: 11, color: "#7A8A80" }}>{u.date.split(" ")[2]}</div>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: GREEN_LIGHT, color: GREEN_DARK, padding: "3px 10px", borderRadius: 100 }}>{u.tag}</span>
-                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", color: GREEN_DARK, margin: "10px 0 6px" }}>{u.title}</h3>
-                  <p style={{ fontSize: 14, color: "#5A5A5A", lineHeight: 1.6 }}>{u.body}</p>
-                </div>
-              </div>
-            ))}
+            {updateItems.slice(0, 2).map((u, i) => updateCard(u, i))}
           </div>
 
-          <div style={{ marginTop: 32, background: GREEN_DARK, borderRadius: 12, padding: "24px 28px", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", color: WHITE, marginBottom: 4 }}>Never miss an update</h4>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>For direct enquiries, contact the school office and we'll keep you informed.</p>
-            </div>
-            <button onClick={() => scrollTo("contact")} style={{
-              background: "#4CAF82", color: GREEN_DARK, padding: "12px 28px",
-              borderRadius: 6, fontWeight: 600, border: "none", cursor: "pointer", fontSize: 15,
-            }}>Contact the Office</button>
+          <div style={{ marginTop: 28, display: "flex", justifyContent: "center" }}>
+            <button onClick={() => openDetail("/updates")} style={{
+              display: "inline-flex", alignItems: "center", gap: 10, cursor: "pointer",
+              background: GREEN_MAIN, color: WHITE, border: "none", borderRadius: 100,
+              padding: "13px 30px", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
+              boxShadow: "0 10px 24px rgba(10,64,32,0.18)", transition: "background 0.2s, transform 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = GREEN_MAIN; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              View All {updateItems.length} Updates
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </button>
           </div>
         </div>
       </section>
