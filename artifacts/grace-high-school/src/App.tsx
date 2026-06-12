@@ -363,6 +363,7 @@ export default function App() {
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
     { src: img_mdd,         label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
     { src: img_welding,     label: "Vocational Skills — Metal Welding",      cat: "vocational", wide: true },
+    { src: img_crafts,      label: "Vocational Skills — Handicraft & Weaving", cat: "vocational", wide: true },
     { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
   ];
 
