@@ -20,7 +20,7 @@ import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
 import img_admissions_watermark from "@assets/IMG_9926_1780917530721.jpg";
 import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
-import img_students_group from "@assets/3@_(5)_1781252197940.JPG";
+import img_students_group from "@assets/3@_(5)_1781252589025.JPG";
 import img_mdd from "@assets/IMG_5939_1780675538368.JPG";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
