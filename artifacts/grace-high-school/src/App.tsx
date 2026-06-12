@@ -48,10 +48,10 @@ const GOLD        = "#C9A24B";
 const GOLD_LIGHT  = "#E6C66E";
 
 const HERO_SLIDES = [
+  img_students_group,
   img_campus_hero,
   img_assembly1,
   img_alevel,
-  img_students_group,
 ];
 
 const HERO_WORDS = ["Vision", "Faith", "Excellence"];
@@ -1030,7 +1030,7 @@ export default function App() {
         {HERO_SLIDES.map((src, i) => (
           <div key={i} style={{
             position: "absolute", inset: 0,
-            backgroundImage: `url(${src})`,
+            backgroundImage: `url("${src}")`,
             backgroundSize: "cover", backgroundPosition: "center",
             filter: "saturate(1.08) contrast(1.04) brightness(1.03)",
             transform: i === heroSlide ? "scale(1.08)" : "scale(1.0)",
@@ -2011,7 +2011,7 @@ export default function App() {
         {/* Campus watermark */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none", userSelect: "none",
-          backgroundImage: `url(${img_footer_watermark})`,
+          backgroundImage: `url("${img_footer_watermark}")`,
           backgroundSize: "cover", backgroundPosition: "center",
           opacity: 0.22,
         }} />
