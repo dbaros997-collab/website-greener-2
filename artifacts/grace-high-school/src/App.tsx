@@ -361,7 +361,7 @@ export default function App() {
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
     { src: img_drama,       label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
-    { src: img_crafts,      label: "Vocational Skills — Handicraft & Weaving", cat: "vocational", wide: true },
+    { src: img_crafts,      label: "Vocational Skills — Handicraft & Weaving", cat: "vocational" },
     { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
   ];
 
