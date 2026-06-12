@@ -1,3 +1,4 @@
 - [Grace site preview quirks](grace-preview-quirks.md) — app_preview screenshots render from document top (ignore hash scroll); 88vh hero makes lower sections hard to capture in one shot.
 - [Storage object access tiers](storage-object-access.md) — `uploads/` prefix is public, `applications/` prefix is staff-only PII; same serving route gated by path prefix.
+- [Grace gallery grid tiling](grace-gallery-grid.md) — 3-col grid, wide=span2; keep spans a multiple of 3 (3 wide + 3 single for 6 items) or empty holes appear.
 - [CSS url() must quote asset URLs](css-url-parens-assets.md) — inline `backgroundImage: url(${src})` fails silently (dark/empty) when the filename has parentheses; always `url("${src}")`.
