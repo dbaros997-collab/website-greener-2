@@ -418,7 +418,7 @@ export default function App() {
 
   const PROGRAMMES_FALLBACK = [
     {
-      tag: "S1 – S4", title: "Ordinary Level", img: img_exam,
+      tag: "S1 – S4", title: "Ordinary Level", img: img_students_group,
       desc: "Four years of broad foundational education leading to the Uganda Certificate of Education (UCE), setting students up for A-Level and beyond.",
       subjects: ["Mathematics", "Sciences", "English", "History", "Geography", "CRE", "SST", "Languages"],
     },
