@@ -28,6 +28,7 @@ import img_waterfilter from "@assets/481698095_1150000593486362_5954536687911692
 import img_lab from "@assets/481779877_1149893336830421_4127942201837184591_n_1780398909151.jpg";
 import img_uace from "@assets/481820657_1149996483486773_2392940494083029153_n_1780398909151.jpg";
 import img_crafts from "@assets/IMG_9915_1781253071818.jpg";
+import img_drama from "@assets/IMG_6133_1781254062546.JPG";
 import img_trophy from "@assets/481896802_1149890086830746_7205278328307673506_n_1780398909152.jpg";
 import img_assembly3 from "@assets/481907330_1149892830163805_8613282942842560566_n_1780398909153.jpg";
 import img_conference from "@assets/481919937_1149893610163727_7736672364831677932_n_1780398909153.jpg";
@@ -359,6 +360,7 @@ export default function App() {
     { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
     { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
     { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
+    { src: img_drama,       label: "Music, Dance & Drama — Stage Performance", cat: "events", wide: true },
     { src: img_crafts,      label: "Vocational Skills — Handicraft & Weaving", cat: "vocational", wide: true },
     { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
   ];
