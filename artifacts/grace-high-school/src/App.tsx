@@ -100,9 +100,7 @@ export default function App() {
   const [menuOpen, setMenuOpen]       = useState(false);
   const [openGroup, setOpenGroup]     = useState<string | null>(null);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
-  const [lightbox, setLightbox]       = useState<string | null>(null);
   const [videoModal, setVideoModal]   = useState<string | null>(null);
-  const [galleryFilter, setGalFilter] = useState("all");
   const [formSent, setFormSent]       = useState(false);
   const [formSending, setFormSending] = useState(false);
   const [formError, setFormError]     = useState(false);
@@ -335,7 +333,6 @@ export default function App() {
     { label: "Home", id: "__home" },
     { label: "About", children: [
       { label: "About Us", id: "about", desc: "Our story, Christian foundation & values" },
-      { label: "Campus Gallery", id: "campus", desc: "Photos of our 28-acre Gayaza campus" },
     ] },
     { label: "Academics", children: [
       { label: "Programmes", id: "programmes", desc: "O-Level, A-Level & vocational skills" },
@@ -351,22 +348,12 @@ export default function App() {
 
   const navGo = (id: string) => (id === "__home" ? goHome() : scrollTo(id));
 
-  const galleryItems = [
-    { src: img_computerlab, label: "Computer Lab — ICT Practical Session",  cat: "academics", wide: true },
-    { src: img_library,     label: "School Library — Students Reading",      cat: "academics" },
-    { src: img_alevel,      label: "A-Level Students — S5 & S6 Class",       cat: "campus", wide: true },
-    { src: img_drama,       label: "Music, Dance & Drama — Stage Performance", cat: "events" },
-    { src: img_crafts,      label: "Vocational Skills — Handicraft & Weaving", cat: "vocational" },
-    { src: img_trophy,      label: "Award Ceremony — Excellence Recognised", cat: "achievements", wide: true },
-  ];
-
   const schoolVideos = [
     { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
   ];
 
   // ===== Dynamic content (DB-backed, with the static content above as a
   // graceful fallback whenever the API is empty or unreachable). =====
-  const storageUrl = (objectPath: string) => `${API}/storage${objectPath}`;
 
   const sfInput: CSSProperties = {
     padding: "11px 14px", border: "1.5px solid rgba(255,255,255,0.18)", borderRadius: 6,
@@ -379,7 +366,6 @@ export default function App() {
   const videosQ = useListVideos();
   const programmesQ = useListProgrammes();
   const admissionsQ = useListAdmissionSteps();
-  const galleryQ = useListGalleryImages();
   const siteTextQ = useListSiteText();
 
   // Editable section copy: look up by key, falling back to the original
@@ -771,17 +757,6 @@ export default function App() {
       }))
     : schoolVideos;
 
-  const galleryViewItems = galleryQ.data?.length
-    ? galleryQ.data.map((g) => ({
-        src: storageUrl(g.objectPath), label: g.caption, cat: g.category, wide: g.wide,
-      }))
-    : galleryItems;
-  const filtered = galleryFilter === "all"
-    ? galleryViewItems
-    : galleryViewItems.filter((g) => g.cat === galleryFilter);
-  const catLabel = (cat: string) =>
-    ({ campus: "Campus", academics: "Academics", vocational: "Vocational", events: "Events", achievements: "Achievements" } as Record<string, string>)[cat] ?? cat;
-
   const navBg = scrolled
     ? `rgba(10,64,32,0.45)`
     : `transparent`;
@@ -789,13 +764,6 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: OFF_WHITE, color: "#1A1A1A", overflowX: "hidden" }}>
-
-      {/* ===== LIGHTBOX ===== */}
-      {lightbox && (
-        <div className="lightbox-overlay" onClick={() => setLightbox(null)}>
-          <img src={lightbox} alt="Full size" />
-        </div>
-      )}
 
       {/* ===== VIDEO MODAL ===== */}
       {videoModal !== null && (
@@ -843,7 +811,6 @@ export default function App() {
         <div className="utility-links" style={{ display: "flex", alignItems: "center", gap: 22 }}>
           {[
             { id: "resources", label: "Student Resources" },
-            { id: "campus", label: "Campus Life" },
             { id: "contact", label: "Contact" },
           ].map(l => (
             <button key={l.id} onClick={() => scrollTo(l.id)} style={{
@@ -1150,7 +1117,7 @@ export default function App() {
             {
               icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></>,
               title: "Student Resources",
-              desc: "Download past papers and holiday work, and explore everyday school life through our videos and campus gallery.",
+              desc: "Download past papers and holiday work, and explore everyday school life through our videos.",
               id: "resources",
             },
           ].map((c, i) => (
