@@ -26,7 +26,6 @@ import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_17
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
 import img_waterfilter from "@assets/481698095_1150000593486362_595453668791169278_n_1780398909149.jpg";
-import img_sewing from "@assets/481774229_1150000706819684_3856748495753883636_n_1780398909150.jpg";
 import img_lab from "@assets/481779877_1149893336830421_4127942201837184591_n_1780398909151.jpg";
 import img_uace from "@assets/481820657_1149996483486773_2392940494083029153_n_1780398909151.jpg";
 import img_welding from "@assets/481823396_1149998740153214_8410241474044159533_n_1780398909152.jpg";
@@ -428,7 +427,7 @@ export default function App() {
       subjects: ["Sciences", "Arts", "Business", "ICT", "Agriculture", "Economics"],
     },
     {
-      tag: "Extracurricular", title: "Vocational Skills", img: img_sewing,
+      tag: "Extracurricular", title: "Vocational Skills", img: img_welding,
       desc: "Practical skills training alongside academics, equipping students with capabilities that create real-world opportunities.",
       subjects: ["Entrepreneurship", "Life Skills", "Sports", "Arts & Crafts", "Leadership", "Welding"],
     },
