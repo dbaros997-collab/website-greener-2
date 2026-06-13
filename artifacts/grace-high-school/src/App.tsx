@@ -42,7 +42,6 @@ const GOLD        = "#C9A24B";
 const GOLD_LIGHT  = "#E6C66E";
 
 const HERO_SLIDES = [
-  img_students_group,
   img_campus_hero,
   img_assembly1,
   img_alevel,
