@@ -11,7 +11,6 @@ import {
 } from "@workspace/api-client-react";
 
 import schoolLogo from "@assets/school_logo_transparent.png";
-import img_assembly1 from "@assets/483102123_1154996392986782_6972322137511794977_n_1780398909145.jpg";
 import img_about_group from "@assets/SSEKAMATTE_SIMON_1780946570401.png";
 import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
 import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
@@ -46,7 +45,6 @@ const GOLD_LIGHT  = "#E6C66E";
 const HERO_SLIDES = [
   img_students_group,
   img_campus_hero,
-  img_assembly1,
   img_alevel,
   img_hotsprings,
   img_library,
