@@ -22,6 +22,7 @@ import img_library from "@assets/IMG_0062_1781375708800.jpg";
 import img_dance from "@assets/IMG_3673_1781376146283.JPG";
 import img_dean_students from "@assets/MUGERWA_DENIS_studio.png";
 import img_careers_mistress from "@assets/Nakabiito_Linda_studio_v3.png";
+import img_viola from "@assets/Namuyomba_Viola_studio.png";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
@@ -63,6 +64,7 @@ interface Leader { name: string; title: string; img: string; }
 const LEADERSHIP: Leader[] = [
   { name: "Mugerwa Denis", title: "Dean of Students", img: img_dean_students },
   { name: "Nakabiito Linda", title: "Careers Mistress", img: img_careers_mistress },
+  { name: "Namuyomba Viola", title: "Member of Staff", img: img_viola },
 ];
 
 const API = "/api";
