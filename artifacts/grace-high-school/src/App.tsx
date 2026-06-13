@@ -20,6 +20,7 @@ import img_students_group from "@assets/3@_(5)_1781252589025.JPG";
 import img_hotsprings from "@assets/IMG_20230304_115149_291_1781375070289.jpg";
 import img_library from "@assets/IMG_0062_1781375708800.jpg";
 import img_dance from "@assets/IMG_3673_1781376146283.JPG";
+import img_dean_students from "@assets/MUGERWA_DENIS_nobg.png";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
@@ -56,6 +57,11 @@ const HERO_SLIDES = [
 const HERO_CONTAIN = new Set<string>([img_dance]);
 
 const HERO_WORDS = ["Vision", "Faith", "Excellence"];
+
+interface Leader { name: string; title: string; img: string; }
+const LEADERSHIP: Leader[] = [
+  { name: "Mugerwa Denis", title: "Dean of Students", img: img_dean_students },
+];
 
 const API = "/api";
 
@@ -1196,6 +1202,37 @@ export default function App() {
                 <p style={{ fontSize: 13, color: GREEN_MAIN, margin: 0 }}>Grace High School, Gayaza</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== SCHOOL LEADERSHIP ===== */}
+      <section id="leadership" className="reveal" style={{ background: OFF_WHITE, padding: "64px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
+              Our Leadership
+              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>Meet Our School Administrators</h2>
+            <p style={{ fontSize: 16, color: "#4A6655", lineHeight: 1.7 }}>The dedicated team guiding Grace High School day to day.</p>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 28 }}>
+            {LEADERSHIP.map((p, i) => (
+              <div key={i} style={{ width: 250, background: WHITE, borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 30px rgba(10,64,32,0.08)", border: "1px solid rgba(10,64,32,0.06)", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 18px 40px rgba(10,64,32,0.14)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.08)"; }}>
+                <div style={{ aspectRatio: "4 / 5", background: `linear-gradient(160deg, ${GREEN_LIGHT}, rgba(201,162,75,0.14))`, overflow: "hidden" }}>
+                  <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
+                </div>
+                <div style={{ padding: "18px 16px 22px", textAlign: "center" }}>
+                  <h3 style={{ fontSize: 16.5, fontWeight: 700, color: GREEN_DARK, margin: "0 0 6px" }}>{p.name}</h3>
+                  <span style={{ display: "inline-block", width: 26, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, borderRadius: 2, margin: "0 auto 8px" }} />
+                  <p style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>{p.title}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -1,3 +1,4 @@
 - [Grace site preview quirks](grace-preview-quirks.md) — app_preview screenshots render from document top (ignore hash scroll); 88vh hero makes lower sections hard to capture in one shot.
 - [Storage object access tiers](storage-object-access.md) — `uploads/` prefix is public, `applications/` prefix is staff-only PII; same serving route gated by path prefix.
 - [CSS url() must quote asset URLs](css-url-parens-assets.md) — inline `backgroundImage: url(${src})` fails silently (dark/empty) when the filename has parentheses; always `url("${src}")`.
+- [Grace admin headshots](grace-admin-headshots.md) — supplied leadership PNGs are RGBA-but-opaque (solid black bg); remove background before using on the light leadership cards.
