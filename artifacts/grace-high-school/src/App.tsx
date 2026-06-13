@@ -64,7 +64,7 @@ interface Leader { name: string; title: string; img: string; }
 const LEADERSHIP: Leader[] = [
   { name: "Mugerwa Denis", title: "Dean of Students", img: img_dean_students },
   { name: "Nakabiito Linda", title: "Careers Mistress", img: img_careers_mistress },
-  { name: "Namuyomba Viola", title: "Dean of Students", img: img_viola },
+  { name: "Namuyomba Viola", title: "Director of Studies", img: img_viola },
 ];
 
 const API = "/api";
