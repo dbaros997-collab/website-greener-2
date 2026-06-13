@@ -52,6 +52,9 @@ const HERO_SLIDES = [
   img_dance,
 ];
 
+// Slides whose subject would be cropped by "cover" — show the full photo instead.
+const HERO_CONTAIN = new Set<string>([img_dance]);
+
 const HERO_WORDS = ["Vision", "Faith", "Excellence"];
 
 const API = "/api";
@@ -996,7 +999,8 @@ export default function App() {
           <div key={i} style={{
             position: "absolute", inset: 0,
             backgroundImage: `url("${src}")`,
-            backgroundSize: "cover", backgroundPosition: "center",
+            backgroundSize: HERO_CONTAIN.has(src) ? "contain" : "cover",
+            backgroundPosition: "center", backgroundRepeat: "no-repeat",
             filter: "saturate(1.08) contrast(1.04) brightness(1.03)",
             transform: i === heroSlide ? "scale(1.08)" : "scale(1.0)",
             opacity: i === heroSlide ? 1 : 0,
