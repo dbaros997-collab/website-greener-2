@@ -20,7 +20,7 @@ import img_students_group from "@assets/3@_(5)_1781252589025.JPG";
 import img_hotsprings from "@assets/IMG_20230304_115149_291_1781375070289.jpg";
 import img_library from "@assets/IMG_0062_1781375708800.jpg";
 import img_dance from "@assets/IMG_3673_1781376146283.JPG";
-import img_dean_students from "@assets/MUGERWA_DENIS_nobg.png";
+import img_dean_students from "@assets/MUGERWA_DENIS_card.png";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
 import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
 import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
