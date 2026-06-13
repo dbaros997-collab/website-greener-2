@@ -1222,18 +1222,15 @@ export default function App() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>Meet Our School Administrators</h2>
             <p style={{ fontSize: 16, color: "#4A6655", lineHeight: 1.7 }}>The dedicated team guiding Grace High School day to day.</p>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 28 }}>
+          <div className="leaders-grid">
             {LEADERSHIP.map((p, i) => (
-              <div key={i} style={{ width: 250, background: WHITE, borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 30px rgba(10,64,32,0.08)", border: "1px solid rgba(10,64,32,0.06)", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 18px 40px rgba(10,64,32,0.14)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.08)"; }}>
-                <div style={{ aspectRatio: "4 / 5", background: `linear-gradient(160deg, ${GREEN_LIGHT}, rgba(201,162,75,0.14))`, overflow: "hidden" }}>
-                  <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
-                </div>
-                <div style={{ padding: "18px 16px 22px", textAlign: "center" }}>
-                  <h3 style={{ fontSize: 16.5, fontWeight: 700, color: GREEN_DARK, margin: "0 0 6px" }}>{p.name}</h3>
-                  <span style={{ display: "inline-block", width: 26, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, borderRadius: 2, margin: "0 auto 8px" }} />
-                  <p style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN, margin: 0 }}>{p.title}</p>
+              <div key={i} className="leader-card">
+                <img className="leader-photo" src={p.img} alt={p.name} />
+                <div className="leader-scrim" />
+                <div className="leader-info">
+                  <h3>{p.name}</h3>
+                  <span className="leader-rule" />
+                  <p className="leader-role">{p.title}</p>
                 </div>
               </div>
             ))}
