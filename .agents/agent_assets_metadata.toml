@@ -18,3 +18,9 @@ id = "fAyzeTLeCsS79l4ANUDin"
 uri = "file://artifacts/grace-high-school/Grace-High-School-Website-Content.md"
 type = "text"
 title = "Grace High School — Full Website Content"
+
+[[outputs]]
+id = "BtXX98pv2oIFHYirY-lf5"
+uri = "file://screenshots/leadership_card.jpg"
+type = "image"
+title = "Dean of Students card — current render (left: real size, right: zoomed)"
