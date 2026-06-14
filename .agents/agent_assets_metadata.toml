@@ -1,5 +1,10 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "WEDOHeyiQeX5_ofLWzDkP"
+uri = "file://attached_assets/generated_images/black_tie_graft.png"
+type = "image"
+title = "black necktie"
 
 [[outputs]]
 id = "Beah5U1zwrK24u2UvNXlA"
