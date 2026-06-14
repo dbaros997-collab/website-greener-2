@@ -20,7 +20,7 @@ import img_students_group from "@assets/3@_(5)_1781252589025.JPG";
 import img_hotsprings from "@assets/IMG_20230304_115149_291_1781375070289.jpg";
 import img_library from "@assets/IMG_0062_1781375708800.jpg";
 import img_dance from "@assets/IMG_3673_1781376146283.JPG";
-import img_dean_students from "@assets/MUGERWA_DENIS_studio_black.png";
+import img_dean_students from "@assets/MUGERWA_DENIS_studio_blacktie.png";
 import img_careers_mistress from "@assets/Nakabiito_Linda_studio_v3.png";
 import img_viola from "@assets/Namuyomba_Viola_studio.png";
 import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
