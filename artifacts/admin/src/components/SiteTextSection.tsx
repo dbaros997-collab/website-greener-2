@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { toFriendlyError } from "@/lib/errors";
 import { Loader2 } from "lucide-react";
 
 export function SiteTextSection() {
@@ -53,9 +54,8 @@ export function SiteTextSection() {
       await queryClient.invalidateQueries({ queryKey });
       toast({ title: "Saved", description: `${block.label} updated.` });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      toast({ title: "Error", description: message, variant: "destructive" });
+      const { title, description } = toFriendlyError(err);
+      toast({ title, description, variant: "destructive" });
     } finally {
       setSavingKey(null);
     }

@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { toFriendlyError } from "@/lib/errors";
 import {
   ArrowDown,
   ArrowUp,
@@ -149,9 +150,8 @@ export function ContentSection<T extends BaseItem>(
     queryClient.invalidateQueries({ queryKey: query.queryKey });
 
   const onError = (err: unknown) => {
-    const message =
-      err instanceof Error ? err.message : "Something went wrong";
-    toast({ title: "Error", description: message, variant: "destructive" });
+    const { title, description } = toFriendlyError(err);
+    toast({ title, description, variant: "destructive" });
   };
 
   const startCreate = () => {

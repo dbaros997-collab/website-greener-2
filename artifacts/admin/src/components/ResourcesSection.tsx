@@ -27,6 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { toFriendlyError } from "@/lib/errors";
 import { Download, Loader2, Plus, Trash2, X } from "lucide-react";
 
 const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
@@ -78,8 +79,8 @@ export function ResourcesSection() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
   const onError = (err: unknown) => {
-    const message = err instanceof Error ? err.message : "Something went wrong";
-    toast({ title: "Error", description: message, variant: "destructive" });
+    const { title, description } = toFriendlyError(err);
+    toast({ title, description, variant: "destructive" });
   };
 
   const createMutation = useMutation({
