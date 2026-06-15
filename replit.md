@@ -9,6 +9,7 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/scripts run test:login-upload` — e2e regression test for the staff login → request-upload-URL → upload flow (runs against the dev server over HTTPS; creates and deletes its own throwaway staff user)
 - Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack

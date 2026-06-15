@@ -3,3 +3,4 @@
 - [CSS url() must quote asset URLs](css-url-parens-assets.md) — inline `backgroundImage: url(${src})` fails silently (dark/empty) when the filename has parentheses; always `url("${src}")`.
 - [Grace admin headshots](grace-admin-headshots.md) — supplied leadership PNGs are RGBA-but-opaque (solid black bg); remove background before using on the light leadership cards.
 - [Admin cross-site auth cookie](admin-cross-site-auth-cookie.md) — authed admin 401s are usually a dropped session cookie (shared client needs credentials:include), not a server bug; verify server over HTTPS, not localhost.
+- [Auth e2e test users](auth-e2e-test-users.md) — seeded admin can drift from ADMIN_* env; authed e2e tests must create+delete their own throwaway staff user, not rely on env creds.
