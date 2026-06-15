@@ -12,6 +12,7 @@ export interface ProgrammePatch {
   title?: string;
   description?: string;
   subjects?: string[];
+  objectPath?: string;
   isVisible?: boolean;
   sortOrder?: number;
 }

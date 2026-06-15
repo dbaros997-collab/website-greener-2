@@ -303,6 +303,8 @@ export interface Programme {
   title: string;
   description: string;
   subjects: string[];
+  /** Path to the uploaded programme image, or empty string when none. */
+  objectPath: string;
   isVisible: boolean;
   sortOrder: number;
   createdAt: string;
@@ -316,6 +318,7 @@ export interface ProgrammeInput {
   title: string;
   description?: string;
   subjects?: string[];
+  objectPath?: string;
 }
 
 export interface ProgrammePatch {
@@ -324,6 +327,7 @@ export interface ProgrammePatch {
   title?: string;
   description?: string;
   subjects?: string[];
+  objectPath?: string;
   isVisible?: boolean;
   sortOrder?: number;
 }

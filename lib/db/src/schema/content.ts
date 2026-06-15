@@ -52,6 +52,9 @@ export const programmesTable = pgTable("programmes", {
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
   subjects: text("subjects").array().notNull().default([]),
+  // Optional uploaded programme image. Empty string means "no image" — the
+  // public site then falls back to a static image looked up by title.
+  objectPath: text("object_path").notNull().default(""),
   ...ordering,
 });
 

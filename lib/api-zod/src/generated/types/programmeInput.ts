@@ -12,4 +12,5 @@ export interface ProgrammeInput {
   title: string;
   description?: string;
   subjects?: string[];
+  objectPath?: string;
 }

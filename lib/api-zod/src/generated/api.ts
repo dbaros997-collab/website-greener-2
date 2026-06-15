@@ -598,6 +598,7 @@ export const ListProgrammesResponseItem = zod.object({
   "title": zod.string(),
   "description": zod.string(),
   "subjects": zod.array(zod.string()),
+  "objectPath": zod.string().describe('Path to the uploaded programme image, or empty string when none.'),
   "isVisible": zod.boolean(),
   "sortOrder": zod.number(),
   "createdAt": zod.coerce.date()
@@ -615,7 +616,8 @@ export const CreateProgrammeBody = zod.object({
   "tag": zod.string().optional(),
   "title": zod.string().min(1),
   "description": zod.string().optional(),
-  "subjects": zod.array(zod.string()).optional()
+  "subjects": zod.array(zod.string()).optional(),
+  "objectPath": zod.string().optional()
 })
 
 
@@ -646,6 +648,7 @@ export const UpdateProgrammeBody = zod.object({
   "title": zod.string().min(1).optional(),
   "description": zod.string().optional(),
   "subjects": zod.array(zod.string()).optional(),
+  "objectPath": zod.string().optional(),
   "isVisible": zod.boolean().optional(),
   "sortOrder": zod.number().optional()
 })
@@ -656,6 +659,7 @@ export const UpdateProgrammeResponse = zod.object({
   "title": zod.string(),
   "description": zod.string(),
   "subjects": zod.array(zod.string()),
+  "objectPath": zod.string().describe('Path to the uploaded programme image, or empty string when none.'),
   "isVisible": zod.boolean(),
   "sortOrder": zod.number(),
   "createdAt": zod.coerce.date()

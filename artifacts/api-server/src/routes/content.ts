@@ -285,6 +285,13 @@ const configs: CrudConfig[] = [
     createBody: CreateProgrammeBody,
     updateBody: UpdateProgrammeBody,
     reorderBody: ReorderProgrammesBody,
+    afterDelete: async (row, req) => {
+      const objectPath = row["objectPath"];
+      if (typeof objectPath === "string" && objectPath) {
+        await objectStorageService.deleteObjectEntity(objectPath);
+        req.log.info({ objectPath }, "Removed programme image file");
+      }
+    },
   },
   {
     resource: "stats",

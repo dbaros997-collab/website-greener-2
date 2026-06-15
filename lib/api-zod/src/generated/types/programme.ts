@@ -12,6 +12,8 @@ export interface Programme {
   title: string;
   description: string;
   subjects: string[];
+  /** Path to the uploaded programme image, or empty string when none. */
+  objectPath: string;
   isVisible: boolean;
   sortOrder: number;
   createdAt: Date;

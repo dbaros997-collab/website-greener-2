@@ -270,7 +270,7 @@ export default function Dashboard() {
           <TabsContent value="programmes">
             <ContentSection
               title="Programmes"
-              description="Academic programmes and their subjects."
+              description="Academic programmes and their subjects. Upload an image, or leave it empty to use the default."
               fields={programmeFields}
               primaryKey="title"
               secondaryKey="tag"
@@ -279,6 +279,8 @@ export default function Dashboard() {
               updateMutation={programmesUpdate}
               deleteMutation={programmesDelete}
               reorderMutation={programmesReorder}
+              imageUpload
+              imageRequired={false}
             />
           </TabsContent>
 

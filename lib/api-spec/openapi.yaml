@@ -1927,7 +1927,7 @@ components:
           type: integer
     Programme:
       type: object
-      required: [id, tag, title, description, subjects, isVisible, sortOrder, createdAt]
+      required: [id, tag, title, description, subjects, objectPath, isVisible, sortOrder, createdAt]
       properties:
         id:
           type: integer
@@ -1941,6 +1941,9 @@ components:
           type: array
           items:
             type: string
+        objectPath:
+          type: string
+          description: Path to the uploaded programme image, or empty string when none.
         isVisible:
           type: boolean
         sortOrder:
@@ -1967,6 +1970,8 @@ components:
           type: array
           items:
             type: string
+        objectPath:
+          type: string
     ProgrammePatch:
       type: object
       properties:
@@ -1981,6 +1986,8 @@ components:
           type: array
           items:
             type: string
+        objectPath:
+          type: string
         isVisible:
           type: boolean
         sortOrder:

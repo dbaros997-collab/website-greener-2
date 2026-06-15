@@ -434,7 +434,8 @@ export default function App() {
     PROGRAMMES_FALLBACK.find((p) => p.title === title)?.img ?? img_campus_hero;
   const programmeItems = programmesQ.data?.length
     ? programmesQ.data.map((p) => ({
-        tag: p.tag, title: p.title, img: programmeImg(p.title),
+        tag: p.tag, title: p.title,
+        img: p.objectPath ? `${API}/storage${p.objectPath}` : programmeImg(p.title),
         desc: p.description, subjects: p.subjects,
       }))
     : PROGRAMMES_FALLBACK;

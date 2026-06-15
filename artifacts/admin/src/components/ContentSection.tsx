@@ -63,6 +63,12 @@ export interface ContentSectionProps<T extends BaseItem> {
   deleteMutation: AnyMutation;
   reorderMutation: AnyMutation;
   imageUpload?: boolean;
+  /**
+   * When `imageUpload` is on, whether an image must be supplied on create.
+   * Defaults to `true` (gallery behaviour). Set to `false` for sections where
+   * the image is optional (e.g. programmes fall back to a static image).
+   */
+  imageRequired?: boolean;
 }
 
 type FormValues = Record<string, string>;
@@ -126,6 +132,7 @@ export function ContentSection<T extends BaseItem>(
     deleteMutation,
     reorderMutation,
     imageUpload,
+    imageRequired = true,
   } = props;
 
   const queryClient = useQueryClient();
@@ -189,7 +196,7 @@ export function ContentSection<T extends BaseItem>(
 
       if (editingId === "new") {
         if (imageUpload) {
-          if (!file) {
+          if (!file && imageRequired) {
             toast({
               title: "Image required",
               description: "Please choose an image to upload.",
@@ -197,10 +204,12 @@ export function ContentSection<T extends BaseItem>(
             });
             return;
           }
-          setUploading(true);
-          const objectPath = await uploadFile();
-          setUploading(false);
-          payload.objectPath = objectPath;
+          if (file) {
+            setUploading(true);
+            const objectPath = await uploadFile();
+            setUploading(false);
+            payload.objectPath = objectPath;
+          }
         }
         await createMutation.mutateAsync({ data: payload });
         toast({ title: "Created", description: `${title} item added.` });
@@ -317,7 +326,7 @@ export function ContentSection<T extends BaseItem>(
           <div className="space-y-1.5">
             <Label htmlFor="image-file">
               Image
-              {editingId === "new" ? (
+              {editingId === "new" && imageRequired ? (
                 <span className="text-red-500"> *</span>
               ) : (
                 <span className="text-muted-foreground">
@@ -408,7 +417,8 @@ export function ContentSection<T extends BaseItem>(
                 </div>
 
                 {imageUpload &&
-                typeof asRecord(item).objectPath === "string" ? (
+                typeof asRecord(item).objectPath === "string" &&
+                asRecord(item).objectPath ? (
                   <img
                     src={imageSrc(asRecord(item).objectPath as string)}
                     alt=""
