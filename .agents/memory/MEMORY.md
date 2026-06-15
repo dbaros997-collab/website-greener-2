@@ -2,3 +2,4 @@
 - [Storage object access tiers](storage-object-access.md) — `uploads/` prefix is public, `applications/` prefix is staff-only PII; same serving route gated by path prefix.
 - [CSS url() must quote asset URLs](css-url-parens-assets.md) — inline `backgroundImage: url(${src})` fails silently (dark/empty) when the filename has parentheses; always `url("${src}")`.
 - [Grace admin headshots](grace-admin-headshots.md) — supplied leadership PNGs are RGBA-but-opaque (solid black bg); remove background before using on the light leadership cards.
+- [Admin cross-site auth cookie](admin-cross-site-auth-cookie.md) — authed admin 401s are usually a dropped session cookie (shared client needs credentials:include), not a server bug; verify server over HTTPS, not localhost.

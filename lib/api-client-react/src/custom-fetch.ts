@@ -360,7 +360,17 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  // Always send cookies. The admin runs in a cross-site iframe and authenticates
+  // with a session cookie (SameSite=None; Secure), so credentials must be
+  // explicitly included — the fetch default of "same-origin" drops the cookie in
+  // that partitioned/cross-site context, causing authed calls to 401. Any
+  // explicit `credentials` passed via options still wins.
+  const response = await fetch(input, {
+    credentials: "include",
+    ...init,
+    method,
+    headers,
+  });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
