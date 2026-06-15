@@ -2,6 +2,7 @@ import { useAuth } from "@/lib/auth";
 import { ContentSection, type FieldDef } from "@/components/ContentSection";
 import { ResourcesSection } from "@/components/ResourcesSection";
 import { SubmissionsSection } from "@/components/SubmissionsSection";
+import { ApplicationsSection } from "@/components/ApplicationsSection";
 import { SiteTextSection } from "@/components/SiteTextSection";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -62,6 +63,7 @@ const TABS: { value: string; label: string }[] = [
   { value: "admissions", label: "Admission Steps" },
   { value: "section-text", label: "Section Text" },
   { value: "resources", label: "Resources" },
+  { value: "applications", label: "Applications" },
   { value: "enquiries", label: "Enquiries" },
 ];
 
@@ -322,8 +324,18 @@ export default function Dashboard() {
             <ResourcesSection />
           </TabsContent>
 
+          <TabsContent value="applications">
+            <ApplicationsSection />
+          </TabsContent>
+
           <TabsContent value="enquiries">
-            <SubmissionsSection />
+            <SubmissionsSection
+              filterType="enquiry"
+              title="Enquiries"
+              description="Messages sent through the “Enquire / Apply Now” form on the website."
+              emptyText="No enquiries yet. They will appear here as soon as someone sends a message from the website."
+              csvPrefix="grace-enquiries"
+            />
           </TabsContent>
         </Tabs>
       </main>

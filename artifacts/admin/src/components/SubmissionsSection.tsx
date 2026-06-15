@@ -38,7 +38,7 @@ function csvCell(value: unknown): string {
   return `"${s.replace(/"/g, '""')}"`;
 }
 
-function downloadCsv(items: Submission[]) {
+function downloadCsv(items: Submission[], prefix: string) {
   const headers = [
     "Date",
     "Type",
@@ -72,20 +72,37 @@ function downloadCsv(items: Submission[]) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `grace-enquiries-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `${prefix}-${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-export function SubmissionsSection() {
+interface SubmissionsSectionProps {
+  filterType?: "enquiry" | "application";
+  title?: string;
+  description?: string;
+  emptyText?: string;
+  csvPrefix?: string;
+}
+
+export function SubmissionsSection({
+  filterType,
+  title = "Enquiries & Applications",
+  description = "Enquiries from the “Enquire / Apply Now” form and completed application forms students upload via “Submit Your Completed Form”. Open any attached form, or download everything as a spreadsheet for your records.",
+  emptyText = "No submissions yet. They will appear here as soon as someone fills in the form on the website.",
+  csvPrefix = "grace-enquiries",
+}: SubmissionsSectionProps = {}) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const query = useListSubmissions();
   const queryKey = getListSubmissionsQueryKey();
-  const items = (query.data ?? []) as Submission[];
+  const allItems = (query.data ?? []) as Submission[];
+  const items = filterType
+    ? allItems.filter((s) => s.type === filterType)
+    : allItems;
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
@@ -138,23 +155,18 @@ export function SubmissionsSection() {
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <CardTitle>
-            Enquiries &amp; Applications
+            {title}
             {newCount > 0 ? (
               <Badge className="ml-2 bg-emerald-600">{newCount} new</Badge>
             ) : null}
           </CardTitle>
-          <CardDescription>
-            Enquiries from the &ldquo;Enquire / Apply Now&rdquo; form and completed
-            application forms students upload via &ldquo;Submit Your Completed
-            Form&rdquo;. Open any attached form, or download everything as a
-            spreadsheet for your records.
-          </CardDescription>
+          <CardDescription>{description}</CardDescription>
         </div>
         <Button
           size="sm"
           variant="outline"
           disabled={items.length === 0}
-          onClick={() => downloadCsv(items)}
+          onClick={() => downloadCsv(items, csvPrefix)}
         >
           <Download className="mr-2 h-4 w-4" />
           Download CSV
@@ -164,10 +176,7 @@ export function SubmissionsSection() {
         {query.isLoading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No submissions yet. They will appear here as soon as someone fills in
-            the form on the website.
-          </p>
+          <p className="text-sm text-muted-foreground">{emptyText}</p>
         ) : (
           <ul className="space-y-2">
             {items.map((s) => (
