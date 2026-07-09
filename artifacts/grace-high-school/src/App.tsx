@@ -298,6 +298,18 @@ export default function App() {
     setOpenMobileGroup(null);
   };
 
+  useEffect(() => {
+    document.body.classList.toggle("mobile-menu-open", menuOpen);
+    return () => document.body.classList.remove("mobile-menu-open");
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeMenus(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
   const scrollTo = (id: string) => {
     if (id === "__home") return goHome();
     closeMenus();
@@ -672,7 +684,7 @@ export default function App() {
     return (
       <main style={{ background: opts.dark ? GREEN_DARK : OFF_WHITE, minHeight: "70vh" }}>
         {/* Hero band — padding-top clears the fixed logo/nav overhang */}
-        <div style={{ position: "relative", background: GREEN_DARK, padding: "170px 5% 56px", overflow: "hidden" }}>
+        <div className="detail-hero-band" style={{ background: GREEN_DARK }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 0%, rgba(26,107,60,0.5), transparent 60%)" }} />
           <div style={{ position: "relative", maxWidth: 880, margin: "0 auto" }}>
             <nav style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 18 }}>
@@ -838,7 +850,7 @@ export default function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschoolgayaza@gmail.com</span>
-          <a href="/admin/" style={{
+          <a href="/admin/" className="utility-bar-staff" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             color: GOLD_LIGHT, fontSize: 12, fontWeight: 600, textDecoration: "none",
             letterSpacing: "0.04em", textTransform: "uppercase",
@@ -860,13 +872,9 @@ export default function App() {
           <img
             src={schoolLogo}
             alt="Grace High School Logo"
+            className={`site-logo${scrolled ? " is-scrolled" : ""}`}
             style={{
-              height: scrolled ? 120 : 164,
               width: "auto",
-              objectFit: "contain",
-              flexShrink: 0,
-              transition: "height 0.3s",
-              filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.45))",
             }}
           />
         </a>
@@ -938,8 +946,11 @@ export default function App() {
 
         {/* Hamburger */}
         <button
-          className="flex md:hidden flex-col gap-1.5 p-1.5 bg-transparent border-0 cursor-pointer"
+          className="flex md:hidden flex-col gap-1.5 p-2 bg-transparent border-0 cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav-panel"
         >
           {[0,1,2].map(i => (
             <span key={i} style={{ width: 24, height: 2, background: navText, borderRadius: 2, display: "block", transition: "background 0.3s" }} />
@@ -949,8 +960,10 @@ export default function App() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div style={{
-          position: "fixed", top: scrolled ? 98 : 110, left: 0, right: 0, zIndex: 999,
+        <>
+        <button type="button" className="mobile-menu-backdrop" aria-label="Close menu" onClick={closeMenus} />
+        <div id="mobile-nav-panel" className="mobile-menu-panel" style={{
+          top: scrolled ? 98 : 110,
           background: GREEN_DARK, padding: "20px 5% 28px",
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
@@ -990,12 +1003,13 @@ export default function App() {
             padding: 14, borderRadius: 6, fontWeight: 700, marginTop: 12, cursor: "pointer",
           }}>Apply Now</button>
         </div>
+        </>
       )}
 
       {/* ===== HOME PAGE (all sections below render only on "/") ===== */}
       {isHome && (<>
       {/* ===== HERO ===== */}
-      <section style={{
+      <section className="hero-section" style={{
         minHeight: "88vh", background: GREEN_DARK,
         display: "flex", alignItems: "center", justifyContent: "center",
         position: "relative", overflow: "hidden", padding: "120px 5% 64px",
@@ -1171,7 +1185,7 @@ export default function App() {
               <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Grace High School</span>
             </div>
             {/* Years-of-experience badge */}
-            <div style={{ position: "absolute", zIndex: 3, top: -18, right: -14, width: 96, height: 96, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", boxShadow: "0 12px 28px rgba(201,162,75,0.4)", border: "3px solid #FFFFFF" }}>
+            <div className="welcome-badge" style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, boxShadow: "0 12px 28px rgba(201,162,75,0.4)" }}>
               <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "#3A2D08", lineHeight: 1 }}>25+</span>
               <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#5A4715", marginTop: 3, lineHeight: 1.2 }}>Years of<br />Experience</span>
             </div>
@@ -1551,11 +1565,10 @@ export default function App() {
           </p>
 
           {/* Staff stats */}
-          <div style={{
+          <div className="staff-stats-banner" style={{
             borderRadius: 14, marginBottom: 40,
             background: `linear-gradient(135deg, ${GREEN_DARK}, ${GREEN_MAIN})`,
-            padding: "32px", display: "flex", alignItems: "center",
-            justifyContent: "space-between", flexWrap: "wrap", gap: 24,
+            padding: "32px",
           }}>
             <div>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: WHITE, marginBottom: 4 }}>
@@ -1565,7 +1578,7 @@ export default function App() {
                 Qualified, passionate educators — Gayaza campus
               </p>
             </div>
-            <div style={{ display: "flex", gap: 28 }}>
+            <div className="staff-stats-inner">
               {[
                 { num: "12+", label: "Teaching Staff" },
                 { num: "100%", label: "Qualified" },
@@ -1739,12 +1752,12 @@ export default function App() {
                       {submitError}
                     </div>
                   ) : null}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                  <div className="form-row-2">
                     {[["First Name", "sfFirstName", true], ["Surname", "sfLastName", false]].map(([lbl, name, req]) => (
                       <input key={name as string} name={name as string} required={req as boolean} placeholder={lbl as string} style={sfInput} />
                     ))}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                  <div className="form-row-2">
                     <input name="sfPhone" type="tel" placeholder="Phone / WhatsApp" style={sfInput} />
                     <select name="sfLevel" defaultValue="" style={sfInput}>
                       <option value="">Applying for…</option>

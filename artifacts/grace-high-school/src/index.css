@@ -117,6 +117,147 @@ body {
 
 @media (max-width: 768px) { .utility-links { display: none !important; } }
 
+/* ========== SITE LOGO (responsive) ========== */
+.site-logo {
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: max-height 0.3s, filter 0.3s;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.45));
+  max-height: 120px;
+}
+.site-logo.is-scrolled { max-height: 88px; }
+
+/* ========== WELCOME SECTION MEDIA ========== */
+.welcome-media {
+  position: relative;
+  overflow: visible;
+}
+.welcome-badge {
+  position: absolute;
+  z-index: 3;
+  top: -18px;
+  right: -14px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 3px solid #FFFFFF;
+}
+
+/* ========== FORM / GRID HELPERS ========== */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.entry-points-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ========== DETAIL PAGE HERO ========== */
+.detail-hero-band {
+  position: relative;
+  padding: 170px 5% 56px;
+  overflow: hidden;
+}
+
+/* ========== STAFF STATS ========== */
+.staff-stats-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.staff-stats-inner {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ========== MOBILE MENU ========== */
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: rgba(0, 0, 0, 0.45);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.mobile-menu-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
+/* ========== TABLET / MOBILE (≤ 768px — matches nav breakpoint) ========== */
+@media (max-width: 768px) {
+  .site-logo { max-height: 64px; }
+  .site-logo.is-scrolled { max-height: 52px; }
+
+  .welcome-media { margin-top: 8px; }
+  .welcome-badge {
+    top: -8px;
+    right: 8px;
+    width: 76px;
+    height: 76px;
+  }
+
+  .entry-points-grid { grid-template-columns: 1fr !important; }
+  .form-row-2,
+  .form-name-row { grid-template-columns: 1fr !important; }
+
+  .detail-hero-band { padding: 120px 5% 40px !important; }
+
+  .staff-stats-banner { flex-direction: column; align-items: flex-start; }
+  .staff-stats-inner {
+    width: 100%;
+    justify-content: space-around;
+    gap: 16px;
+  }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .service-grid { grid-template-columns: 1fr !important; }
+  .videos-grid { grid-template-columns: 1fr !important; }
+  .resources-grid { grid-template-columns: 1fr !important; }
+  .programme-row,
+  .programme-row--reverse { flex-direction: column !important; gap: 18px !important; }
+  .programme-row-img { width: 100% !important; height: 220px; min-height: 0 !important; }
+  .programme-row-body { width: 100% !important; }
+  .footer-grid { grid-template-columns: 1fr !important; }
+  .admissions-grid { grid-template-columns: 1fr !important; }
+  .welcome-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
+
+  .hero-section { padding: 100px 5% 48px !important; min-height: 75vh !important; }
+
+  .utility-bar-staff { font-size: 11px !important; letter-spacing: 0.02em !important; }
+}
+
+@media (max-width: 480px) {
+  .site-logo { max-height: 52px; }
+  .site-logo.is-scrolled { max-height: 44px; }
+  .detail-hero-band { padding: 108px 5% 32px !important; }
+  .staff-stats-inner { flex-direction: column; align-items: center; }
+  .welcome-badge { width: 68px; height: 68px; top: 4px; right: 4px; }
+}
+
 /* ========== CREST FLOAT ========== */
 @keyframes crest-float {
   0%, 100% { transform: translateY(0px); }
