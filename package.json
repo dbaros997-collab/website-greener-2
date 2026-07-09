@@ -8,11 +8,12 @@
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "setup:local": "pnpm --filter @workspace/scripts run setup-local",
+    "setup:db": "node ./scripts/src/setup-db.mjs",
     "set-admin": "pnpm --filter @workspace/scripts run set-admin",
     "dev:api": "node ./scripts/src/run-dev-api.mjs",
     "dev:admin": "node ./scripts/src/run-dev-grace-admin.mjs",
     "dev:site": "pnpm --filter @workspace/grace-high-school run dev",
-    "start": "pnpm --filter @workspace/api-server run start"
+    "start": "pnpm run setup:db && pnpm --filter @workspace/api-server run start"
   },
   "private": true,
   "devDependencies": {

@@ -6,7 +6,7 @@
   "scripts": {
     "hello": "tsx ./src/hello.ts",
     "start-db": "node ./src/start-db.mjs",
-    "setup-db": "node --env-file=../.env ./src/setup-db.mjs",
+    "setup-db": "node ./src/setup-db.mjs",
     "seed": "node --env-file=../.env --import tsx ./src/seed.ts",
     "reset-admin": "node --env-file=../.env ./src/reset-admin.mjs",
     "set-admin": "node ./src/set-admin.mjs",
