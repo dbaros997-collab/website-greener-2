@@ -1,9 +1,11 @@
 import pg from "pg";
 
+// Never hard-fail the process: Render start commands often chain this with
+// `&& node …`, and a DB blip must not prevent the HTTP server from binding.
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("DATABASE_URL is not set.");
-  process.exit(1);
+  console.warn("DATABASE_URL is not set — skipping schema setup.");
+  process.exit(0);
 }
 
 const useSsl =
@@ -13,7 +15,7 @@ const useSsl =
 
 const pool = new pg.Pool({
   connectionString,
-  connectionTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 8_000,
   ssl: useSsl ? { rejectUnauthorized: false } : undefined,
 });
 
@@ -156,11 +158,20 @@ CREATE TABLE IF NOT EXISTS "form_submissions" (
 `;
 
 try {
-  await pool.query(schemaSql);
+  await Promise.race([
+    pool.query(schemaSql),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("schema setup timed out after 15s")), 15_000),
+    ),
+  ]);
   console.log("Database schema is ready.");
 } catch (err) {
-  console.error("Setup failed:", err);
-  process.exitCode = 1;
+  console.error("Setup failed (continuing so the web server can start):", err);
 } finally {
-  await pool.end();
+  try {
+    await pool.end();
+  } catch {
+    // ignore
+  }
+  process.exit(0);
 }
