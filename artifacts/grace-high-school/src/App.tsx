@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { useLocation, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
+import { subscribeToContentEvents } from "./lib/contentEvents";
 import {
   useListNewsItems,
   useListStats,
@@ -286,20 +287,9 @@ export default function App() {
     };
   }, [videoModal]);
 
-  // Live updates: subscribe to the API's Server-Sent Events stream so any change
-  // made in the admin dashboard refreshes the public site instantly, without a
-  // page reload. The EventSource auto-reconnects if the connection drops.
+  // Live updates: admin changes broadcast over SSE and refresh the public site.
   useEffect(() => {
-    const source = new EventSource(`${API}/events`);
-    const onChange = () => {
-      queryClient.invalidateQueries();
-      loadResources();
-    };
-    source.addEventListener("content-changed", onChange);
-    return () => {
-      source.removeEventListener("content-changed", onChange);
-      source.close();
-    };
+    return subscribeToContentEvents(API, queryClient, loadResources);
   }, [queryClient]);
 
   const closeMenus = () => {
@@ -388,7 +378,7 @@ export default function App() {
   // Editable section copy: look up by key, falling back to the original
   // hard-coded strings whenever the API is empty or unreachable.
   const siteTextMap: Record<string, string> = {};
-  for (const b of siteTextQ.data ?? []) siteTextMap[b.key] = b.value;
+  for (const b of (Array.isArray(siteTextQ.data) ? siteTextQ.data : [])) siteTextMap[b.key] = b.value;
   const text = (key: string, fallback: string) => siteTextMap[key] ?? fallback;
 
   const NEWS_FALLBACK = [
@@ -398,9 +388,10 @@ export default function App() {
     "Students represent at National Renewable Energy Conference 2023",
     "New Term III begins 14 July 2025 — All students report",
   ];
-  const tickerMessages = newsQ.data?.length
-    ? newsQ.data.map((n) => n.message)
-    : NEWS_FALLBACK;
+  const tickerMessages =
+    Array.isArray(newsQ.data) && newsQ.data.length > 0
+      ? newsQ.data.map((n) => n.message)
+      : NEWS_FALLBACK;
 
   const STATS_FALLBACK = [
     { num: "28", label: "Acre Campus" },
@@ -409,9 +400,10 @@ export default function App() {
     { num: "100%", label: "Christian Values" },
     { num: "∞", label: "Opportunities" },
   ];
-  const statItems = statsQ.data?.length
-    ? statsQ.data.map((s) => ({ num: s.value, label: s.label }))
-    : STATS_FALLBACK;
+  const statItems =
+    Array.isArray(statsQ.data) && statsQ.data.length > 0
+      ? statsQ.data.map((s) => ({ num: s.value, label: s.label }))
+      : STATS_FALLBACK;
 
   const PROGRAMMES_FALLBACK = [
     {
@@ -432,13 +424,14 @@ export default function App() {
   ];
   const programmeImg = (title: string) =>
     PROGRAMMES_FALLBACK.find((p) => p.title === title)?.img ?? img_campus_hero;
-  const programmeItems = programmesQ.data?.length
-    ? programmesQ.data.map((p) => ({
-        tag: p.tag, title: p.title,
-        img: p.objectPath ? `${API}/storage${p.objectPath}` : programmeImg(p.title),
-        desc: p.description, subjects: p.subjects,
-      }))
-    : PROGRAMMES_FALLBACK;
+  const programmeItems =
+    Array.isArray(programmesQ.data) && programmesQ.data.length > 0
+      ? programmesQ.data.map((p) => ({
+          tag: p.tag, title: p.title,
+          img: p.objectPath ? `${API}/storage${p.objectPath}` : programmeImg(p.title),
+          desc: p.description, subjects: p.subjects,
+        }))
+      : PROGRAMMES_FALLBACK;
 
   const ADMISSIONS_FALLBACK = [
     { step: 1, title: "Contact the School", desc: "Call or email us to express interest and get an admissions form." },
@@ -447,9 +440,10 @@ export default function App() {
     { step: 4, title: "Placement Assessment", desc: "Students may sit a brief assessment to identify the right class." },
     { step: 5, title: "Confirm Enrollment", desc: "Receive your admission letter, pay fees, and report on opening day." },
   ];
-  const admissionItems = admissionsQ.data?.length
-    ? admissionsQ.data.map((a, i) => ({ step: i + 1, title: a.title, desc: a.description }))
-    : ADMISSIONS_FALLBACK;
+  const admissionItems =
+    Array.isArray(admissionsQ.data) && admissionsQ.data.length > 0
+      ? admissionsQ.data.map((a, i) => ({ step: i + 1, title: a.title, desc: a.description }))
+      : ADMISSIONS_FALLBACK;
 
   // ===== Detail-page bodies =====
   // These three blocks used to live inside click-to-open popups. They now power
@@ -769,11 +763,12 @@ export default function App() {
   const videoThumb = (youtubeId: string) =>
     schoolVideos.find((v) => v.youtubeId === youtubeId)?.thumb ??
     `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-  const videoItems = videosQ.data?.length
-    ? videosQ.data.map((v) => ({
-        thumb: videoThumb(v.youtubeId), cat: v.category, title: v.title, youtubeId: v.youtubeId,
-      }))
-    : schoolVideos;
+  const videoItems =
+    Array.isArray(videosQ.data) && videosQ.data.length > 0
+      ? videosQ.data.map((v) => ({
+          thumb: videoThumb(v.youtubeId), cat: v.category, title: v.title, youtubeId: v.youtubeId,
+        }))
+      : schoolVideos;
 
   const navBg = scrolled
     ? `rgba(10,64,32,0.45)`

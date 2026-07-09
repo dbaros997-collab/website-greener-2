@@ -1,0 +1,157 @@
+import pg from "pg";
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error("DATABASE_URL is not set.");
+  process.exit(1);
+}
+
+const pool = new pg.Pool({ connectionString });
+
+const schemaSql = `
+CREATE TABLE IF NOT EXISTS "staff_users" (
+  "id" serial PRIMARY KEY,
+  "username" text NOT NULL UNIQUE,
+  "password_hash" text NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "session" (
+  "sid" varchar NOT NULL,
+  "sess" json NOT NULL,
+  "expire" timestamp(6) NOT NULL,
+  CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
+);
+CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+
+CREATE TABLE IF NOT EXISTS "resources" (
+  "id" serial PRIMARY KEY,
+  "title" text NOT NULL,
+  "subject" text NOT NULL,
+  "category" text NOT NULL,
+  "level" text NOT NULL DEFAULT 'All',
+  "term" text,
+  "object_path" text NOT NULL,
+  "file_name" text NOT NULL,
+  "file_size" integer,
+  "content_type" text,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "news_items" (
+  "id" serial PRIMARY KEY,
+  "message" text NOT NULL,
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "gallery_images" (
+  "id" serial PRIMARY KEY,
+  "caption" text NOT NULL,
+  "category" text NOT NULL DEFAULT 'campus',
+  "object_path" text NOT NULL,
+  "wide" boolean NOT NULL DEFAULT false,
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "testimonials" (
+  "id" serial PRIMARY KEY,
+  "quote" text NOT NULL,
+  "name" text NOT NULL,
+  "role" text NOT NULL DEFAULT '',
+  "initials" text NOT NULL DEFAULT '',
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "videos" (
+  "id" serial PRIMARY KEY,
+  "title" text NOT NULL,
+  "category" text NOT NULL DEFAULT 'Featured',
+  "youtube_id" text NOT NULL,
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "programmes" (
+  "id" serial PRIMARY KEY,
+  "tag" text NOT NULL DEFAULT '',
+  "title" text NOT NULL,
+  "description" text NOT NULL DEFAULT '',
+  "subjects" text[] NOT NULL DEFAULT '{}',
+  "object_path" text NOT NULL DEFAULT '',
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "stats" (
+  "id" serial PRIMARY KEY,
+  "value" text NOT NULL,
+  "label" text NOT NULL,
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "school_values" (
+  "id" serial PRIMARY KEY,
+  "icon" text NOT NULL DEFAULT '',
+  "title" text NOT NULL,
+  "description" text NOT NULL DEFAULT '',
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "admission_steps" (
+  "id" serial PRIMARY KEY,
+  "title" text NOT NULL,
+  "description" text NOT NULL DEFAULT '',
+  "is_visible" boolean NOT NULL DEFAULT true,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "site_text" (
+  "id" serial PRIMARY KEY,
+  "key" text NOT NULL UNIQUE,
+  "label" text NOT NULL,
+  "value" text NOT NULL DEFAULT '',
+  "multiline" boolean NOT NULL DEFAULT false,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "form_submissions" (
+  "id" serial PRIMARY KEY,
+  "type" text NOT NULL DEFAULT 'enquiry',
+  "first_name" text NOT NULL,
+  "last_name" text,
+  "email" text,
+  "phone" text,
+  "level" text,
+  "message" text,
+  "file_url" text,
+  "file_name" text,
+  "status" text NOT NULL DEFAULT 'new',
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT "form_submissions_type_check" CHECK ("type" IN ('enquiry', 'application')),
+  CONSTRAINT "form_submissions_status_check" CHECK ("status" IN ('new', 'read'))
+);
+`;
+
+try {
+  await pool.query(schemaSql);
+  console.log("Database schema is ready.");
+} catch (err) {
+  console.error("Setup failed:", err);
+  process.exitCode = 1;
+} finally {
+  await pool.end();
+}

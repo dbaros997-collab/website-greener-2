@@ -33,17 +33,24 @@ app.use(
 // Lock CORS down to this deployment's own domains. Admin and public are both
 // served same-origin through the shared proxy, so no third-party origin needs
 // credentialed access; requests with no Origin header (curl, same-origin) pass.
+const isLocalDev =
+  process.env.NODE_ENV !== "production" && process.env.REPL_ID === undefined;
 const allowedOrigins = (process.env.REPLIT_DOMAINS ?? "")
   .split(",")
   .map((d) => d.trim())
   .filter(Boolean)
   .map((d) => `https://${d}`);
+const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 app.use(
   cors({
     credentials: true,
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        (isLocalDev && localOriginPattern.test(origin))
+      ) {
         callback(null, true);
         return;
       }

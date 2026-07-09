@@ -5,16 +5,23 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
-    "seed": "tsx ./src/seed.ts",
+    "start-db": "node ./src/start-db.mjs",
+    "setup-db": "node --env-file=../.env ./src/setup-db.mjs",
+    "seed": "node --env-file=../.env --import tsx ./src/seed.ts",
+    "reset-admin": "node --env-file=../.env ./src/reset-admin.mjs",
+    "set-admin": "node ./src/set-admin.mjs",
+    "setup-local": "node --env-file=../.env ./src/setup-db.mjs && node --env-file=../.env ./src/reset-admin.mjs",
     "test:login-upload": "tsx ./src/test-login-upload.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@workspace/db": "workspace:*",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "embedded-postgres": "^17.5.0-beta.15",
     "tsx": "catalog:"
   }
 }

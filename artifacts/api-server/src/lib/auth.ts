@@ -2,6 +2,7 @@ import {
   randomBytes,
   scrypt as scryptCb,
   timingSafeEqual,
+  createHash,
 } from "node:crypto";
 import { promisify } from "node:util";
 import type { Request, Response, NextFunction } from "express";
@@ -28,6 +29,13 @@ export async function verifyPassword(
   const derived = (await scrypt(password, salt, expected.length)) as Buffer;
   if (derived.length !== expected.length) return false;
   return timingSafeEqual(derived, expected);
+}
+
+// Compare a recovery code to PASSWORD_RESET_SECRET without leaking timing info.
+export function verifyResetSecret(provided: string, expected: string): boolean {
+  const providedHash = createHash("sha256").update(provided).digest();
+  const expectedHash = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(providedHash, expectedHash);
 }
 
 // Express middleware: reject requests without an authenticated session.

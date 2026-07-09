@@ -979,3 +979,23 @@ export const GetCurrentUserResponse = zod.object({
 })
 
 
+/**
+ * @summary Reset a staff password using the recovery code
+ */
+
+
+export const resetPasswordBodyNewPasswordMin = 6;
+
+
+
+export const ResetPasswordBody = zod.object({
+  "username": zod.string().min(1),
+  "resetCode": zod.string().min(1).describe('Recovery code configured as PASSWORD_RESET_SECRET on the server.'),
+  "newPassword": zod.string().min(resetPasswordBodyNewPasswordMin)
+})
+
+export const ResetPasswordResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+

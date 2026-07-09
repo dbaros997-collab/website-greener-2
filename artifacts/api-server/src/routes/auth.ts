@@ -6,8 +6,10 @@ import {
   LoginResponse,
   LogoutResponse,
   GetCurrentUserResponse,
+  ResetPasswordBody,
+  ResetPasswordResponse,
 } from "@workspace/api-zod";
-import { verifyPassword, requireAuth } from "../lib/auth";
+import { hashPassword, verifyPassword, requireAuth, verifyResetSecret } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -53,6 +55,48 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
       username: req.session.username,
     }),
   );
+});
+
+router.post("/auth/reset-password", async (req, res): Promise<void> => {
+  const resetSecret = process.env.PASSWORD_RESET_SECRET;
+  if (!resetSecret) {
+    res.status(503).json({
+      error: "Password reset is not configured on this server.",
+    });
+    return;
+  }
+
+  const parsed = ResetPasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid request" });
+    return;
+  }
+
+  if (!verifyResetSecret(parsed.data.resetCode, resetSecret)) {
+    req.log.warn({ username: parsed.data.username }, "Failed password reset attempt");
+    res.status(401).json({ error: "Invalid recovery code or username." });
+    return;
+  }
+
+  const [user] = await db
+    .select()
+    .from(staffUsersTable)
+    .where(eq(staffUsersTable.username, parsed.data.username));
+
+  if (!user) {
+    req.log.warn({ username: parsed.data.username }, "Failed password reset attempt");
+    res.status(401).json({ error: "Invalid recovery code or username." });
+    return;
+  }
+
+  const passwordHash = await hashPassword(parsed.data.newPassword);
+  await db
+    .update(staffUsersTable)
+    .set({ passwordHash })
+    .where(eq(staffUsersTable.id, user.id));
+
+  req.log.info({ username: user.username }, "Staff password reset via recovery code");
+  res.json(ResetPasswordResponse.parse({ ok: true }));
 });
 
 export default router;

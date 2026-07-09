@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/dashboard/"
+title = "Grace Admin Dashboard"
+version = "1.0.0"
+id = "artifacts/grace-admin"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/dashboard/" ]
+localPort = 23745
+
+[services.development]
+run = "pnpm --filter @workspace/grace-admin run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/grace-admin", "run", "build" ]
+publicDir = "artifacts/grace-admin/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23745"
+BASE_PATH = "/dashboard/"

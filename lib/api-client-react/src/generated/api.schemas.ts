@@ -441,6 +441,18 @@ export interface LoginInput {
   password: string;
 }
 
+export interface ResetPasswordInput {
+  /** @minLength 1 */
+  username: string;
+  /**
+     * Recovery code configured as PASSWORD_RESET_SECRET on the server.
+     * @minLength 1
+     */
+  resetCode: string;
+  /** @minLength 6 */
+  newPassword: string;
+}
+
 export interface AuthUser {
   id: number;
   username: string;

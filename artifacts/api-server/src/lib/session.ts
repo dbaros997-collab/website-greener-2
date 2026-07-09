@@ -17,6 +17,9 @@ if (!secret) {
   throw new Error("SESSION_SECRET environment variable is required.");
 }
 
+const isLocalDev =
+  process.env.NODE_ENV !== "production" && process.env.REPL_ID === undefined;
+
 // connect-pg-simple's `createTableIfMissing` reads a `table.sql` file that is
 // not included in the esbuild bundle, so we create the session table ourselves.
 void pool.query(`
@@ -43,8 +46,8 @@ export const sessionMiddleware: RequestHandler = session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: !isLocalDev,
+    sameSite: isLocalDev ? "lax" : "none",
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },

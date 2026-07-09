@@ -26,6 +26,9 @@ if (!basePath) {
   );
 }
 
+const isReplit = process.env.REPL_ID !== undefined;
+const apiProxyTarget = process.env.API_PROXY_TARGET ?? "http://localhost:8080";
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -66,6 +69,14 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    proxy: isReplit
+      ? undefined
+      : {
+          "/api": {
+            target: apiProxyTarget,
+            changeOrigin: true,
+          },
+        },
   },
   preview: {
     port,

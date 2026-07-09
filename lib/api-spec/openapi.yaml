@@ -1518,6 +1518,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      operationId: resetPassword
+      summary: Reset a staff password using the recovery code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordInput'
+      responses:
+        '200':
+          description: Password updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Invalid recovery code or username.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Password reset is not configured on this server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
 components:
   schemas:
     HealthStatus:
@@ -2174,6 +2210,20 @@ components:
         password:
           type: string
           minLength: 1
+    ResetPasswordInput:
+      type: object
+      required: [username, resetCode, newPassword]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        resetCode:
+          type: string
+          minLength: 1
+          description: Recovery code configured as PASSWORD_RESET_SECRET on the server.
+        newPassword:
+          type: string
+          minLength: 6
     AuthUser:
       type: object
       required: [id, username]

@@ -40,6 +40,7 @@ export * from './programmeInput';
 export * from './programmeList';
 export * from './programmePatch';
 export * from './reorderInput';
+export * from './resetPasswordInput';
 export * from './resource';
 export * from './resourceList';
 export * from './schoolValue';
