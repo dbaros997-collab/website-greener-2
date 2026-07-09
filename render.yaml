@@ -12,7 +12,8 @@ services:
     runtime: node
     plan: free
     buildCommand: pnpm install && pnpm run build
-    startCommand: pnpm start
+    # Start the API only — schema setup runs inside the process after listen.
+    startCommand: pnpm --filter @workspace/api-server run start
     healthCheckPath: /api/healthz
     envVars:
       - key: NODE_ENV
