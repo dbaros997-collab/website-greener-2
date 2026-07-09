@@ -1,21 +1,5 @@
-import pg from "pg";
-
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  console.error("DATABASE_URL is not set.");
-  process.exit(1);
-}
-
-const useSsl =
-  process.env.PGSSL === "true" ||
-  /render\.com/i.test(connectionString) ||
-  /[?&]sslmode=require/i.test(connectionString);
-
-const pool = new pg.Pool({
-  connectionString,
-  connectionTimeoutMillis: 10_000,
-  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
-});
+import { pool } from "@workspace/db";
+import { logger } from "./logger";
 
 const schemaSql = `
 CREATE TABLE IF NOT EXISTS "staff_users" (
@@ -155,12 +139,12 @@ CREATE TABLE IF NOT EXISTS "form_submissions" (
 );
 `;
 
-try {
-  await pool.query(schemaSql);
-  console.log("Database schema is ready.");
-} catch (err) {
-  console.error("Setup failed:", err);
-  process.exitCode = 1;
-} finally {
-  await pool.end();
+/** Create tables if missing. Safe to call on every boot; never throws to callers. */
+export async function ensureSchema(): Promise<void> {
+  try {
+    await pool.query(schemaSql);
+    logger.info("Database schema is ready");
+  } catch (err) {
+    logger.error({ err }, "Failed to ensure database schema");
+  }
 }

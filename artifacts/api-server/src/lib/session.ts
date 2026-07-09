@@ -20,18 +20,7 @@ if (!secret) {
 const isLocalDev =
   process.env.NODE_ENV !== "production" && process.env.REPL_ID === undefined;
 
-// connect-pg-simple's `createTableIfMissing` reads a `table.sql` file that is
-// not included in the esbuild bundle, so we create the session table ourselves.
-void pool.query(`
-  CREATE TABLE IF NOT EXISTS "session" (
-    "sid" varchar NOT NULL COLLATE "default",
-    "sess" json NOT NULL,
-    "expire" timestamp(6) NOT NULL,
-    CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
-  );
-  CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
-`);
-
+// Session table is created by ensureSchema() after the HTTP server listens.
 // Session middleware backed by Postgres. The Replit preview runs in a
 // cross-site iframe served over HTTPS via the shared proxy, so the cookie must
 // be SameSite=None + Secure, and the app must trust the proxy (set in app.ts).
