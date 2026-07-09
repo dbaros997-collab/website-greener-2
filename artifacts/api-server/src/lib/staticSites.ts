@@ -51,7 +51,8 @@ function mountSpa(app: Express, mount: string, publicDir: string): void {
   }
 
   app.use(mount, express.static(publicDir));
-  app.get(`${mount}/*`, spaFallback(publicDir));
+  // Express 5 / path-to-regexp v8 requires a named wildcard (/* is invalid).
+  app.get(`${mount}/*path`, spaFallback(publicDir));
 }
 
 /** Serve Vite build output for the public site and admin dashboards (Render / single-service deploys). */
