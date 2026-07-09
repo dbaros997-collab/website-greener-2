@@ -4,6 +4,7 @@ import pinoHttp from "pino-http";
 import router from "./routes";
 import { sessionMiddleware } from "./lib/session";
 import { logger } from "./lib/logger";
+import { registerStaticSites } from "./lib/staticSites";
 
 const app: Express = express();
 
@@ -63,5 +64,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 
 app.use("/api", router);
+
+registerStaticSites(app);
 
 export default app;
