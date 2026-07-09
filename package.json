@@ -13,7 +13,7 @@
     "dev:api": "node ./scripts/src/run-dev-api.mjs",
     "dev:admin": "node ./scripts/src/run-dev-grace-admin.mjs",
     "dev:site": "pnpm --filter @workspace/grace-high-school run dev",
-    "start": "pnpm --filter @workspace/api-server run start"
+    "start": "node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
   },
   "private": true,
   "devDependencies": {
