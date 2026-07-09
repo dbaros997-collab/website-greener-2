@@ -11,7 +11,8 @@
     "set-admin": "pnpm --filter @workspace/scripts run set-admin",
     "dev:api": "node ./scripts/src/run-dev-api.mjs",
     "dev:admin": "node ./scripts/src/run-dev-grace-admin.mjs",
-    "dev:site": "pnpm --filter @workspace/grace-high-school run dev"
+    "dev:site": "pnpm --filter @workspace/grace-high-school run dev",
+    "start": "pnpm --filter @workspace/api-server run start"
   },
   "private": true,
   "devDependencies": {
