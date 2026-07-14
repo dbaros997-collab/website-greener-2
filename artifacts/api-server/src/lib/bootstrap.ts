@@ -3,24 +3,37 @@ import { db, staffUsersTable } from "@workspace/db";
 import { hashPassword } from "./auth";
 import { logger } from "./logger";
 
+function envFlagEnabled(name: string): boolean {
+  const raw = process.env[name]?.trim().toLowerCase();
+  return raw === "1" || raw === "true" || raw === "yes";
+}
+
 /**
- * Keep the staff admin aligned with ADMIN_USERNAME / ADMIN_PASSWORD when both
- * are set in the environment (Render Dashboard → Environment).
+ * Bootstrap staff accounts from ADMIN_USERNAME / ADMIN_PASSWORD.
  *
- * - No staff user yet → create one
- * - Username exists → refresh its password hash
- * - Env unset → leave DB alone (first-run /dashboard/ setup still works)
+ * IMPORTANT: By default we only CREATE the first admin when the table is empty.
+ * We do NOT rewrite an existing password on every deploy — that was why login
+ * kept failing after each admin/site update whenever Render env credentials
+ * differed from the password chosen on /dashboard/.
  *
- * This stops the recurring “password won’t work” issue after redeploys / DB
- * rebuilds, as long as the Render env vars stay set.
+ * To force the DB password to match Render env on boot (recovery), set:
+ *   ADMIN_SYNC_PASSWORD=true
  */
 export async function ensureAdminUser(): Promise<void> {
   const username = process.env.ADMIN_USERNAME?.trim();
   const password = process.env.ADMIN_PASSWORD;
+  const syncPassword = envFlagEnabled("ADMIN_SYNC_PASSWORD");
+
+  const existingRows = await db.select().from(staffUsersTable).limit(5);
+  const hasAnyAdmin = existingRows.length > 0;
+
+  if (hasAnyAdmin && !syncPassword) {
+    // Leave the password the operator set via /dashboard/ alone.
+    return;
+  }
 
   if (!username || !password) {
-    const existing = await db.select().from(staffUsersTable).limit(1);
-    if (existing.length === 0) {
+    if (!hasAnyAdmin) {
       logger.info(
         "No staff account yet — open /dashboard/ to create the first admin (ADMIN_USERNAME / ADMIN_PASSWORD not set).",
       );
@@ -36,26 +49,32 @@ export async function ensureAdminUser(): Promise<void> {
   }
 
   const passwordHash = await hashPassword(password);
-  const [existing] = await db
+  const [matching] = await db
     .select()
     .from(staffUsersTable)
     .where(eq(staffUsersTable.username, username))
     .limit(1);
 
-  if (existing) {
+  if (matching) {
+    if (!syncPassword) {
+      return;
+    }
     await db
       .update(staffUsersTable)
       .set({ passwordHash })
-      .where(eq(staffUsersTable.id, existing.id));
+      .where(eq(staffUsersTable.id, matching.id));
     logger.info(
       { username },
-      "Synced staff admin password from ADMIN_USERNAME / ADMIN_PASSWORD",
+      "Synced staff admin password from env (ADMIN_SYNC_PASSWORD=true)",
     );
     return;
   }
 
-  // Env username is new — if another admin already exists, still create this
-  // named account so Render credentials always work.
+  if (hasAnyAdmin && !syncPassword) {
+    return;
+  }
+
+  // No matching username yet — create the env-named admin (first boot or recovery).
   await db.insert(staffUsersTable).values({ username, passwordHash });
   logger.info(
     { username },

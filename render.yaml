@@ -26,10 +26,14 @@ services:
         generateValue: true
       - key: PASSWORD_RESET_SECRET
         generateValue: true
-      # Set BOTH in the Render Dashboard (Environment). On every boot the API
-      # creates/updates that admin so /dashboard/ login always matches these values.
-      # If left unset, /dashboard/ shows first-run "Create admin account" instead.
+      # Optional defaults for first boot only. Existing dashboard passwords are
+      # NEVER overwritten on deploy (that caused login to break after updates).
+      # To reset the password after a forgotten login, temporarily set:
+      #   ADMIN_USERNAME / ADMIN_PASSWORD / ADMIN_SYNC_PASSWORD=true
+      # then clear ADMIN_SYNC_PASSWORD after one successful restart.
       - key: ADMIN_USERNAME
         sync: false
       - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_SYNC_PASSWORD
         sync: false

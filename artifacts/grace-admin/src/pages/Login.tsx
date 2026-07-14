@@ -50,7 +50,11 @@ export default function Login() {
           <CardTitle className="text-2xl text-emerald-900">
             Grace High School
           </CardTitle>
-          <CardDescription>Staff dashboard — edits appear on the website instantly</CardDescription>
+          <CardDescription>
+            Staff dashboard — edits appear on the website instantly. After a
+            site update you may need to sign in again; your password does not
+            change unless you reset it.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
