@@ -27,12 +27,12 @@ export default function Login() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(username, password);
+      await login(username.trim(), password);
     } catch (err) {
       setError(
         isNetworkError(err)
           ? toFriendlyError(err).description
-          : "Invalid username or password.",
+          : toFriendlyError(err).description || "Invalid username or password.",
       );
     } finally {
       setSubmitting(false);

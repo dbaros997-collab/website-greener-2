@@ -26,8 +26,9 @@ services:
         generateValue: true
       - key: PASSWORD_RESET_SECRET
         generateValue: true
-      # Optional — leave unset so /dashboard/ shows first-run setup.
-      # Set both only if you want the API to create the admin on boot.
+      # Set BOTH in the Render Dashboard (Environment). On every boot the API
+      # creates/updates that admin so /dashboard/ login always matches these values.
+      # If left unset, /dashboard/ shows first-run "Create admin account" instead.
       - key: ADMIN_USERNAME
         sync: false
       - key: ADMIN_PASSWORD

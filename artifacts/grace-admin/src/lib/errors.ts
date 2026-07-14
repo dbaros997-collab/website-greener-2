@@ -30,19 +30,40 @@ export function isNetworkError(err: unknown): boolean {
  * third-party cookies in the admin iframe) — get a clear, actionable message
  * instead of a generic "HTTP 401" string.
  */
+function apiErrorMessage(err: ApiError): string | undefined {
+  const body = err.data as { error?: string } | undefined;
+  return typeof body?.error === "string" && body.error.trim()
+    ? body.error.trim()
+    : undefined;
+}
+
 export function toFriendlyError(err: unknown): FriendlyError {
   const status = err instanceof ApiError ? err.status : undefined;
 
   if (status === 401 || status === 403) {
+    const serverMessage =
+      err instanceof ApiError ? apiErrorMessage(err) : undefined;
+    // Prefer the API's message (wrong password / no admin yet) over the
+    // generic cookie hint — that hint is only useful when a session was expected.
+    if (serverMessage && !/^not authenticated$/i.test(serverMessage)) {
+      return { title: "Sign-in failed", description: serverMessage };
+    }
     return { title: "Sign-in needed", description: SESSION_MESSAGE };
   }
 
   if (status === 409 && err instanceof ApiError) {
-    const body = err.data as { error?: string } | undefined;
     return {
       title: "Already set up",
-      description: body?.error ?? "An admin account already exists. Sign in instead.",
+      description:
+        apiErrorMessage(err) ?? "An admin account already exists. Sign in instead.",
     };
+  }
+
+  if (err instanceof ApiError) {
+    const serverMessage = apiErrorMessage(err);
+    if (serverMessage) {
+      return { title: "Error", description: serverMessage };
+    }
   }
 
   if (isNetworkError(err)) {

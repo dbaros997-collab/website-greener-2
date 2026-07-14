@@ -28,7 +28,8 @@ export const sessionMiddleware: RequestHandler = session({
   store: new PgStore({
     pool,
     tableName: "session",
-    createTableIfMissing: false,
+    // Safer on free-tier deploys where schema bootstrap can race the first request.
+    createTableIfMissing: true,
   }),
   secret,
   resave: false,

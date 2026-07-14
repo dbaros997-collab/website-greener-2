@@ -34,6 +34,14 @@ async function start(): Promise<void> {
   // Bind immediately with health + static files only — no DB imports yet.
   await listen();
 
+  // Schema must exist before session middleware / auth routes touch Postgres.
+  try {
+    const { ensureSchema } = await import("./lib/ensureSchema");
+    await ensureSchema();
+  } catch (err) {
+    logger.error({ err }, "Failed to ensure database schema");
+  }
+
   try {
     await mountApiRoutes(app);
   } catch (err) {
@@ -41,12 +49,10 @@ async function start(): Promise<void> {
   }
 
   try {
-    const { ensureSchema } = await import("./lib/ensureSchema");
     const { ensureAdminUser } = await import("./lib/bootstrap");
-    await ensureSchema();
     await ensureAdminUser();
   } catch (err) {
-    logger.error({ err }, "Post-listen database bootstrap failed");
+    logger.error({ err }, "Post-listen admin bootstrap failed");
   }
 }
 

@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // react-query keeps the last successful `data` when a refetch errors, so we
   // gate on isSuccess to immediately drop the user after logout returns 401.
   const user = meQuery.isSuccess ? (meQuery.data ?? null) : null;
-  const needsSetup = !user && (setupStatusQuery.data?.needsSetup ?? false);
+  const needsSetup = !user && setupStatusQuery.data?.needsSetup === true;
 
   const meNetworkError =
     !meQuery.isSuccess && meQuery.isError && isNetworkError(meQuery.error);
