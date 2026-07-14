@@ -137,6 +137,16 @@ CREATE TABLE IF NOT EXISTS "form_submissions" (
   CONSTRAINT "form_submissions_type_check" CHECK ("type" IN ('enquiry', 'application')),
   CONSTRAINT "form_submissions_status_check" CHECK ("status" IN ('new', 'read'))
 );
+
+-- Durable file blobs for Render free tier (ephemeral disk is wiped on restart).
+CREATE TABLE IF NOT EXISTS "stored_objects" (
+  "object_path" text PRIMARY KEY,
+  "content_type" text NOT NULL DEFAULT 'application/octet-stream',
+  "file_name" text NOT NULL DEFAULT 'download',
+  "byte_size" integer NOT NULL DEFAULT 0,
+  "data" bytea NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
 `;
 
 /** Create tables if missing. Safe to call on every boot; never throws to callers. */

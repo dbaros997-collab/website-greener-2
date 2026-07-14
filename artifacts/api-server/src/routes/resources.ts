@@ -11,7 +11,11 @@ import {
 } from "@workspace/api-zod";
 import { requireAuth } from "../lib/auth";
 import { broadcast } from "../lib/events";
-import { deleteStoredObject } from "../lib/localObjectStorage";
+import {
+  deleteStoredObject,
+  isLocalObjectStorage,
+  localObjectExists,
+} from "../lib/localObjectStorage";
 
 const router: IRouter = Router();
 
@@ -94,6 +98,21 @@ router.patch("/resources/:id", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
+  if (
+    patch.objectPath &&
+    patch.objectPath !== existing.objectPath &&
+    isLocalObjectStorage()
+  ) {
+    const ready = await localObjectExists(patch.objectPath);
+    if (!ready) {
+      res.status(400).json({
+        error:
+          "Updated file was not found in storage. Please upload the file again, then save.",
+      });
+      return;
+    }
+  }
+
   const [resource] = await db
     .update(resourcesTable)
     .set({
@@ -117,10 +136,7 @@ router.patch("/resources/:id", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  if (
-    patch.objectPath &&
-    patch.objectPath !== existing.objectPath
-  ) {
+  if (patch.objectPath && patch.objectPath !== existing.objectPath) {
     try {
       await deleteStoredObject(existing.objectPath);
     } catch (error) {

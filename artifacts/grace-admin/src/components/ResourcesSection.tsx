@@ -414,7 +414,7 @@ export function ResourcesSection() {
                       <Badge variant="secondary">{r.fileName}</Badge>
                       <div className="flex items-center gap-2">
                         <a
-                          href={`${STORAGE_PREFIX}${r.objectPath}`}
+                          href={`${STORAGE_PREFIX}${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label="Download"

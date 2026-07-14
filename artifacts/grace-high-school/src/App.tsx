@@ -1481,7 +1481,7 @@ export default function App() {
                       {items.map(r => (
                         <a
                           key={r.id}
-                          href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(r.createdAt)}`}
+                          href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{

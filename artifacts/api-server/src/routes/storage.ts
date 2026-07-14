@@ -107,7 +107,10 @@ router.post(
 
     try {
       if (isLocalObjectStorage()) {
-        const local = createLocalUpload("applications", req);
+        const local = createLocalUpload("applications", req, {
+          contentType,
+          fileName: name,
+        });
         res.json(
           RequestUploadUrlResponse.parse({
             uploadURL: local.uploadURL,
@@ -152,7 +155,10 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
     const { name, size, contentType } = parsed.data;
 
     if (isLocalObjectStorage()) {
-      const local = createLocalUpload("uploads", req);
+      const local = createLocalUpload("uploads", req, {
+        contentType,
+        fileName: name,
+      });
       res.json(
         RequestUploadUrlResponse.parse({
           uploadURL: local.uploadURL,
