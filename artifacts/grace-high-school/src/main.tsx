@@ -10,11 +10,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 10_000,
+      // Prefer SSE-driven invalidation; keep a short poll as a safety net.
+      staleTime: 0,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 15_000,
-      refetchIntervalInBackground: false,
+      refetchInterval: 8_000,
+      refetchIntervalInBackground: true,
     },
   },
 });

@@ -28,12 +28,7 @@ const RESOURCE_QUERY_KEYS: Record<string, readonly unknown[]> = {
 export function invalidateContentQueries(
   queryClient: QueryClient,
   resource: string,
-  onResourcesChange?: () => void,
 ): void {
-  if (resource === "resources" || resource === "all") {
-    onResourcesChange?.();
-  }
-
   const queryKey = RESOURCE_QUERY_KEYS[resource];
   if (queryKey) {
     void queryClient.invalidateQueries({ queryKey });
@@ -41,17 +36,24 @@ export function invalidateContentQueries(
   }
 
   void queryClient.invalidateQueries();
-  onResourcesChange?.();
 }
 
+/**
+ * Subscribe to admin content changes over SSE with automatic reconnect.
+ * When the stream drops, we reconnect with backoff and immediately refetch
+ * so the public site stays in sync without a manual refresh — including
+ * visitors who opened a shared link in another tab or device.
+ */
 export function subscribeToContentEvents(
   apiBase: string,
   queryClient: QueryClient,
-  onResourcesChange?: () => void,
 ): () => void {
-  const source = new EventSource(`${apiBase}/events`);
+  let source: EventSource | null = null;
+  let closed = false;
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let attempt = 0;
 
-  const onChange = (event: Event) => {
+  const applyChange = (event: Event) => {
     let resource = "all";
     try {
       const data = JSON.parse((event as MessageEvent<string>).data) as {
@@ -61,13 +63,41 @@ export function subscribeToContentEvents(
     } catch {
       // Fall back to invalidating everything.
     }
-
-    invalidateContentQueries(queryClient, resource, onResourcesChange);
+    invalidateContentQueries(queryClient, resource);
   };
 
-  source.addEventListener("content-changed", onChange);
+  const connect = () => {
+    if (closed) return;
+    source?.close();
+    source = new EventSource(`${apiBase}/events`);
+
+    source.addEventListener("content-changed", applyChange);
+
+    source.onopen = () => {
+      attempt = 0;
+    };
+
+    source.onerror = () => {
+      source?.close();
+      source = null;
+      if (closed) return;
+
+      // Refetch everything so a dropped stream never leaves the page stale.
+      invalidateContentQueries(queryClient, "all");
+
+      const delay = Math.min(30_000, 1_000 * 2 ** attempt);
+      attempt += 1;
+      reconnectTimer = setTimeout(connect, delay);
+    };
+  };
+
+  connect();
+
   return () => {
-    source.removeEventListener("content-changed", onChange);
-    source.close();
+    closed = true;
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    source?.removeEventListener("content-changed", applyChange);
+    source?.close();
+    source = null;
   };
 }

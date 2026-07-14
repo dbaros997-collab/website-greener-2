@@ -9,6 +9,7 @@ import {
   useListProgrammes,
   useListAdmissionSteps,
   useListSiteText,
+  useListResources,
 } from "@workspace/api-client-react";
 
 import schoolLogo from "@assets/school_logo_transparent.png";
@@ -70,21 +71,7 @@ const LEADERSHIP: Leader[] = [
 
 const API = "/api";
 
-interface Resource {
-  id: number;
-  title: string;
-  subject: string;
-  category: "past_paper" | "holiday_work" | "application_form";
-  level: string;
-  term: string | null;
-  objectPath: string;
-  fileName: string;
-  fileSize: number | null;
-  contentType: string | null;
-  createdAt: string;
-}
-
-const formatSize = (bytes: number | null): string => {
+const formatSize = (bytes: number | null | undefined): string => {
   if (!bytes) return "";
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -126,9 +113,13 @@ export default function App() {
   const [submitSending, setSubmitSending] = useState(false);
   const [submitSent, setSubmitSent]   = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [resources, setResources]     = useState<Resource[]>([]);
-  const [resLoading, setResLoading]   = useState(true);
   const [heroSlide, setHeroSlide]     = useState(0);
+
+  // Same React Query path as news/programmes — SSE invalidation + short poll
+  // keep every open tab (including shared links) in sync without a reload.
+  const resourcesQuery = useListResources();
+  const resources = resourcesQuery.data ?? [];
+  const resLoading = resourcesQuery.isLoading;
 
   const lastScrollY = useRef(0);
   const scrollDir = useRef<"down" | "up">("down");
@@ -183,22 +174,6 @@ export default function App() {
     // Re-run when returning to the home page so the freshly-remounted section
     // wrappers get re-observed (otherwise they stay stuck at opacity 0).
   }, [isHome]);
-
-  const loadResources = async () => {
-    try {
-      const res = await fetch(`${API}/resources`);
-      if (!res.ok) throw new Error("Failed to load resources");
-      setResources(await res.json());
-    } catch {
-      setResources([]);
-    } finally {
-      setResLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadResources();
-  }, []);
 
   // Close the video modal when the Escape key is pressed.
   useEffect(() => {
@@ -289,7 +264,7 @@ export default function App() {
 
   // Live updates: admin changes broadcast over SSE and refresh the public site.
   useEffect(() => {
-    return subscribeToContentEvents(API, queryClient, loadResources);
+    return subscribeToContentEvents(API, queryClient);
   }, [queryClient]);
 
   const closeMenus = () => {
@@ -850,7 +825,7 @@ export default function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschoolgayaza@gmail.com</span>
-          <a href="/admin/" className="utility-bar-staff" style={{
+          <a href="/dashboard/" className="utility-bar-staff" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             color: GOLD_LIGHT, fontSize: 12, fontWeight: 600, textDecoration: "none",
             letterSpacing: "0.04em", textTransform: "uppercase",
@@ -1506,7 +1481,7 @@ export default function App() {
                       {items.map(r => (
                         <a
                           key={r.id}
-                          href={`${API}/storage${r.objectPath}`}
+                          href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(r.createdAt)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{

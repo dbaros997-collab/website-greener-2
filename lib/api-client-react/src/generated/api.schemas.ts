@@ -74,6 +74,29 @@ export interface CreateResourceInput {
   contentType?: string | null;
 }
 
+/**
+ * Partial update. Omit objectPath to keep the existing file.
+ */
+export interface UpdateResourceInput {
+  /** @minLength 1 */
+  title?: string;
+  /** @minLength 1 */
+  subject?: string;
+  /**
+     * past_paper, holiday_work, or application_form.
+     * @minLength 1
+     */
+  category?: string;
+  level?: string;
+  term?: string | null;
+  /** @minLength 1 */
+  objectPath?: string;
+  /** @minLength 1 */
+  fileName?: string;
+  fileSize?: number | null;
+  contentType?: string | null;
+}
+
 export interface ErrorEnvelope {
   error: string;
 }
@@ -438,6 +461,18 @@ export interface LoginInput {
   /** @minLength 1 */
   username: string;
   /** @minLength 1 */
+  password: string;
+}
+
+export interface SetupStatus {
+  /** True when no staff account exists yet. */
+  needsSetup: boolean;
+}
+
+export interface SetupAdminInput {
+  /** @minLength 1 */
+  username: string;
+  /** @minLength 6 */
   password: string;
 }
 

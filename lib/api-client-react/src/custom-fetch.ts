@@ -364,9 +364,11 @@ export async function customFetch<T = unknown>(
   // with a session cookie (SameSite=None; Secure), so credentials must be
   // explicitly included — the fetch default of "same-origin" drops the cookie in
   // that partitioned/cross-site context, causing authed calls to 401. Any
-  // explicit `credentials` passed via options still wins.
+  // explicit `credentials` / `cache` passed via options still wins.
   const response = await fetch(input, {
     credentials: "include",
+    // Keep public lists (resources, news, …) fresh after admin SSE invalidation.
+    cache: method === "GET" || method === "HEAD" ? "no-store" : "default",
     ...init,
     method,
     headers,

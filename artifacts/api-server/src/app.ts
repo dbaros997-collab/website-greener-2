@@ -104,7 +104,15 @@ export function createBaseApp(): Express {
       },
     }),
   );
-  app.use(express.json());
+  // Skip JSON parsing for local binary uploads so the raw body stream stays intact.
+  const jsonParser = express.json();
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/storage/local-upload/")) {
+      next();
+      return;
+    }
+    jsonParser(req, res, next);
+  });
   app.use(express.urlencoded({ extended: true }));
 
   // Static sites before API so HTML is available as soon as we listen.

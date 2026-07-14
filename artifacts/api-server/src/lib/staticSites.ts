@@ -17,7 +17,6 @@ type StaticSite = {
 
 const STATIC_SITES: StaticSite[] = [
   { mount: "/dashboard", artifact: "grace-admin" },
-  { mount: "/admin", artifact: "admin" },
   { mount: "/", artifact: "grace-high-school" },
 ];
 
@@ -37,11 +36,7 @@ function mountSpa(app: Express, mount: string, publicDir: string): void {
   if (mount === "/") {
     app.use(express.static(publicDir));
     app.use((req, res, next) => {
-      if (
-        req.path.startsWith("/api") ||
-        req.path.startsWith("/dashboard") ||
-        req.path.startsWith("/admin")
-      ) {
+      if (req.path.startsWith("/api") || req.path.startsWith("/dashboard")) {
         next();
         return;
       }
@@ -57,6 +52,11 @@ function mountSpa(app: Express, mount: string, publicDir: string): void {
 
 /** Serve Vite build output for the public site and admin dashboards (Render / single-service deploys). */
 export function registerStaticSites(app: Express): void {
+  // Legacy /admin bookmarks → grace-admin
+  app.get(["/admin", "/admin/", "/admin/*path"], (_req, res) => {
+    res.redirect(302, "/dashboard/");
+  });
+
   let mounted = 0;
 
   for (const site of STATIC_SITES.filter((s) => s.mount !== "/")) {

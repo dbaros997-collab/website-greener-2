@@ -61,6 +61,17 @@ export default defineConfig({
           "/api": {
             target: apiProxyTarget,
             changeOrigin: true,
+            // Keep SSE (/api/events) open — default timeouts drop the stream.
+            timeout: 0,
+            proxyTimeout: 0,
+            configure(proxy) {
+              proxy.on("proxyReq", (proxyReq, req) => {
+                if (req.url?.startsWith("/api/events") || req.url === "/events") {
+                  proxyReq.setHeader("Connection", "keep-alive");
+                  proxyReq.setHeader("Accept", "text/event-stream");
+                }
+              });
+            },
           },
         },
   },

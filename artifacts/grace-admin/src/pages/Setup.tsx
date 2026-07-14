@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
-import ForgotPassword from "@/pages/ForgotPassword";
 import { useAuth } from "@/lib/auth";
-import { isNetworkError, toFriendlyError } from "@/lib/errors";
+import { toFriendlyError } from "@/lib/errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,50 +13,55 @@ import {
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-export default function Login() {
-  const { login } = useAuth();
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+export default function Setup() {
+  const { setup } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await login(username, password);
+      await setup(username.trim(), password);
     } catch (err) {
-      setError(
-        isNetworkError(err)
-          ? toFriendlyError(err).description
-          : "Invalid username or password.",
-      );
+      setError(toFriendlyError(err).description);
     } finally {
       setSubmitting(false);
     }
   };
-
-  if (showForgotPassword) {
-    return <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-emerald-950 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-emerald-900">
-            Grace High School
+            Create admin account
           </CardTitle>
-          <CardDescription>Staff dashboard — edits appear on the website instantly</CardDescription>
+          <CardDescription>
+            No staff password is set yet. Choose a username and password to unlock
+            the dashboard.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="setup-username">Username</Label>
               <Input
-                id="username"
+                id="setup-username"
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -65,35 +69,35 @@ export default function Login() {
               />
             </div>
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <button
-                  type="button"
-                  className="text-xs text-emerald-800 underline-offset-2 hover:underline"
-                  onClick={() => setShowForgotPassword(true)}
-                >
-                  Forgot password?
-                </button>
-              </div>
+              <Label htmlFor="setup-password">Password</Label>
               <Input
-                id="password"
+                id="setup-password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="setup-confirm">Confirm password</Label>
+              <Input
+                id="setup-confirm"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
               />
             </div>
             {error ? <p className="text-sm text-red-500">{error}</p> : null}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={submitting}
-            >
+            <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Sign in
+              Create account & sign in
             </Button>
           </form>
         </CardContent>

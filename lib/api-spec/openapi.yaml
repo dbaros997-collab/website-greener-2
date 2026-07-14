@@ -220,6 +220,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
   /resources/{id}:
+    patch:
+      tags: [Resources]
+      operationId: updateResource
+      summary: Update a resource
+      description: |
+        Update resource metadata and optionally replace the file (pass a new
+        objectPath from the upload flow). Broadcasts so the public site refreshes.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Resource id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceInput'
+      responses:
+        '200':
+          description: Resource updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '400':
+          description: Missing or invalid fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
     delete:
       tags: [Resources]
       operationId: deleteResource
@@ -1554,6 +1599,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /auth/setup-status:
+    get:
+      tags: [Auth]
+      operationId: getSetupStatus
+      summary: Whether the first staff account still needs to be created
+      responses:
+        '200':
+          description: Setup status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupStatus'
+  /auth/setup:
+    post:
+      tags: [Auth]
+      operationId: setupAdmin
+      summary: Create the first staff account when none exist yet
+      description: >
+        Only succeeds when the staff_users table is empty. Creates the account
+        and signs the caller in. After the first account exists, this endpoint
+        returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupAdminInput'
+      responses:
+        '200':
+          description: First admin created and signed in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: An admin account already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
 components:
   schemas:
     HealthStatus:
@@ -1645,6 +1736,37 @@ components:
         level:
           type: string
           description: 'O-Level, A-Level, or All. Defaults to All.'
+        term:
+          type: string
+          nullable: true
+        objectPath:
+          type: string
+          minLength: 1
+        fileName:
+          type: string
+          minLength: 1
+        fileSize:
+          type: integer
+          nullable: true
+        contentType:
+          type: string
+          nullable: true
+    UpdateResourceInput:
+      type: object
+      description: Partial update. Omit objectPath to keep the existing file.
+      properties:
+        title:
+          type: string
+          minLength: 1
+        subject:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+          description: past_paper, holiday_work, or application_form.
+        level:
+          type: string
         term:
           type: string
           nullable: true
@@ -2210,6 +2332,23 @@ components:
         password:
           type: string
           minLength: 1
+    SetupStatus:
+      type: object
+      required: [needsSetup]
+      properties:
+        needsSetup:
+          type: boolean
+          description: True when no staff account exists yet.
+    SetupAdminInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 6
     ResetPasswordInput:
       type: object
       required: [username, resetCode, newPassword]

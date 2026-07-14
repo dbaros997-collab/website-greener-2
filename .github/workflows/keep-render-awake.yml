@@ -29,7 +29,7 @@ jobs:
           SITE_URL: ${{ vars.RENDER_KEEPALIVE_URL }}
         run: |
           set -euo pipefail
-          base="${SITE_URL:-https://grace-high-school-gayaza.onrender.com}"
+          base="${SITE_URL:-https://grace-high-school-gayaza-t7p6.onrender.com}"
           url="${base%/}/api/healthz"
           echo "Pinging $url"
           # Retry a few times in case of a cold start.

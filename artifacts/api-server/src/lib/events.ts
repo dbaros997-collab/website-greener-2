@@ -50,6 +50,9 @@ export function broadcast(resource: string): void {
   for (const client of clients) {
     try {
       client.res.write(frame);
+      // Compression / proxy layers may buffer until flush.
+      const flushable = client.res as Response & { flush?: () => void };
+      flushable.flush?.();
     } catch {
       clients.delete(client);
     }

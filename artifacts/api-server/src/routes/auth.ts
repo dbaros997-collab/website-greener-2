@@ -8,10 +8,64 @@ import {
   GetCurrentUserResponse,
   ResetPasswordBody,
   ResetPasswordResponse,
+  GetSetupStatusResponse,
+  SetupAdminBody,
+  SetupAdminResponse,
 } from "@workspace/api-zod";
 import { hashPassword, verifyPassword, requireAuth, verifyResetSecret } from "../lib/auth";
 
 const router: IRouter = Router();
+
+async function staffAccountExists(): Promise<boolean> {
+  const existing = await db.select().from(staffUsersTable).limit(1);
+  return existing.length > 0;
+}
+
+router.get("/auth/setup-status", async (_req, res): Promise<void> => {
+  const needsSetup = !(await staffAccountExists());
+  res.json(GetSetupStatusResponse.parse({ needsSetup }));
+});
+
+router.post("/auth/setup", async (req, res): Promise<void> => {
+  if (await staffAccountExists()) {
+    res.status(409).json({ error: "An admin account already exists. Sign in instead." });
+    return;
+  }
+
+  const parsed = SetupAdminBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid request. Username and password (min 6 characters) are required." });
+    return;
+  }
+
+  const username = parsed.data.username.trim();
+  if (!username) {
+    res.status(400).json({ error: "Username is required." });
+    return;
+  }
+
+  // Re-check immediately before insert to reduce race windows.
+  if (await staffAccountExists()) {
+    res.status(409).json({ error: "An admin account already exists. Sign in instead." });
+    return;
+  }
+
+  const passwordHash = await hashPassword(parsed.data.password);
+  const [user] = await db
+    .insert(staffUsersTable)
+    .values({ username, passwordHash })
+    .returning();
+
+  if (!user) {
+    res.status(500).json({ error: "Failed to create admin account." });
+    return;
+  }
+
+  req.session.userId = user.id;
+  req.session.username = user.username;
+  req.log.info({ username: user.username }, "Created first staff admin via setup");
+  res.json(SetupAdminResponse.parse({ id: user.id, username: user.username }));
+});
 
 router.post("/auth/login", async (req, res): Promise<void> => {
   const parsed = LoginBody.safeParse(req.body);

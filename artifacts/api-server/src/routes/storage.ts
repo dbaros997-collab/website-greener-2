@@ -7,9 +7,35 @@ import {
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { ObjectPermission } from "../lib/objectAcl";
 import { requireAuth } from "../lib/auth";
+import {
+  createLocalUpload,
+  handleLocalUploadPut,
+  isLocalObjectStorage,
+  serveLocalObject,
+} from "../lib/localObjectStorage";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
+
+/**
+ * PUT /storage/local-upload/:token
+ * Receives the file body for local-disk uploads (when PRIVATE_OBJECT_DIR is unset).
+ */
+router.put("/storage/local-upload/:token", async (req: Request, res: Response) => {
+  const token = typeof req.params.token === "string" ? req.params.token : "";
+  if (!token) {
+    res.status(400).json({ error: "Missing upload token" });
+    return;
+  }
+  try {
+    await handleLocalUploadPut(req, res, token);
+  } catch (error) {
+    req.log.error({ err: error }, "Error writing local upload");
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Failed to store upload" });
+    }
+  }
+});
 
 const APP_UPLOAD_WINDOW_MS = 60_000;
 const APP_UPLOAD_MAX = 8;
@@ -80,6 +106,18 @@ router.post(
     }
 
     try {
+      if (isLocalObjectStorage()) {
+        const local = createLocalUpload("applications", req);
+        res.json(
+          RequestUploadUrlResponse.parse({
+            uploadURL: local.uploadURL,
+            objectPath: local.objectPath,
+            metadata: { name, size, contentType },
+          }),
+        );
+        return;
+      }
+
       const uploadURL = await objectStorageService.getApplicationUploadURL();
       const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
       res.json(
@@ -112,6 +150,18 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
 
   try {
     const { name, size, contentType } = parsed.data;
+
+    if (isLocalObjectStorage()) {
+      const local = createLocalUpload("uploads", req);
+      res.json(
+        RequestUploadUrlResponse.parse({
+          uploadURL: local.uploadURL,
+          objectPath: local.objectPath,
+          metadata: { name, size, contentType },
+        }),
+      );
+      return;
+    }
 
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
@@ -182,6 +232,15 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
     }
 
     const objectPath = `/objects/${wildcardPath}`;
+
+    if (isLocalObjectStorage()) {
+      const served = await serveLocalObject(objectPath, res);
+      if (!served) {
+        res.status(404).json({ error: "Object not found" });
+      }
+      return;
+    }
+
     const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
 
     // --- Protected route example (uncomment when using replit-auth) ---

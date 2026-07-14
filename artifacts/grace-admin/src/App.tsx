@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useContentEvents } from "@/lib/useContentEvents";
 import Login from "@/pages/Login";
+import Setup from "@/pages/Setup";
 import Dashboard from "@/pages/Dashboard";
 
 const queryClient = new QueryClient({
@@ -17,7 +18,7 @@ const queryClient = new QueryClient({
 });
 
 function Gate() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, needsSetup } = useAuth();
   useContentEvents();
 
   if (isLoading) {
@@ -28,7 +29,9 @@ function Gate() {
     );
   }
 
-  return user ? <Dashboard /> : <Login />;
+  if (user) return <Dashboard />;
+  if (needsSetup) return <Setup />;
+  return <Login />;
 }
 
 function App() {

@@ -3,16 +3,17 @@ import { desc, eq } from "drizzle-orm";
 import { db, resourcesTable } from "@workspace/db";
 import {
   CreateResourceBody,
+  UpdateResourceBody,
   ListResourcesResponse,
   ListResourcesResponseItem,
   DeleteResourceParams,
+  UpdateResourceParams,
 } from "@workspace/api-zod";
-import { ObjectStorageService } from "../lib/objectStorage";
 import { requireAuth } from "../lib/auth";
 import { broadcast } from "../lib/events";
+import { deleteStoredObject } from "../lib/localObjectStorage";
 
 const router: IRouter = Router();
-const objectStorageService = new ObjectStorageService();
 
 router.get("/resources", async (req, res): Promise<void> => {
   const category =
@@ -29,6 +30,9 @@ router.get("/resources", async (req, res): Promise<void> => {
         .from(resourcesTable)
         .orderBy(desc(resourcesTable.createdAt));
 
+  // Never let browsers/CDNs serve a stale resource list after an admin edit.
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
   res.json(ListResourcesResponse.parse(rows));
 });
 
@@ -59,6 +63,78 @@ router.post("/resources", requireAuth, async (req, res): Promise<void> => {
   res.status(201).json(ListResourcesResponseItem.parse(resource));
 });
 
+router.patch("/resources/:id", requireAuth, async (req, res): Promise<void> => {
+  const params = UpdateResourceParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const parsed = UpdateResourceBody.safeParse(req.body);
+  if (!parsed.success) {
+    req.log.warn({ errors: parsed.error.message }, "Invalid resource patch");
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const patch = parsed.data;
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: "No fields to update." });
+    return;
+  }
+
+  const [existing] = await db
+    .select()
+    .from(resourcesTable)
+    .where(eq(resourcesTable.id, params.data.id))
+    .limit(1);
+
+  if (!existing) {
+    res.status(404).json({ error: "Resource not found" });
+    return;
+  }
+
+  const [resource] = await db
+    .update(resourcesTable)
+    .set({
+      ...(patch.title !== undefined ? { title: patch.title } : {}),
+      ...(patch.subject !== undefined ? { subject: patch.subject } : {}),
+      ...(patch.category !== undefined ? { category: patch.category } : {}),
+      ...(patch.level !== undefined ? { level: patch.level } : {}),
+      ...(patch.term !== undefined ? { term: patch.term } : {}),
+      ...(patch.objectPath !== undefined ? { objectPath: patch.objectPath } : {}),
+      ...(patch.fileName !== undefined ? { fileName: patch.fileName } : {}),
+      ...(patch.fileSize !== undefined ? { fileSize: patch.fileSize } : {}),
+      ...(patch.contentType !== undefined
+        ? { contentType: patch.contentType }
+        : {}),
+    })
+    .where(eq(resourcesTable.id, params.data.id))
+    .returning();
+
+  if (!resource) {
+    res.status(404).json({ error: "Resource not found" });
+    return;
+  }
+
+  if (
+    patch.objectPath &&
+    patch.objectPath !== existing.objectPath
+  ) {
+    try {
+      await deleteStoredObject(existing.objectPath);
+    } catch (error) {
+      req.log.error(
+        { err: error, objectPath: existing.objectPath },
+        "Updated resource but failed to remove previous stored file",
+      );
+    }
+  }
+
+  broadcast("resources");
+  res.json(ListResourcesResponseItem.parse(resource));
+});
+
 router.delete("/resources/:id", requireAuth, async (req, res): Promise<void> => {
   const params = DeleteResourceParams.safeParse(req.params);
   if (!params.success) {
@@ -77,7 +153,7 @@ router.delete("/resources/:id", requireAuth, async (req, res): Promise<void> => 
   }
 
   try {
-    await objectStorageService.deleteObjectEntity(deleted.objectPath);
+    await deleteStoredObject(deleted.objectPath);
   } catch (error) {
     req.log.error(
       { err: error, objectPath: deleted.objectPath },

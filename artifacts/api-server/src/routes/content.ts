@@ -58,8 +58,8 @@ import {
   ReorderAdmissionStepsBody,
 } from "@workspace/api-zod";
 import { requireAuth } from "../lib/auth";
-import { ObjectStorageService } from "../lib/objectStorage";
 import { broadcast } from "../lib/events";
+import { deleteStoredObject } from "../lib/localObjectStorage";
 
 // drizzle's generic table types make a fully-typed factory awkward; zod
 // validation is the real safety net, so we use loose casts on the query builder.
@@ -236,8 +236,6 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
   return router;
 }
 
-const objectStorageService = new ObjectStorageService();
-
 const configs: CrudConfig[] = [
   {
     resource: "news",
@@ -257,7 +255,7 @@ const configs: CrudConfig[] = [
     afterDelete: async (row, req) => {
       const objectPath = row["objectPath"];
       if (typeof objectPath === "string" && objectPath) {
-        await objectStorageService.deleteObjectEntity(objectPath);
+        await deleteStoredObject(objectPath);
         req.log.info({ objectPath }, "Removed gallery image file");
       }
     },
@@ -288,7 +286,7 @@ const configs: CrudConfig[] = [
     afterDelete: async (row, req) => {
       const objectPath = row["objectPath"];
       if (typeof objectPath === "string" && objectPath) {
-        await objectStorageService.deleteObjectEntity(objectPath);
+        await deleteStoredObject(objectPath);
         req.log.info({ objectPath }, "Removed programme image file");
       }
     },

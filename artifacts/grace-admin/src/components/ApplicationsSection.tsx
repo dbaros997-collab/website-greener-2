@@ -4,6 +4,7 @@ import {
   useListResources,
   getListResourcesQueryKey,
   createResource,
+  updateResource,
   deleteResource,
   requestUploadUrl,
   type Resource,
@@ -29,9 +30,9 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { toFriendlyError } from "@/lib/errors";
-import { Download, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Download, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 
-const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
+const STORAGE_PREFIX = "/api/storage";
 const LEVELS = ["All", "S1", "S2", "S3", "S4", "S5", "S6", "O-Level", "A-Level"];
 
 function formatSize(bytes: number | null | undefined): string {
@@ -51,7 +52,7 @@ function BlankFormsCard() {
     (r: Resource) => r.category === "application_form",
   );
 
-  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState("All");
   const [file, setFile] = useState<File | null>(null);
@@ -73,9 +74,16 @@ function BlankFormsCard() {
   });
 
   const reset = () => {
-    setAdding(false);
+    setEditingId(null);
     setTitle("");
     setLevel("All");
+    setFile(null);
+  };
+
+  const startEdit = (item: Resource) => {
+    setEditingId(item.id);
+    setTitle(item.title);
+    setLevel(item.level || "All");
     setFile(null);
   };
 
@@ -88,7 +96,7 @@ function BlankFormsCard() {
       });
       return;
     }
-    if (!file) {
+    if (editingId === "new" && !file) {
       toast({
         title: "File required",
         description: "Please choose a file to upload.",
@@ -98,31 +106,59 @@ function BlankFormsCard() {
     }
     try {
       setUploading(true);
-      const upload = await requestUploadUrl({
-        name: file.name,
-        size: file.size,
-        contentType: file.type || "application/octet-stream",
-      });
-      const putRes = await fetch(upload.uploadURL, {
-        method: "PUT",
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-        body: file,
-      });
-      if (!putRes.ok) throw new Error(`Upload failed (${putRes.status})`);
-      await createResource({
-        title: title.trim(),
-        subject: "Application Form",
-        category: "application_form",
-        level,
-        term: null,
-        objectPath: upload.objectPath,
-        fileName: file.name,
-        fileSize: file.size,
-        contentType: file.type || "application/octet-stream",
-      });
+      let fileFields: {
+        objectPath?: string;
+        fileName?: string;
+        fileSize?: number;
+        contentType?: string;
+      } = {};
+      if (file) {
+        const upload = await requestUploadUrl({
+          name: file.name,
+          size: file.size,
+          contentType: file.type || "application/octet-stream",
+        });
+        const putRes = await fetch(upload.uploadURL, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+          credentials: "include",
+        });
+        if (!putRes.ok) throw new Error(`Upload failed (${putRes.status})`);
+        fileFields = {
+          objectPath: upload.objectPath,
+          fileName: file.name,
+          fileSize: file.size,
+          contentType: file.type || "application/octet-stream",
+        };
+      }
+
+      if (editingId === "new") {
+        await createResource({
+          title: title.trim(),
+          subject: "Application Form",
+          category: "application_form",
+          level,
+          term: null,
+          objectPath: fileFields.objectPath!,
+          fileName: fileFields.fileName!,
+          fileSize: fileFields.fileSize,
+          contentType: fileFields.contentType,
+        });
+        toast({ title: "Uploaded", description: "Application form added." });
+      } else if (typeof editingId === "number") {
+        await updateResource(editingId, {
+          title: title.trim(),
+          subject: "Application Form",
+          category: "application_form",
+          level,
+          term: null,
+          ...fileFields,
+        });
+        toast({ title: "Saved", description: "Application form updated." });
+      }
       await invalidate();
       reset();
-      toast({ title: "Uploaded", description: "Application form added." });
     } catch (err) {
       onError(err);
     } finally {
@@ -151,18 +187,22 @@ function BlankFormsCard() {
             the &ldquo;Application Forms&rdquo; group on the website.
           </CardDescription>
         </div>
-        {!adding ? (
-          <Button size="sm" onClick={() => setAdding(true)}>
+        {editingId === null ? (
+          <Button size="sm" onClick={() => setEditingId("new")}>
             <Plus className="mr-2 h-4 w-4" />
             Add form
           </Button>
         ) : null}
       </CardHeader>
       <CardContent className="space-y-4">
-        {adding ? (
+        {editingId !== null ? (
           <Card className="border-emerald-200 bg-emerald-50/40">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Add application form</CardTitle>
+              <CardTitle className="text-base">
+                {editingId === "new"
+                  ? "Add application form"
+                  : "Edit application form"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
@@ -193,7 +233,15 @@ function BlankFormsCard() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-file">
-                  File<span className="text-red-500"> *</span>
+                  File
+                  {editingId === "new" ? (
+                    <span className="text-red-500"> *</span>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      (optional — leave empty to keep current file)
+                    </span>
+                  )}
                 </Label>
                 <Input
                   id="form-file"
@@ -246,6 +294,14 @@ function BlankFormsCard() {
                   >
                     <Download className="h-4 w-4" />
                   </a>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => startEdit(r)}
+                    aria-label="Edit"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button
                     size="icon"
                     variant="ghost"

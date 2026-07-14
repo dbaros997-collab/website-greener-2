@@ -112,7 +112,8 @@ function valuesToPayload(
   return out;
 }
 
-const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
+// Always hit the API root — BASE_URL is `/dashboard/` in this app.
+const STORAGE_PREFIX = "/api/storage";
 
 function imageSrc(objectPath: string): string {
   return `${STORAGE_PREFIX}${objectPath}`;

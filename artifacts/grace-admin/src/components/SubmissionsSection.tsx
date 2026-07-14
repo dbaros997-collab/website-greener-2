@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { toFriendlyError } from "@/lib/errors";
 import { Download, FileText, Mail, Phone, Trash2 } from "lucide-react";
 
-const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
+const STORAGE_PREFIX = "/api/storage";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);

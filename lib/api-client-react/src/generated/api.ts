@@ -60,6 +60,8 @@ import type {
   SchoolValueInput,
   SchoolValueList,
   SchoolValuePatch,
+  SetupAdminInput,
+  SetupStatus,
   SiteText,
   SiteTextInput,
   SiteTextList,
@@ -73,6 +75,7 @@ import type {
   TestimonialInput,
   TestimonialList,
   TestimonialPatch,
+  UpdateResourceInput,
   UpdateSubmissionInput,
   UploadUrlRequest,
   UploadUrlResponse,
@@ -638,6 +641,81 @@ export const useCreateResource = <TError = ErrorType<ErrorEnvelope>,
         TContext
       > => {
       return useMutation(getCreateResourceMutationOptions(options));
+    }
+
+export const getUpdateResourceUrl = (id: number,) => {
+
+
+
+
+  return `/api/resources/${id}`
+}
+
+/**
+ * Update resource metadata and optionally replace the file (pass a new
+objectPath from the upload flow). Broadcasts so the public site refreshes.
+
+ * @summary Update a resource
+ */
+export const updateResource = async (id: number,
+    updateResourceInput: UpdateResourceInput, options?: RequestInit): Promise<Resource> => {
+
+  return customFetch<Resource>(getUpdateResourceUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateResourceInput,)
+  }
+);}
+
+
+
+
+export const getUpdateResourceMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateResource>>, TError,{id: number;data: BodyType<UpdateResourceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateResource>>, TError,{id: number;data: BodyType<UpdateResourceInput>}, TContext> => {
+
+const mutationKey = ['updateResource'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateResource>>, {id: number;data: BodyType<UpdateResourceInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateResource(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateResourceMutationResult = NonNullable<Awaited<ReturnType<typeof updateResource>>>
+    export type UpdateResourceMutationBody = BodyType<UpdateResourceInput>
+    export type UpdateResourceMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Update a resource
+ */
+export const useUpdateResource = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateResource>>, TError,{id: number;data: BodyType<UpdateResourceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateResource>>,
+        TError,
+        {id: number;data: BodyType<UpdateResourceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateResourceMutationOptions(options));
     }
 
 export const getDeleteResourceUrl = (id: number,) => {
@@ -4382,5 +4460,155 @@ export const useResetPassword = <TError = ErrorType<ErrorEnvelope>,
         TContext
       > => {
       return useMutation(getResetPasswordMutationOptions(options));
+    }
+
+export const getGetSetupStatusUrl = () => {
+
+
+
+
+  return `/api/auth/setup-status`
+}
+
+/**
+ * @summary Whether the first staff account still needs to be created
+ */
+export const getSetupStatus = async ( options?: RequestInit): Promise<SetupStatus> => {
+
+  return customFetch<SetupStatus>(getGetSetupStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSetupStatusQueryKey = () => {
+    return [
+    `/api/auth/setup-status`
+    ] as const;
+    }
+
+
+export const getGetSetupStatusQueryOptions = <TData = Awaited<ReturnType<typeof getSetupStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSetupStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSetupStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSetupStatus>>> = ({ signal }) => getSetupStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSetupStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSetupStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getSetupStatus>>>
+export type GetSetupStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Whether the first staff account still needs to be created
+ */
+
+export function useGetSetupStatus<TData = Awaited<ReturnType<typeof getSetupStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSetupStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSetupStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getSetupAdminUrl = () => {
+
+
+
+
+  return `/api/auth/setup`
+}
+
+/**
+ * Only succeeds when the staff_users table is empty. Creates the account and signs the caller in. After the first account exists, this endpoint returns 409.
+
+ * @summary Create the first staff account when none exist yet
+ */
+export const setupAdmin = async (setupAdminInput: SetupAdminInput, options?: RequestInit): Promise<AuthUser> => {
+
+  return customFetch<AuthUser>(getSetupAdminUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      setupAdminInput,)
+  }
+);}
+
+
+
+
+export const getSetupAdminMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setupAdmin>>, TError,{data: BodyType<SetupAdminInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setupAdmin>>, TError,{data: BodyType<SetupAdminInput>}, TContext> => {
+
+const mutationKey = ['setupAdmin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setupAdmin>>, {data: BodyType<SetupAdminInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  setupAdmin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetupAdminMutationResult = NonNullable<Awaited<ReturnType<typeof setupAdmin>>>
+    export type SetupAdminMutationBody = BodyType<SetupAdminInput>
+    export type SetupAdminMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Create the first staff account when none exist yet
+ */
+export const useSetupAdmin = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setupAdmin>>, TError,{data: BodyType<SetupAdminInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setupAdmin>>,
+        TError,
+        {data: BodyType<SetupAdminInput>},
+        TContext
+      > => {
+      return useMutation(getSetupAdminMutationOptions(options));
     }
 

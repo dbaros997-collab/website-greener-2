@@ -4,6 +4,7 @@ import {
   useListResources,
   getListResourcesQueryKey,
   createResource,
+  updateResource,
   deleteResource,
   requestUploadUrl,
   type Resource,
@@ -28,9 +29,9 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { toFriendlyError } from "@/lib/errors";
-import { Download, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Download, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 
-const STORAGE_PREFIX = `${import.meta.env.BASE_URL.replace(/admin\/?$/, "")}api/storage`;
+const STORAGE_PREFIX = "/api/storage";
 
 const CATEGORIES = [
   { value: "past_paper", label: "Past Paper" },
@@ -71,7 +72,7 @@ export function ResourcesSection() {
   const queryKey = getListResourcesQueryKey();
   const items = query.data ?? [];
 
-  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [uploading, setUploading] = useState(false);
 
@@ -96,6 +97,7 @@ export function ResourcesSection() {
           "Content-Type": state.file.type || "application/octet-stream",
         },
         body: state.file,
+        credentials: "include",
       });
       if (!putRes.ok) throw new Error(`Upload failed (${putRes.status})`);
       return createResource({
@@ -112,13 +114,73 @@ export function ResourcesSection() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, state }: { id: number; state: FormState }) => {
+      let fileFields: {
+        objectPath?: string;
+        fileName?: string;
+        fileSize?: number;
+        contentType?: string;
+      } = {};
+
+      if (state.file) {
+        const upload = await requestUploadUrl({
+          name: state.file.name,
+          size: state.file.size,
+          contentType: state.file.type || "application/octet-stream",
+        });
+        const putRes = await fetch(upload.uploadURL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": state.file.type || "application/octet-stream",
+          },
+          body: state.file,
+          credentials: "include",
+        });
+        if (!putRes.ok) throw new Error(`Upload failed (${putRes.status})`);
+        fileFields = {
+          objectPath: upload.objectPath,
+          fileName: state.file.name,
+          fileSize: state.file.size,
+          contentType: state.file.type || "application/octet-stream",
+        };
+      }
+
+      return updateResource(id, {
+        title: state.title.trim(),
+        subject: state.subject.trim(),
+        category: state.category,
+        level: state.level,
+        term: state.term.trim() || null,
+        ...fileFields,
+      });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteResource(id),
   });
 
   const reset = () => {
-    setAdding(false);
+    setEditingId(null);
     setForm(EMPTY_FORM);
+  };
+
+  const startCreate = () => {
+    setEditingId("new");
+    setForm(EMPTY_FORM);
+  };
+
+  const startEdit = (item: Resource) => {
+    setEditingId(item.id);
+    setForm({
+      title: item.title,
+      subject: item.subject,
+      category: item.category,
+      level: item.level || "All",
+      term: item.term ?? "",
+      file: null,
+    });
   };
 
   const submit = async () => {
@@ -130,7 +192,7 @@ export function ResourcesSection() {
       });
       return;
     }
-    if (!form.file) {
+    if (editingId === "new" && !form.file) {
       toast({
         title: "File required",
         description: "Please choose a file to upload.",
@@ -140,10 +202,15 @@ export function ResourcesSection() {
     }
     try {
       setUploading(true);
-      await createMutation.mutateAsync(form);
+      if (editingId === "new") {
+        await createMutation.mutateAsync(form);
+        toast({ title: "Uploaded", description: "Resource added." });
+      } else if (typeof editingId === "number") {
+        await updateMutation.mutateAsync({ id: editingId, state: form });
+        toast({ title: "Saved", description: "Resource updated." });
+      }
       await invalidate();
       reset();
-      toast({ title: "Uploaded", description: "Resource added." });
     } catch (err) {
       onError(err);
     } finally {
@@ -167,27 +234,35 @@ export function ResourcesSection() {
     items: items.filter((r: Resource) => r.category === cat.value),
   }));
 
+  const editingExisting =
+    typeof editingId === "number"
+      ? items.find((r) => r.id === editingId)
+      : undefined;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <CardTitle>Resources</CardTitle>
           <CardDescription>
-            Past papers and holiday work students can download.
+            Past papers and holiday work students can download. Edit any item to
+            change details or replace the file — the website updates instantly.
           </CardDescription>
         </div>
-        {!adding ? (
-          <Button size="sm" onClick={() => setAdding(true)}>
+        {editingId === null ? (
+          <Button size="sm" onClick={startCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Add
           </Button>
         ) : null}
       </CardHeader>
       <CardContent className="space-y-4">
-        {adding ? (
+        {editingId !== null ? (
           <Card className="border-emerald-200 bg-emerald-50/40">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Add resource</CardTitle>
+              <CardTitle className="text-base">
+                {editingId === "new" ? "Add resource" : "Edit resource"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
@@ -269,13 +344,25 @@ export function ResourcesSection() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="res-file">
-                  File<span className="text-red-500"> *</span>
+                  File
+                  {editingId === "new" ? (
+                    <span className="text-red-500"> *</span>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      (optional — leave empty to keep{" "}
+                      {editingExisting?.fileName ?? "current file"})
+                    </span>
+                  )}
                 </Label>
                 <Input
                   id="res-file"
                   type="file"
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, file: e.target.files?.[0] ?? null }))
+                    setForm((f) => ({
+                      ...f,
+                      file: e.target.files?.[0] ?? null,
+                    }))
                   }
                 />
               </div>
@@ -335,6 +422,14 @@ export function ResourcesSection() {
                         >
                           <Download className="h-4 w-4" />
                         </a>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => startEdit(r)}
+                          aria-label="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                         <Button
                           size="icon"
                           variant="ghost"

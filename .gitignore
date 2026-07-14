@@ -48,6 +48,9 @@ Thumbs.db
 .env
 .local/
 
+# Local disk uploads when PRIVATE_OBJECT_DIR is unset
+artifacts/api-server/.local/
+
 # Replit
 .cache/
 .local/

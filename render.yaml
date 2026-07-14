@@ -26,6 +26,8 @@ services:
         generateValue: true
       - key: PASSWORD_RESET_SECRET
         generateValue: true
+      # Optional — leave unset so /dashboard/ shows first-run setup.
+      # Set both only if you want the API to create the admin on boot.
       - key: ADMIN_USERNAME
         sync: false
       - key: ADMIN_PASSWORD

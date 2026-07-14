@@ -3,25 +3,25 @@ import { hashPassword } from "./auth";
 import { logger } from "./logger";
 
 /**
- * Ensure at least one staff account exists so the admin dashboard is usable on
- * first boot without a manual seed step. Runs idempotently on every startup:
- * if any staff user already exists it does nothing; otherwise it creates one
- * from ADMIN_USERNAME / ADMIN_PASSWORD when both are present.
+ * Optionally bootstrap a staff account from env on first boot.
+ * Prefer leaving ADMIN_USERNAME / ADMIN_PASSWORD unset — the dashboard shows a
+ * first-run setup screen that creates the account. If both env vars are set and
+ * no staff user exists yet, this still creates one (useful for automated deploys).
  */
 export async function ensureAdminUser(): Promise<void> {
   const existing = await db.select().from(staffUsersTable).limit(1);
   if (existing.length > 0) return;
 
-  const username = process.env.ADMIN_USERNAME;
+  const username = process.env.ADMIN_USERNAME?.trim();
   const password = process.env.ADMIN_PASSWORD;
   if (!username || !password) {
-    logger.warn(
-      "No staff account exists and ADMIN_USERNAME / ADMIN_PASSWORD are not set — admin login will be unavailable until one is created.",
+    logger.info(
+      "No staff account yet — open /dashboard/ to create the first admin (ADMIN_USERNAME / ADMIN_PASSWORD not set).",
     );
     return;
   }
 
   const passwordHash = await hashPassword(password);
   await db.insert(staffUsersTable).values({ username, passwordHash });
-  logger.info({ username }, "Bootstrapped initial staff admin account");
+  logger.info({ username }, "Bootstrapped initial staff admin account from env");
 }

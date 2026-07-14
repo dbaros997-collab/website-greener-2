@@ -157,6 +157,50 @@ export const CreateResourceBody = zod.object({
 
 
 /**
+ * Update resource metadata and optionally replace the file (pass a new
+objectPath from the upload flow). Broadcasts so the public site refreshes.
+
+ * @summary Update a resource
+ */
+export const UpdateResourceParams = zod.object({
+  "id": zod.coerce.number().describe('Resource id.')
+})
+
+
+
+
+
+
+
+
+export const UpdateResourceBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "subject": zod.string().min(1).optional(),
+  "category": zod.string().min(1).optional().describe('past_paper, holiday_work, or application_form.'),
+  "level": zod.string().optional(),
+  "term": zod.string().nullish(),
+  "objectPath": zod.string().min(1).optional(),
+  "fileName": zod.string().min(1).optional(),
+  "fileSize": zod.number().nullish(),
+  "contentType": zod.string().nullish()
+}).describe('Partial update. Omit objectPath to keep the existing file.')
+
+export const UpdateResourceResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "subject": zod.string(),
+  "category": zod.string().describe('past_paper or holiday_work.'),
+  "level": zod.string().describe('O-Level, A-Level, or All.'),
+  "term": zod.string().nullish(),
+  "objectPath": zod.string(),
+  "fileName": zod.string(),
+  "fileSize": zod.number().nullish(),
+  "contentType": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * @summary Delete a resource
  */
 export const DeleteResourceParams = zod.object({
@@ -996,6 +1040,35 @@ export const ResetPasswordBody = zod.object({
 
 export const ResetPasswordResponse = zod.object({
   "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Whether the first staff account still needs to be created
+ */
+export const GetSetupStatusResponse = zod.object({
+  "needsSetup": zod.boolean().describe('True when no staff account exists yet.')
+})
+
+
+/**
+ * Only succeeds when the staff_users table is empty. Creates the account and signs the caller in. After the first account exists, this endpoint returns 409.
+
+ * @summary Create the first staff account when none exist yet
+ */
+
+export const setupAdminBodyPasswordMin = 6;
+
+
+
+export const SetupAdminBody = zod.object({
+  "username": zod.string().min(1),
+  "password": zod.string().min(setupAdminBodyPasswordMin)
+})
+
+export const SetupAdminResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string()
 })
 
 
