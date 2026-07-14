@@ -1,7 +1,9 @@
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import { randomBytes } from "node:crypto";
 import { pool } from "@workspace/db";
 import type { RequestHandler } from "express";
+import { logger } from "./logger";
 
 declare module "express-session" {
   interface SessionData {
@@ -12,9 +14,18 @@ declare module "express-session" {
 
 const PgStore = connectPgSimple(session);
 
-const secret = process.env.SESSION_SECRET;
-if (!secret) {
-  throw new Error("SESSION_SECRET environment variable is required.");
+const secretFromEnv = process.env.SESSION_SECRET?.trim();
+const secret =
+  secretFromEnv && secretFromEnv.length > 0
+    ? secretFromEnv
+    : randomBytes(32).toString("hex");
+
+if (!secretFromEnv) {
+  // Don't crash the whole deploy — API must still mount. Sessions won't survive
+  // restarts until SESSION_SECRET is set stably in the Render Environment tab.
+  logger.warn(
+    "SESSION_SECRET is missing; using an ephemeral secret for this boot. Set SESSION_SECRET in Render so logins survive redeploys.",
+  );
 }
 
 const isLocalDev =
