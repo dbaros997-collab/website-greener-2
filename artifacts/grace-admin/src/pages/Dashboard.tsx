@@ -166,7 +166,7 @@ export default function Dashboard() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div>
             <h1 className="text-lg font-semibold text-emerald-900">
-              Grace High School — Dashboard
+              Grace High School — Dashboard (no password)
             </h1>
             <p className="text-xs text-muted-foreground">
               Open access dashboard · changes sync to the public site in real time

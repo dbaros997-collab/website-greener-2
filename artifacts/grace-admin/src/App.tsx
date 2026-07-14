@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuth } from "@/lib/auth";
+import { AuthProvider } from "@/lib/auth";
 import { useContentEvents } from "@/lib/useContentEvents";
 import Dashboard from "@/pages/Dashboard";
 
@@ -16,18 +16,8 @@ const queryClient = new QueryClient({
 });
 
 function Gate() {
-  const { isLoading } = useAuth();
   useContentEvents();
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <p className="text-sm text-muted-foreground">Opening dashboard…</p>
-      </div>
-    );
-  }
-
-  // Passwordless admin — no login/setup screens.
+  // Passwordless: never show login/password screens.
   return <Dashboard />;
 }
 

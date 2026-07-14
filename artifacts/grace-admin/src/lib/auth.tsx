@@ -2,8 +2,6 @@ import { createContext, useContext, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetCurrentUser,
-  useLogin,
-  useLogout,
   getGetCurrentUserQueryKey,
   type AuthUser,
 } from "@workspace/api-client-react";
@@ -23,7 +21,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
-  // /auth/me auto-creates a passwordless session via requireAuth.
+  // Establishes a passwordless session in the background for API writes.
   const meQuery = useGetCurrentUser({
     query: {
       queryKey: getGetCurrentUserQueryKey(),
@@ -36,39 +34,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const loginMutation = useLogin();
-  const logoutMutation = useLogout();
-
   const refreshUser = () =>
     queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
 
-  const login = async (_username: string, _password: string) => {
-    // Passwordless: body is ignored by the API.
-    await loginMutation.mutateAsync({
-      data: { username: "admin", password: "passwordless" },
-    });
-    await refreshUser();
-  };
-
-  const setup = async (username: string, password: string) => {
-    await login(username, password);
-  };
-
-  const logout = async () => {
-    await logoutMutation.mutateAsync();
-    await refreshUser();
-  };
-
   const user = meQuery.isSuccess ? (meQuery.data ?? null) : null;
-  const needsSetup = false;
-
-  const meNetworkError =
-    !meQuery.isSuccess && meQuery.isError && isNetworkError(meQuery.error);
-  const isLoading = meQuery.isLoading || meNetworkError;
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, needsSetup, login, setup, logout }}
+      value={{
+        user,
+        isLoading: false,
+        needsSetup: false,
+        login: async () => {
+          await refreshUser();
+        },
+        setup: async () => {
+          await refreshUser();
+        },
+        logout: async () => {
+          await refreshUser();
+        },
+      }}
     >
       {children}
     </AuthContext.Provider>
