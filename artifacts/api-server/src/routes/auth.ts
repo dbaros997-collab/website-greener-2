@@ -2,132 +2,49 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, staffUsersTable } from "@workspace/db";
 import {
-  LoginBody,
   LoginResponse,
   LogoutResponse,
   GetCurrentUserResponse,
   ResetPasswordBody,
   ResetPasswordResponse,
   GetSetupStatusResponse,
-  SetupAdminBody,
   SetupAdminResponse,
 } from "@workspace/api-zod";
-import { hashPassword, verifyPassword, requireAuth, verifyResetSecret } from "../lib/auth";
+import {
+  hashPassword,
+  requireAuth,
+  verifyResetSecret,
+  ensurePasswordlessSession,
+} from "../lib/auth";
 
 const router: IRouter = Router();
 
-async function staffAccountExists(): Promise<boolean> {
-  const existing = await db.select().from(staffUsersTable).limit(1);
-  return existing.length > 0;
-}
-
+// Passwordless admin: setup is never required.
 router.get("/auth/setup-status", async (_req, res): Promise<void> => {
-  const needsSetup = !(await staffAccountExists());
-  res.json(GetSetupStatusResponse.parse({ needsSetup }));
+  res.json(GetSetupStatusResponse.parse({ needsSetup: false }));
 });
 
+// Passwordless enter/setup — no credentials needed.
 router.post("/auth/setup", async (req, res): Promise<void> => {
   try {
-    if (await staffAccountExists()) {
-      res.status(409).json({ error: "An admin account already exists. Sign in instead." });
-      return;
-    }
-
-    const parsed = SetupAdminBody.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({
-        error: "Invalid request. Username and password (min 6 characters) are required.",
-      });
-      return;
-    }
-
-    const username = parsed.data.username.trim();
-    if (!username) {
-      res.status(400).json({ error: "Username is required." });
-      return;
-    }
-
-    // Re-check immediately before insert to reduce race windows.
-    if (await staffAccountExists()) {
-      res.status(409).json({ error: "An admin account already exists. Sign in instead." });
-      return;
-    }
-
-    const passwordHash = await hashPassword(parsed.data.password);
-    const inserted = await db
-      .insert(staffUsersTable)
-      .values({ username, passwordHash })
-      .returning({
-        id: staffUsersTable.id,
-        username: staffUsersTable.username,
-      });
-
-    const user = inserted[0];
-    if (!user) {
-      res.status(500).json({ error: "Failed to create admin account." });
-      return;
-    }
-
-    req.session.userId = user.id;
-    req.session.username = user.username;
-
-    await new Promise<void>((resolve, reject) => {
-      req.session.save((err) => (err ? reject(err) : resolve()));
-    });
-
-    req.log.info({ username: user.username }, "Created first staff admin via setup");
-    res.json(SetupAdminResponse.parse({ id: user.id, username: user.username }));
+    const user = await ensurePasswordlessSession(req);
+    req.log.info({ username: user.username }, "Passwordless admin session via setup");
+    res.json(SetupAdminResponse.parse(user));
   } catch (err) {
-    req.log.error({ err }, "Setup admin failed");
-    res.status(500).json({
-      error:
-        "Failed to create admin account. Confirm the database is reachable, then try again.",
-    });
+    req.log.error({ err }, "Passwordless setup failed");
+    res.status(500).json({ error: "Failed to open admin session." });
   }
 });
 
+// Passwordless login — ignores username/password body.
 router.post("/auth/login", async (req, res): Promise<void> => {
-  const parsed = LoginBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(401).json({ error: "Invalid credentials" });
-    return;
+  try {
+    const user = await ensurePasswordlessSession(req);
+    res.json(LoginResponse.parse(user));
+  } catch (err) {
+    req.log.error({ err }, "Passwordless login failed");
+    res.status(500).json({ error: "Failed to open admin session." });
   }
-
-  const username = parsed.data.username.trim();
-  if (!username) {
-    res.status(401).json({ error: "Invalid credentials" });
-    return;
-  }
-
-  // Prefer exact match; fall back to case-insensitive match for older accounts.
-  const exact = await db
-    .select()
-    .from(staffUsersTable)
-    .where(eq(staffUsersTable.username, username))
-    .limit(1);
-
-  let user: (typeof exact)[number] | undefined = exact[0];
-  if (!user) {
-    const all = await db.select().from(staffUsersTable);
-    user = all.find((u) => u.username.toLowerCase() === username.toLowerCase());
-  }
-
-  if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash))) {
-    // Help operators when the DB has no staff row yet (common after free-tier resets).
-    if (!(await staffAccountExists())) {
-      res.status(401).json({
-        error: "No admin account exists yet. Open /dashboard/ to create one.",
-      });
-      return;
-    }
-    req.log.warn({ username }, "Failed login attempt");
-    res.status(401).json({ error: "Invalid credentials" });
-    return;
-  }
-
-  req.session.userId = user.id;
-  req.session.username = user.username;
-  res.json(LoginResponse.parse({ id: user.id, username: user.username }));
 });
 
 router.post("/auth/logout", async (req, res): Promise<void> => {
@@ -152,6 +69,7 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.post("/auth/reset-password", async (req, res): Promise<void> => {
+  // Kept for API compatibility; passwordless mode does not use passwords.
   const resetSecret = process.env.PASSWORD_RESET_SECRET;
   if (!resetSecret) {
     res.status(503).json({

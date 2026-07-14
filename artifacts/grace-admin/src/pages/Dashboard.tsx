@@ -1,12 +1,9 @@
-import { useAuth } from "@/lib/auth";
 import { ContentSection, type FieldDef } from "@/components/ContentSection";
 import { ResourcesSection } from "@/components/ResourcesSection";
 import { SubmissionsSection } from "@/components/SubmissionsSection";
 import { ApplicationsSection } from "@/components/ApplicationsSection";
 import { SiteTextSection } from "@/components/SiteTextSection";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut } from "lucide-react";
 import {
   useListNewsItems,
   useCreateNewsItem,
@@ -68,8 +65,6 @@ const TABS: { value: string; label: string }[] = [
 ];
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-
   // News
   const news = useListNewsItems(adminParams);
   const newsCreate = useCreateNewsItem();
@@ -174,13 +169,9 @@ export default function Dashboard() {
               Grace High School — Dashboard
             </h1>
             <p className="text-xs text-muted-foreground">
-              Signed in as {user?.username} · changes sync to the public site in real time
+              Open access dashboard · changes sync to the public site in real time
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => logout()}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
-          </Button>
         </div>
       </header>
 

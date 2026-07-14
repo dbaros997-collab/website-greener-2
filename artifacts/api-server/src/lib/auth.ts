@@ -6,6 +6,7 @@ import {
 } from "node:crypto";
 import { promisify } from "node:util";
 import type { Request, Response, NextFunction } from "express";
+import { db, staffUsersTable } from "@workspace/db";
 
 const scrypt = promisify(scryptCb);
 const KEYLEN = 64;
@@ -38,15 +39,58 @@ export function verifyResetSecret(provided: string, expected: string): boolean {
   return timingSafeEqual(providedHash, expectedHash);
 }
 
-// Express middleware: reject requests without an authenticated session.
+function saveSession(req: Request): Promise<void> {
+  return new Promise((resolve, reject) => {
+    req.session.save((err) => (err ? reject(err) : resolve()));
+  });
+}
+
+/**
+ * Ensure there is a staff row and attach it to the session.
+ * Used for passwordless dashboard access — no password is checked.
+ */
+export async function ensurePasswordlessSession(req: Request): Promise<{
+  id: number;
+  username: string;
+}> {
+  if (req.session.userId && req.session.username) {
+    return { id: req.session.userId, username: req.session.username };
+  }
+
+  const existing = await db.select().from(staffUsersTable).limit(1);
+  let user = existing[0];
+
+  if (!user) {
+    const passwordHash = await hashPassword(randomBytes(24).toString("hex"));
+    const inserted = await db
+      .insert(staffUsersTable)
+      .values({ username: "admin", passwordHash })
+      .returning();
+    user = inserted[0];
+    if (!user) {
+      throw new Error("Failed to create passwordless admin account");
+    }
+  }
+
+  req.session.userId = user.id;
+  req.session.username = user.username;
+  await saveSession(req);
+  return { id: user.id, username: user.username };
+}
+
+// Express middleware: open the admin API without a password.
+// If there is no session yet, create/reuse the staff account automatically.
 export function requireAuth(
   req: Request,
   res: Response,
   next: NextFunction,
 ): void {
-  if (!req.session.userId) {
-    res.status(401).json({ error: "Not authenticated" });
-    return;
-  }
-  next();
+  void (async () => {
+    try {
+      await ensurePasswordlessSession(req);
+      next();
+    } catch (err) {
+      next(err);
+    }
+  })();
 }
