@@ -12,32 +12,24 @@ import {
   useListResources,
 } from "@workspace/api-client-react";
 
-import schoolLogo from "@assets/school_logo_transparent.png";
-import img_about_group from "@assets/SSEKAMATTE_SIMON_1780946570401.png";
-import img_campus_hero from "@assets/IMG_9926_1780652934166.jpg";
-import img_footer_watermark from "@assets/IMG_9926_1780730298484.jpg";
-import img_admissions_watermark from "@assets/IMG_9926_1780917530721.jpg";
-import img_alevel from "@assets/3@_(7)_1780653886082.JPG";
-import img_students_group from "@assets/3@_(5)_1781252589025.JPG";
-import img_hotsprings from "@assets/IMG_20230304_115149_291_1781375070289.jpg";
-import img_library from "@assets/IMG_0062_1781375708800.jpg";
-import img_dance from "@assets/IMG_3673_1781376146283.JPG";
-import img_dean_students from "@assets/MUGERWA_DENIS_charcoal.png";
-import img_careers_mistress from "@assets/Nakabiito_Linda_final.png";
-import img_viola from "@assets/Namuyomba_Viola_final.png";
-import img_exam from "@assets/505808199_3139672606197826_738541539324222896_n_1780398909147.jpg";
-import img_media from "@assets/481302535_1149890503497371_8676145292623403547_n_1780398909148.jpg";
-import img_excursion from "@assets/481667540_1150000930152995_4111129775898704329_n_1780398909149.jpg";
-import img_waterfilter from "@assets/481698095_1150000593486362_595453668791169278_n_1780398909149.jpg";
-import img_lab from "@assets/481779877_1149893336830421_4127942201837184591_n_1780398909151.jpg";
-import img_uace from "@assets/481820657_1149996483486773_2392940494083029153_n_1780398909151.jpg";
-import img_crafts from "@assets/Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png";
-import img_assembly3 from "@assets/481907330_1149892830163805_8613282942842560566_n_1780398909153.jpg";
-import img_conference from "@assets/481919937_1149893610163727_7736672364831677932_n_1780398909153.jpg";
-import img_campus from "@assets/IMG_20260321_093718_497_1780675601336.jpg";
-import img_food from "@assets/481964449_1149999646819790_6834026191577424925_n_1780398909154.jpg";
-import img_featured_video from "@assets/featured_video_thumb_1780677204039.png";
-import { generateApplicationForm } from "./applicationForm";
+import schoolLogo from "@assets/optimized/school-logo.webp";
+import img_about_group from "@assets/optimized/head-teacher.webp";
+import img_campus_hero from "@assets/optimized/campus-hero.webp";
+import img_alevel from "@assets/optimized/alevel.webp";
+import img_students_group from "@assets/optimized/students-group.webp";
+import img_hotsprings from "@assets/optimized/hotsprings.webp";
+import img_library from "@assets/optimized/library.webp";
+import img_dance from "@assets/optimized/dance.webp";
+import img_dean_students from "@assets/optimized/dean-students.webp";
+import img_careers_mistress from "@assets/optimized/careers-mistress.webp";
+import img_viola from "@assets/optimized/viola.webp";
+import img_crafts from "@assets/optimized/crafts.webp";
+import img_featured_video from "@assets/optimized/featured-video.webp";
+
+const downloadApplicationForm = async (level: "S1" | "S5") => {
+  const { generateApplicationForm } = await import("./applicationForm");
+  generateApplicationForm(level);
+};
 
 const GREEN_DARK  = "#0A4020";
 const GREEN_MAIN  = "#1A6B3C";
@@ -114,6 +106,8 @@ export default function App() {
   const [submitSent, setSubmitSent]   = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [heroSlide, setHeroSlide]     = useState(0);
+  // Only fetch hero photos that are (or soon will be) visible — avoids 6× image cost on first paint.
+  const [heroLoaded, setHeroLoaded]   = useState(() => new Set<number>([0]));
 
   // Same React Query path as news/programmes — SSE invalidation + short poll
   // keep every open tab (including shared links) in sync without a reload.
@@ -137,7 +131,19 @@ export default function App() {
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setHeroSlide(i => (i + 1) % HERO_SLIDES.length), 5000);
+    const id = setInterval(() => {
+      setHeroSlide(i => {
+        const next = (i + 1) % HERO_SLIDES.length;
+        setHeroLoaded(prev => {
+          if (prev.has(next) && prev.has(i)) return prev;
+          const copy = new Set(prev);
+          copy.add(i);
+          copy.add(next);
+          return copy;
+        });
+        return next;
+      });
+    }, 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -989,8 +995,9 @@ export default function App() {
         display: "flex", alignItems: "center", justifyContent: "center",
         position: "relative", overflow: "hidden", padding: "120px 5% 64px",
       }}>
-        {/* Background image slideshow — crossfades between campus photos */}
+        {/* Background slideshow — only mount slides that have been (or are about to be) shown */}
         {HERO_SLIDES.map((src, i) => (
+          heroLoaded.has(i) ? (
           <div key={i} style={{
             position: "absolute", inset: 0,
             backgroundImage: `url("${src}")`,
@@ -1001,6 +1008,7 @@ export default function App() {
             opacity: i === heroSlide ? 1 : 0,
             transition: "opacity 1.4s ease-in-out, transform 6s ease-out",
           }} />
+          ) : null
         ))}
         {/* Cinematic scrim — neutral charcoal so the photo colours stay true */}
         <div style={{
@@ -1028,7 +1036,7 @@ export default function App() {
 
           {/* Rotating headline — "___ to Create the Future." */}
           <h1 style={{
-            fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800,
+            fontFamily: "'DM Sans', system-ui, sans-serif", fontWeight: 800,
             fontSize: "clamp(2.7rem, 6.6vw, 5.3rem)",
             color: WHITE, lineHeight: 1.02, marginBottom: 26,
             letterSpacing: "-0.02em", textShadow: "0 2px 30px rgba(0,0,0,0.45)",
@@ -1154,9 +1162,9 @@ export default function App() {
         <div className="welcome-grid">
           <div className="welcome-media" style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: -10, borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.18))`, zIndex: 0 }} />
-            <img src={img_about_group} alt="The Head Teacher, Grace High School" style={{ position: "relative", zIndex: 1, width: "100%", aspectRatio: "4 / 5", objectFit: "cover", objectPosition: "center 18%", borderRadius: 14, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.12))`, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
+            <img src={img_about_group} alt="The Head Teacher, Grace High School" loading="lazy" decoding="async" width={900} height={1125} style={{ position: "relative", zIndex: 1, width: "100%", aspectRatio: "4 / 5", objectFit: "cover", objectPosition: "center 18%", borderRadius: 14, background: `linear-gradient(135deg, ${GREEN_LIGHT}, rgba(201,162,75,0.12))`, boxShadow: "0 20px 50px rgba(10,64,32,0.22)" }} />
             <div style={{ position: "absolute", zIndex: 2, bottom: 16, left: 16, display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.94)", borderRadius: 100, padding: "8px 16px 8px 8px", boxShadow: "0 8px 22px rgba(0,0,0,0.18)" }}>
-              <img src={schoolLogo} alt="" style={{ width: 34, height: 34, objectFit: "contain" }} />
+              <img src={schoolLogo} alt="" width={34} height={34} style={{ width: 34, height: 34, objectFit: "contain" }} />
               <span style={{ fontSize: 12.5, fontWeight: 700, color: GREEN_DARK }}>Grace High School</span>
             </div>
             {/* Years-of-experience badge */}
@@ -1210,7 +1218,7 @@ export default function App() {
           <div className="leaders-grid">
             {LEADERSHIP.map((p, i) => (
               <div key={i} className="leader-card">
-                <img className="leader-photo" src={p.img} alt={p.name} />
+                <img className="leader-photo" src={p.img} alt={p.name} loading="lazy" decoding="async" width={700} height={875} />
                 <div className="leader-scrim" />
                 <div className="leader-info">
                   <h3>{p.name}</h3>
@@ -1309,7 +1317,7 @@ export default function App() {
             {programmeItems.map((p, i) => (
               <div key={i} className={`programme-row${i % 2 === 1 ? " programme-row--reverse" : ""}`}>
                 <div className="programme-row-img" style={{ overflow: "hidden", borderRadius: 12, minHeight: 300 }}>
-                  <img src={p.img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={p.img} alt={p.title} loading="lazy" decoding="async" width={1200} height={800} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div className="programme-row-body" style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "8px 4px" }}>
                   <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 8 }}>{p.tag}</div>
@@ -1388,7 +1396,7 @@ export default function App() {
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
               >
                 <div style={{ position: "relative", height: 190, overflow: "hidden" }}>
-                  <img src={v.thumb} alt={v.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={v.thumb} alt={v.title} loading="lazy" decoding="async" width={800} height={450} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(transparent, rgba(10,64,32,0.55))" }} />
                   <div style={{
                     position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
@@ -1572,7 +1580,7 @@ export default function App() {
 
       {/* ===== ADMISSIONS ===== */}
       <section id="admissions" className="reveal" style={{ position: "relative", overflow: "hidden", background: GREEN_DARK, padding: "56px 5%" }}>
-        <img src={img_admissions_watermark} alt="" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18 }} />
+        <img src={img_campus_hero} alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18 }} />
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, rgba(10,64,32,0.92) 0%, rgba(10,64,32,0.82) 100%)` }} />
         <div className="admissions-grid" style={{ position: "relative" }}>
           <div>
@@ -1630,7 +1638,7 @@ export default function App() {
                 { level: "S1" as const, label: "S1 Application Form", note: "For Senior One (from PLE)" },
                 { level: "S5" as const, label: "S5 Application Form", note: "For Senior Five (from UCE)" },
               ]).map(f => (
-                <button key={f.level} onClick={() => generateApplicationForm(f.level)} style={{
+                <button key={f.level} onClick={() => void downloadApplicationForm(f.level)} style={{
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left", cursor: "pointer",
                   background: WHITE, border: "none", borderRadius: 8, padding: "16px 18px",
                   fontFamily: "'DM Sans', sans-serif", transition: "transform 0.2s, box-shadow 0.2s",
@@ -1939,13 +1947,18 @@ export default function App() {
 
       {/* ===== FOOTER ===== */}
       <footer style={{ position: "relative", background: GREEN_DARK, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "48px 5% 28px", overflow: "hidden" }}>
-        {/* Campus watermark */}
-        <div aria-hidden="true" style={{
-          position: "absolute", inset: 0, pointerEvents: "none", userSelect: "none",
-          backgroundImage: `url("${img_footer_watermark}")`,
-          backgroundSize: "cover", backgroundPosition: "center",
-          opacity: 0.22,
-        }} />
+        {/* Campus watermark — lazy so it does not compete with the hero on slow networks */}
+        <img
+          src={img_campus_hero}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover", opacity: 0.22, pointerEvents: "none", userSelect: "none",
+          }}
+        />
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
           background: `linear-gradient(180deg, ${GREEN_DARK}80, ${GREEN_DARK}99)`,
