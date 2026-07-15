@@ -107,24 +107,97 @@ export const GetStorageObjectParams = zod.object({
 
 
 /**
- * Returns all past papers and holiday work, newest first.
+ * Returns all resource categories (folders), ordered by sortOrder then name.
+ * @summary List Download Centre folders
+ */
+export const ListResourceCategoriesResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string().describe('Display name shown as the folder label (e.g. Past Papers).'),
+  "slug": zod.string().describe('Stable key (e.g. past_paper). Used for filtering and Applications tab.'),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListResourceCategoriesResponse = zod.array(ListResourceCategoriesResponseItem)
+
+
+/**
+ * Create a new Download Centre category. Slug is derived from the name if omitted.
+ * @summary Create a folder
+ */
+
+
+
+
+export const CreateResourceCategoryBody = zod.object({
+  "name": zod.string().min(1),
+  "slug": zod.string().min(1).optional().describe('Optional. Derived from name when omitted (lowercase, underscores).'),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Rename or reorder a folder
+ */
+export const UpdateResourceCategoryParams = zod.object({
+  "id": zod.coerce.number().describe('Category id.')
+})
+
+
+
+
+
+export const UpdateResourceCategoryBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "slug": zod.string().min(1).optional(),
+  "sortOrder": zod.number().optional()
+}).describe('Partial update. Renaming updates the display name; slug changes also sync files.')
+
+export const UpdateResourceCategoryResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string().describe('Display name shown as the folder label (e.g. Past Papers).'),
+  "slug": zod.string().describe('Stable key (e.g. past_paper). Used for filtering and Applications tab.'),
+  "sortOrder": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * Deletes a category only when no files reference it.
+The application_form folder cannot be deleted.
+
+ * @summary Delete a folder
+ */
+export const DeleteResourceCategoryParams = zod.object({
+  "id": zod.coerce.number().describe('Category id.')
+})
+
+
+/**
+ * Returns past papers, holiday work, and application forms, newest first.
+By default only resources currently shown on the website (isVisible=true).
+Authenticated admins may pass includeHidden=true to also see archived files.
+
  * @summary List student resources
  */
 export const ListResourcesQueryParams = zod.object({
-  "category": zod.coerce.string().optional().describe('Optional filter by category (past_paper or holiday_work).')
+  "category": zod.coerce.string().optional().describe('Optional filter by category slug (e.g. past_paper, holiday_work, application_form).'),
+  "categoryId": zod.coerce.number().optional().describe('Optional filter by category (folder) id.'),
+  "includeHidden": zod.coerce.boolean().optional().describe('Admin-only. When true and authenticated, include archived (hidden) resources.')
 })
 
 export const ListResourcesResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "subject": zod.string(),
-  "category": zod.string().describe('past_paper or holiday_work.'),
+  "category": zod.string().describe('Category slug (denormalized from the folder).'),
+  "categoryId": zod.number().nullish().describe('Folder id this file belongs to.'),
   "level": zod.string().describe('O-Level, A-Level, or All.'),
   "term": zod.string().nullish(),
   "objectPath": zod.string(),
   "fileName": zod.string(),
   "fileSize": zod.number().nullish(),
   "contentType": zod.string().nullish(),
+  "isVisible": zod.boolean().describe('When false, archived — kept for staff but hidden from the public site.'),
   "createdAt": zod.coerce.date()
 })
 export const ListResourcesResponse = zod.array(ListResourcesResponseItem)
@@ -146,13 +219,15 @@ via the presigned URL flow; pass the returned objectPath here.
 export const CreateResourceBody = zod.object({
   "title": zod.string().min(1),
   "subject": zod.string().min(1),
-  "category": zod.string().min(1).describe('past_paper or holiday_work.'),
+  "category": zod.string().min(1).optional().describe('Category slug. Required when categoryId is omitted.'),
+  "categoryId": zod.number().optional().describe('Folder id. Preferred over category slug when both are sent.'),
   "level": zod.string().optional().describe('O-Level, A-Level, or All. Defaults to All.'),
   "term": zod.string().nullish(),
   "objectPath": zod.string().min(1),
   "fileName": zod.string().min(1),
   "fileSize": zod.number().nullish(),
-  "contentType": zod.string().nullish()
+  "contentType": zod.string().nullish(),
+  "isVisible": zod.boolean().optional().describe('Defaults to true (shown on the website).')
 })
 
 
@@ -176,26 +251,30 @@ export const UpdateResourceParams = zod.object({
 export const UpdateResourceBody = zod.object({
   "title": zod.string().min(1).optional(),
   "subject": zod.string().min(1).optional(),
-  "category": zod.string().min(1).optional().describe('past_paper, holiday_work, or application_form.'),
+  "category": zod.string().min(1).optional().describe('Category slug.'),
+  "categoryId": zod.number().nullish().describe('Move the file into another folder.'),
   "level": zod.string().optional(),
   "term": zod.string().nullish(),
   "objectPath": zod.string().min(1).optional(),
   "fileName": zod.string().min(1).optional(),
   "fileSize": zod.number().nullish(),
-  "contentType": zod.string().nullish()
+  "contentType": zod.string().nullish(),
+  "isVisible": zod.boolean().optional().describe('Set false to archive (hide from public site without deleting).')
 }).describe('Partial update. Omit objectPath to keep the existing file.')
 
 export const UpdateResourceResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "subject": zod.string(),
-  "category": zod.string().describe('past_paper or holiday_work.'),
+  "category": zod.string().describe('Category slug (denormalized from the folder).'),
+  "categoryId": zod.number().nullish().describe('Folder id this file belongs to.'),
   "level": zod.string().describe('O-Level, A-Level, or All.'),
   "term": zod.string().nullish(),
   "objectPath": zod.string(),
   "fileName": zod.string(),
   "fileSize": zod.number().nullish(),
   "contentType": zod.string().nullish(),
+  "isVisible": zod.boolean().describe('When false, archived — kept for staff but hidden from the public site.'),
   "createdAt": zod.coerce.date()
 })
 

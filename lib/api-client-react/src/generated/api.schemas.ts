@@ -35,12 +35,48 @@ export interface UploadUrlResponse {
   metadata?: UploadUrlRequest;
 }
 
+export interface ResourceCategory {
+  id: number;
+  /** Display name shown as the folder label (e.g. Past Papers). */
+  name: string;
+  /** Stable key (e.g. past_paper). Used for filtering and Applications tab. */
+  slug: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export type ResourceCategoryList = ResourceCategory[];
+
+export interface CreateResourceCategoryInput {
+  /** @minLength 1 */
+  name: string;
+  /**
+     * Optional. Derived from name when omitted (lowercase, underscores).
+     * @minLength 1
+     */
+  slug?: string;
+  sortOrder?: number;
+}
+
+/**
+ * Partial update. Renaming updates the display name; slug changes also sync files.
+ */
+export interface UpdateResourceCategoryInput {
+  /** @minLength 1 */
+  name?: string;
+  /** @minLength 1 */
+  slug?: string;
+  sortOrder?: number;
+}
+
 export interface Resource {
   id: number;
   title: string;
   subject: string;
-  /** past_paper or holiday_work. */
+  /** Category slug (denormalized from the folder). */
   category: string;
+  /** Folder id this file belongs to. */
+  categoryId?: number | null;
   /** O-Level, A-Level, or All. */
   level: string;
   term?: string | null;
@@ -48,6 +84,8 @@ export interface Resource {
   fileName: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** When false, archived — kept for staff but hidden from the public site. */
+  isVisible: boolean;
   createdAt: string;
 }
 
@@ -59,10 +97,12 @@ export interface CreateResourceInput {
   /** @minLength 1 */
   subject: string;
   /**
-     * past_paper or holiday_work.
+     * Category slug. Required when categoryId is omitted.
      * @minLength 1
      */
-  category: string;
+  category?: string;
+  /** Folder id. Preferred over category slug when both are sent. */
+  categoryId?: number;
   /** O-Level, A-Level, or All. Defaults to All. */
   level?: string;
   term?: string | null;
@@ -72,6 +112,8 @@ export interface CreateResourceInput {
   fileName: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** Defaults to true (shown on the website). */
+  isVisible?: boolean;
 }
 
 /**
@@ -83,10 +125,12 @@ export interface UpdateResourceInput {
   /** @minLength 1 */
   subject?: string;
   /**
-     * past_paper, holiday_work, or application_form.
+     * Category slug.
      * @minLength 1
      */
   category?: string;
+  /** Move the file into another folder. */
+  categoryId?: number | null;
   level?: string;
   term?: string | null;
   /** @minLength 1 */
@@ -95,6 +139,8 @@ export interface UpdateResourceInput {
   fileName?: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** Set false to archive (hide from public site without deleting). */
+  isVisible?: boolean;
 }
 
 export interface ErrorEnvelope {
@@ -495,9 +541,17 @@ export interface AuthUser {
 
 export type ListResourcesParams = {
 /**
- * Optional filter by category (past_paper or holiday_work).
+ * Optional filter by category slug (e.g. past_paper, holiday_work, application_form).
  */
 category?: string;
+/**
+ * Optional filter by category (folder) id.
+ */
+categoryId?: number;
+/**
+ * Admin-only. When true and authenticated, include archived (hidden) resources.
+ */
+includeHidden?: boolean;
 };
 
 export type ListNewsItemsParams = {

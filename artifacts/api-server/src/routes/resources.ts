@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db, resourcesTable } from "@workspace/db";
 import {
   CreateResourceBody,
@@ -16,23 +16,41 @@ import {
   isLocalObjectStorage,
   localObjectExists,
 } from "../lib/localObjectStorage";
+import { resolveResourceCategory } from "../lib/resolveResourceCategory";
 
 const router: IRouter = Router();
 
 router.get("/resources", async (req, res): Promise<void> => {
   const category =
     typeof req.query.category === "string" ? req.query.category : undefined;
+  const categoryIdRaw =
+    typeof req.query.categoryId === "string" ? req.query.categoryId : undefined;
+  const categoryId =
+    categoryIdRaw !== undefined && categoryIdRaw !== ""
+      ? Number(categoryIdRaw)
+      : undefined;
+  const includeHidden =
+    req.query.includeHidden === "true" || req.query.includeHidden === "1";
+  const showAll = includeHidden && Boolean(req.session.userId);
 
-  const rows = category
-    ? await db
-        .select()
-        .from(resourcesTable)
-        .where(eq(resourcesTable.category, category))
-        .orderBy(desc(resourcesTable.createdAt))
-    : await db
-        .select()
-        .from(resourcesTable)
-        .orderBy(desc(resourcesTable.createdAt));
+  const conditions = [];
+  if (category) conditions.push(eq(resourcesTable.category, category));
+  if (categoryId !== undefined && Number.isInteger(categoryId) && categoryId > 0) {
+    conditions.push(eq(resourcesTable.categoryId, categoryId));
+  }
+  if (!showAll) conditions.push(eq(resourcesTable.isVisible, true));
+
+  const rows =
+    conditions.length > 0
+      ? await db
+          .select()
+          .from(resourcesTable)
+          .where(and(...conditions))
+          .orderBy(desc(resourcesTable.createdAt))
+      : await db
+          .select()
+          .from(resourcesTable)
+          .orderBy(desc(resourcesTable.createdAt));
 
   // Never let browsers/CDNs serve a stale resource list after an admin edit.
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
@@ -48,18 +66,29 @@ router.post("/resources", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
+  const resolved = await resolveResourceCategory({
+    categoryId: parsed.data.categoryId,
+    category: parsed.data.category,
+  });
+  if ("error" in resolved) {
+    res.status(400).json({ error: resolved.error });
+    return;
+  }
+
   const [resource] = await db
     .insert(resourcesTable)
     .values({
       title: parsed.data.title,
       subject: parsed.data.subject,
-      category: parsed.data.category,
+      category: resolved.category,
+      categoryId: resolved.categoryId,
       level: parsed.data.level ?? "All",
       term: parsed.data.term ?? null,
       objectPath: parsed.data.objectPath,
       fileName: parsed.data.fileName,
       fileSize: parsed.data.fileSize ?? null,
       contentType: parsed.data.contentType ?? null,
+      isVisible: parsed.data.isVisible ?? true,
     })
     .returning();
 
@@ -113,12 +142,28 @@ router.patch("/resources/:id", requireAuth, async (req, res): Promise<void> => {
     }
   }
 
+  let categoryFields: { category?: string; categoryId?: number | null } = {};
+  if (patch.categoryId !== undefined || patch.category !== undefined) {
+    const resolved = await resolveResourceCategory({
+      categoryId: patch.categoryId,
+      category: patch.category,
+    });
+    if ("error" in resolved) {
+      res.status(400).json({ error: resolved.error });
+      return;
+    }
+    categoryFields = {
+      category: resolved.category,
+      categoryId: resolved.categoryId,
+    };
+  }
+
   const [resource] = await db
     .update(resourcesTable)
     .set({
       ...(patch.title !== undefined ? { title: patch.title } : {}),
       ...(patch.subject !== undefined ? { subject: patch.subject } : {}),
-      ...(patch.category !== undefined ? { category: patch.category } : {}),
+      ...categoryFields,
       ...(patch.level !== undefined ? { level: patch.level } : {}),
       ...(patch.term !== undefined ? { term: patch.term } : {}),
       ...(patch.objectPath !== undefined ? { objectPath: patch.objectPath } : {}),
@@ -127,6 +172,7 @@ router.patch("/resources/:id", requireAuth, async (req, res): Promise<void> => {
       ...(patch.contentType !== undefined
         ? { contentType: patch.contentType }
         : {}),
+      ...(patch.isVisible !== undefined ? { isVisible: patch.isVisible } : {}),
     })
     .where(eq(resourcesTable.id, params.data.id))
     .returning();

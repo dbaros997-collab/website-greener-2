@@ -12,10 +12,12 @@ export interface CreateResourceInput {
   /** @minLength 1 */
   subject: string;
   /**
-     * past_paper or holiday_work.
+     * Category slug. Required when categoryId is omitted.
      * @minLength 1
      */
-  category: string;
+  category?: string;
+  /** Folder id. Preferred over category slug when both are sent. */
+  categoryId?: number;
   /** O-Level, A-Level, or All. Defaults to All. */
   level?: string;
   term?: string | null;
@@ -25,4 +27,6 @@ export interface CreateResourceInput {
   fileName: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** Defaults to true (shown on the website). */
+  isVisible?: boolean;
 }

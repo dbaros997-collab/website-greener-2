@@ -10,6 +10,7 @@ import {
   useListAdmissionSteps,
   useListSiteText,
   useListResources,
+  useListResourceCategories,
 } from "@workspace/api-client-react";
 
 import schoolLogo from "@assets/optimized/school-logo.webp";
@@ -113,7 +114,10 @@ export default function App() {
   // keep every open tab (including shared links) in sync without a reload.
   const resourcesQuery = useListResources();
   const resources = resourcesQuery.data ?? [];
-  const resLoading = resourcesQuery.isLoading;
+  const categoriesQuery = useListResourceCategories();
+  const resourceFolders = categoriesQuery.data ?? [];
+  const resLoading = resourcesQuery.isLoading || categoriesQuery.isLoading;
+  const [openResourceFolder, setOpenResourceFolder] = useState<number | null>(null);
 
   const lastScrollY = useRef(0);
   const scrollDir = useRef<"down" | "up">("down");
@@ -1428,108 +1432,194 @@ export default function App() {
           </div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Download Centre</h2>
           <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 44 }}>
-            Past examination papers, holiday assignments, and application forms shared by the school — all in one place. Tap any file to download it straight to your device.
+            Browse folders below for past papers, holiday work, application forms, and more. Open a folder to download files. Older materials are kept in the school archive and may be re-published when needed.
           </p>
 
           {resLoading ? (
             <div className="resources-grid">
               {[0, 1, 2].map(i => (
-                <div key={i} style={{ background: WHITE, borderRadius: 18, padding: 22, border: "1px solid rgba(10,64,32,0.07)", height: 150, opacity: 0.6 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: 12, background: GREEN_LIGHT, marginBottom: 16 }} />
-                  <div style={{ width: "70%", height: 12, borderRadius: 6, background: GREEN_LIGHT, marginBottom: 10 }} />
-                  <div style={{ width: "45%", height: 12, borderRadius: 6, background: GREEN_LIGHT }} />
+                <div key={i} style={{ background: WHITE, borderRadius: 18, padding: 22, border: "1px solid rgba(10,64,32,0.07)", height: 88, opacity: 0.6 }}>
+                  <div style={{ width: "55%", height: 14, borderRadius: 6, background: GREEN_LIGHT, marginBottom: 12 }} />
+                  <div style={{ width: "30%", height: 12, borderRadius: 6, background: GREEN_LIGHT }} />
                 </div>
               ))}
             </div>
+          ) : resourceFolders.length === 0 ? (
+            <div style={{
+              textAlign: "center", padding: "48px 24px", borderRadius: 18,
+              background: WHITE, border: `1.5px dashed rgba(26,107,60,0.28)`,
+            }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>Nothing here yet</p>
+              <p style={{ fontSize: 13, color: "#8A958F" }}>Folders will appear here once the school publishes resources.</p>
+            </div>
           ) : (
-            ([
-              { key: "past_paper" as const, label: "Past Papers", icon: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" /><path d="M8 9h2" /></>, blurb: "Revision papers from previous examinations." },
-              { key: "holiday_work" as const, label: "Holiday Work", icon: <><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" /></>, blurb: "Assignments to keep learning over the break." },
-              { key: "application_form" as const, label: "Application Forms", icon: <><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /><path d="m9 14 2 2 4-4" /></>, blurb: "Forms for new student admissions." },
-            ]).map(group => {
-              const items = resources.filter(r => r.category === group.key);
-              return (
-                <div key={group.key} style={{ marginBottom: 40 }}>
-                  {/* group header */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 22, flexWrap: "wrap" }}>
-                    <span style={{
-                      flexShrink: 0, width: 52, height: 52, borderRadius: 14,
-                      background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
-                      display: "flex", alignItems: "center", justifyContent: "center", color: WHITE,
-                      boxShadow: "0 8px 22px rgba(10,64,32,0.22)",
-                    }}><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.35rem", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 2 }}>{group.label}</h3>
-                      <p style={{ fontSize: 13, color: "#7A8A80" }}>{group.blurb}</p>
-                    </div>
-                    <span style={{
-                      flexShrink: 0, fontSize: 12, fontWeight: 700, letterSpacing: "0.03em",
-                      padding: "6px 14px", borderRadius: 999,
-                      background: items.length ? GREEN_LIGHT : "rgba(0,0,0,0.04)",
-                      color: items.length ? GREEN_DARK : "#9AA5A0",
-                      whiteSpace: "nowrap",
-                    }}>{items.length ? `${items.length} file${items.length > 1 ? "s" : ""}` : "Coming soon"}</span>
-                  </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {resourceFolders.map(folder => {
+                const items = resources.filter(
+                  r =>
+                    r.categoryId === folder.id ||
+                    (!r.categoryId && r.category === folder.slug),
+                );
+                const isOpen = openResourceFolder === folder.id;
+                return (
+                  <div
+                    key={folder.id}
+                    style={{
+                      background: WHITE,
+                      borderRadius: 16,
+                      border: `1px solid ${isOpen ? "rgba(26,107,60,0.35)" : "rgba(10,64,32,0.08)"}`,
+                      boxShadow: isOpen
+                        ? "0 12px 32px rgba(10,64,32,0.10)"
+                        : "0 4px 16px rgba(10,64,32,0.04)",
+                      overflow: "hidden",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenResourceFolder(isOpen ? null : folder.id)
+                      }
+                      aria-expanded={isOpen}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 16,
+                        padding: "18px 20px",
+                        background: isOpen ? GREEN_LIGHT : WHITE,
+                        border: "none",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        font: "inherit",
+                        transition: "background 0.2s",
+                      }}
+                    >
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          width: 48,
+                          height: 48,
+                          borderRadius: 12,
+                          background: `linear-gradient(135deg, ${GOLD}, ${GOLD_LIGHT})`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: GREEN_DARK,
+                          boxShadow: "0 6px 16px rgba(201,162,75,0.28)",
+                        }}
+                        aria-hidden
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                        </svg>
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h3 style={{
+                          fontFamily: "'Playfair Display', serif",
+                          fontSize: "1.2rem",
+                          color: GREEN_DARK,
+                          lineHeight: 1.25,
+                          marginBottom: 2,
+                        }}>
+                          {folder.name}
+                        </h3>
+                        <p style={{ fontSize: 13, color: "#7A8A80" }}>
+                          {items.length
+                            ? `${items.length} file${items.length === 1 ? "" : "s"} — click to ${isOpen ? "close" : "open"}`
+                            : "Empty folder"}
+                        </p>
+                      </div>
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          background: isOpen ? GREEN_MAIN : "rgba(10,64,32,0.06)",
+                          color: isOpen ? WHITE : GREEN_DARK,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "transform 0.25s, background 0.2s",
+                          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        }}
+                        aria-hidden
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </span>
+                    </button>
 
-                  {items.length === 0 ? (
-                    <div style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                      textAlign: "center", padding: "40px 24px", borderRadius: 18,
-                      background: WHITE, border: `1.5px dashed rgba(26,107,60,0.28)`,
-                    }}>
-                      <span style={{
-                        width: 56, height: 56, borderRadius: "50%", background: GREEN_LIGHT,
-                        display: "flex", alignItems: "center", justifyContent: "center", color: GREEN_MAIN, marginBottom: 14,
-                      }}><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: GREEN_DARK, marginBottom: 4 }}>Nothing here yet</p>
-                      <p style={{ fontSize: 13, color: "#8A958F", maxWidth: 320 }}>No {group.label.toLowerCase()} have been uploaded yet — please check back soon.</p>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateRows: isOpen ? "1fr" : "0fr",
+                        transition: "grid-template-rows 0.28s ease",
+                      }}
+                    >
+                      <div style={{ overflow: "hidden" }}>
+                        <div style={{ padding: isOpen ? "4px 16px 20px" : "0 16px" }}>
+                          {items.length === 0 ? (
+                            <p style={{ fontSize: 13, color: "#8A958F", padding: "8px 4px 4px" }}>
+                              No files in this folder yet — please check back soon.
+                            </p>
+                          ) : (
+                            <div className="resources-grid" style={{ paddingTop: 12 }}>
+                              {items.map(r => (
+                                <a
+                                  key={r.id}
+                                  href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    display: "flex", flexDirection: "column", background: OFF_WHITE, borderRadius: 14, padding: 18,
+                                    border: "1px solid rgba(10,64,32,0.08)", textDecoration: "none",
+                                    boxShadow: "0 2px 10px rgba(10,64,32,0.04)",
+                                    transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
+                                  }}
+                                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 28px rgba(10,64,32,0.12)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
+                                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 10px rgba(10,64,32,0.04)"; e.currentTarget.style.borderColor = "rgba(10,64,32,0.08)"; }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
+                                    <span style={{
+                                      width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                                      background: GREEN_LIGHT, color: GREEN_DARK,
+                                      display: "flex", alignItems: "center", justifyContent: "center",
+                                    }}>
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <path d="M14 2v6h6" />
+                                      </svg>
+                                    </span>
+                                    <span style={{
+                                      fontSize: 11, fontWeight: 700, letterSpacing: "0.03em",
+                                      padding: "4px 11px", borderRadius: 999,
+                                      background: "rgba(201,162,75,0.16)", color: "#8A6A1E", whiteSpace: "nowrap",
+                                    }}>{r.level}</span>
+                                  </div>
+                                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{r.subject}</span>
+                                  <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", color: GREEN_DARK, lineHeight: 1.3, marginBottom: 14 }}>{r.title}</h4>
+                                  <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid rgba(10,64,32,0.07)" }}>
+                                    <span style={{
+                                      display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 700, color: WHITE,
+                                      background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
+                                      padding: "7px 14px", borderRadius: 999,
+                                    }}>⬇ Download</span>
+                                    <span style={{ fontSize: 11, color: "#A0AAA4", textAlign: "right" }}>{[r.term, formatSize(r.fileSize)].filter(Boolean).join(" · ")}</span>
+                                  </div>
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="resources-grid">
-                      {items.map(r => (
-                        <a
-                          key={r.id}
-                          href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: "flex", flexDirection: "column", background: WHITE, borderRadius: 18, padding: 22,
-                            border: "1px solid rgba(10,64,32,0.08)", textDecoration: "none",
-                            boxShadow: "0 4px 18px rgba(10,64,32,0.05)",
-                            transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
-                          }}
-                          onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 16px 44px rgba(10,64,32,0.16)"; e.currentTarget.style.borderColor = GREEN_MAIN; }}
-                          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 18px rgba(10,64,32,0.05)"; e.currentTarget.style.borderColor = "rgba(10,64,32,0.08)"; }}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
-                            <span style={{
-                              width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                              background: GREEN_LIGHT, color: GREEN_DARK,
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                            }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{group.icon}</svg></span>
-                            <span style={{
-                              fontSize: 11, fontWeight: 700, letterSpacing: "0.03em",
-                              padding: "4px 11px", borderRadius: 999,
-                              background: "rgba(201,162,75,0.16)", color: "#8A6A1E", whiteSpace: "nowrap",
-                            }}>{r.level}</span>
-                          </div>
-                          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{r.subject}</span>
-                          <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.12rem", color: GREEN_DARK, lineHeight: 1.3, marginBottom: 18 }}>{r.title}</h4>
-                          <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, paddingTop: 14, borderTop: "1px solid rgba(10,64,32,0.07)" }}>
-                            <span style={{
-                              display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 700, color: WHITE,
-                              background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`,
-                              padding: "8px 16px", borderRadius: 999,
-                            }}>⬇ Download</span>
-                            <span style={{ fontSize: 11, color: "#A0AAA4", textAlign: "right" }}>{[r.term, formatSize(r.fileSize)].filter(Boolean).join(" · ")}</span>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </section>

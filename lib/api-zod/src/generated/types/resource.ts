@@ -10,8 +10,10 @@ export interface Resource {
   id: number;
   title: string;
   subject: string;
-  /** past_paper or holiday_work. */
+  /** Category slug (denormalized from the folder). */
   category: string;
+  /** Folder id this file belongs to. */
+  categoryId?: number | null;
   /** O-Level, A-Level, or All. */
   level: string;
   term?: string | null;
@@ -19,5 +21,7 @@ export interface Resource {
   fileName: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** When false, archived — kept for staff but hidden from the public site. */
+  isVisible: boolean;
   createdAt: Date;
 }

@@ -5,6 +5,7 @@ import {
   getListGalleryImagesQueryKey,
   getListNewsItemsQueryKey,
   getListProgrammesQueryKey,
+  getListResourceCategoriesQueryKey,
   getListResourcesQueryKey,
   getListSchoolValuesQueryKey,
   getListSiteTextQueryKey,
@@ -26,7 +27,8 @@ const RESOURCE_QUERY_KEYS: Record<string, readonly unknown[]> = {
   values: getListSchoolValuesQueryKey(adminParams),
   "admission-steps": getListAdmissionStepsQueryKey(adminParams),
   "site-text": getListSiteTextQueryKey(),
-  resources: getListResourcesQueryKey(),
+  "resource-categories": getListResourceCategoriesQueryKey(),
+  resources: getListResourcesQueryKey(adminParams),
   submissions: getListSubmissionsQueryKey(),
 };
 

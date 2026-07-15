@@ -14,6 +14,8 @@ tags:
     description: Object storage upload and serving endpoints.
   - name: Resources
     description: Student resources (past papers, holiday work, and application forms).
+  - name: Resource Categories
+    description: Download Centre folders (e.g. Past Papers, Syllabus). Files point at a category via categoryId.
   - name: Submissions
     description: Enquiry / application form submissions captured from the public site.
 paths:
@@ -173,19 +175,155 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /resource-categories:
+    get:
+      tags: [Resource Categories]
+      operationId: listResourceCategories
+      summary: List Download Centre folders
+      description: Returns all resource categories (folders), ordered by sortOrder then name.
+      responses:
+        '200':
+          description: List of categories.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCategoryList'
+    post:
+      tags: [Resource Categories]
+      operationId: createResourceCategory
+      summary: Create a folder
+      description: Create a new Download Centre category. Slug is derived from the name if omitted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceCategoryInput'
+      responses:
+        '201':
+          description: Category created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCategory'
+        '400':
+          description: Missing or invalid fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /resource-categories/{id}:
+    patch:
+      tags: [Resource Categories]
+      operationId: updateResourceCategory
+      summary: Rename or reorder a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Category id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceCategoryInput'
+      responses:
+        '200':
+          description: Category updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCategory'
+        '400':
+          description: Missing or invalid fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Category not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+    delete:
+      tags: [Resource Categories]
+      operationId: deleteResourceCategory
+      summary: Delete a folder
+      description: |
+        Deletes a category only when no files reference it.
+        The application_form folder cannot be deleted.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Category id.
+      responses:
+        '204':
+          description: Category deleted.
+        '400':
+          description: Category still has files, or is protected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Category not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /resources:
     get:
       tags: [Resources]
       operationId: listResources
       summary: List student resources
-      description: Returns all past papers and holiday work, newest first.
+      description: |
+        Returns past papers, holiday work, and application forms, newest first.
+        By default only resources currently shown on the website (isVisible=true).
+        Authenticated admins may pass includeHidden=true to also see archived files.
       parameters:
         - name: category
           in: query
           required: false
           schema:
             type: string
-          description: Optional filter by category (past_paper or holiday_work).
+          description: Optional filter by category slug (e.g. past_paper, holiday_work, application_form).
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional filter by category (folder) id.
+        - name: includeHidden
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Admin-only. When true and authenticated, include archived (hidden) resources.
       responses:
         '200':
           description: List of resources.
@@ -1683,9 +1821,55 @@ components:
           description: Normalized object path (e.g. `/objects/uploads/uuid`). Store this in your database.
         metadata:
           $ref: '#/components/schemas/UploadUrlRequest'
+    ResourceCategory:
+      type: object
+      required: [id, name, slug, sortOrder, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          description: Display name shown as the folder label (e.g. Past Papers).
+        slug:
+          type: string
+          description: Stable key (e.g. past_paper). Used for filtering and Applications tab.
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    ResourceCategoryList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceCategory'
+    CreateResourceCategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+          description: Optional. Derived from name when omitted (lowercase, underscores).
+        sortOrder:
+          type: integer
+    UpdateResourceCategoryInput:
+      type: object
+      description: Partial update. Renaming updates the display name; slug changes also sync files.
+      properties:
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+        sortOrder:
+          type: integer
     Resource:
       type: object
-      required: [id, title, subject, category, level, objectPath, fileName, createdAt]
+      required: [id, title, subject, category, level, objectPath, fileName, isVisible, createdAt]
       properties:
         id:
           type: integer
@@ -1695,7 +1879,11 @@ components:
           type: string
         category:
           type: string
-          description: past_paper or holiday_work.
+          description: Category slug (denormalized from the folder).
+        categoryId:
+          type: integer
+          nullable: true
+          description: Folder id this file belongs to.
         level:
           type: string
           description: 'O-Level, A-Level, or All.'
@@ -1712,6 +1900,9 @@ components:
         contentType:
           type: string
           nullable: true
+        isVisible:
+          type: boolean
+          description: When false, archived — kept for staff but hidden from the public site.
         createdAt:
           type: string
           format: date-time
@@ -1721,7 +1912,7 @@ components:
         $ref: '#/components/schemas/Resource'
     CreateResourceInput:
       type: object
-      required: [title, subject, category, objectPath, fileName]
+      required: [title, subject, objectPath, fileName]
       properties:
         title:
           type: string
@@ -1732,7 +1923,10 @@ components:
         category:
           type: string
           minLength: 1
-          description: past_paper or holiday_work.
+          description: Category slug. Required when categoryId is omitted.
+        categoryId:
+          type: integer
+          description: Folder id. Preferred over category slug when both are sent.
         level:
           type: string
           description: 'O-Level, A-Level, or All. Defaults to All.'
@@ -1751,6 +1945,9 @@ components:
         contentType:
           type: string
           nullable: true
+        isVisible:
+          type: boolean
+          description: Defaults to true (shown on the website).
     UpdateResourceInput:
       type: object
       description: Partial update. Omit objectPath to keep the existing file.
@@ -1764,7 +1961,11 @@ components:
         category:
           type: string
           minLength: 1
-          description: past_paper, holiday_work, or application_form.
+          description: Category slug.
+        categoryId:
+          type: integer
+          nullable: true
+          description: Move the file into another folder.
         level:
           type: string
         term:
@@ -1782,6 +1983,9 @@ components:
         contentType:
           type: string
           nullable: true
+        isVisible:
+          type: boolean
+          description: Set false to archive (hide from public site without deleting).
     ErrorEnvelope:
       type: object
       required: [error]

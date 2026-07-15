@@ -17,19 +17,46 @@ CREATE TABLE IF NOT EXISTS "session" (
 );
 CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
 
+CREATE TABLE IF NOT EXISTS "resource_categories" (
+  "id" serial PRIMARY KEY,
+  "name" text NOT NULL,
+  "slug" text NOT NULL UNIQUE,
+  "sort_order" integer NOT NULL DEFAULT 0,
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS "resources" (
   "id" serial PRIMARY KEY,
   "title" text NOT NULL,
   "subject" text NOT NULL,
   "category" text NOT NULL,
+  "category_id" integer REFERENCES "resource_categories"("id") ON DELETE SET NULL,
   "level" text NOT NULL DEFAULT 'All',
   "term" text,
   "object_path" text NOT NULL,
   "file_name" text NOT NULL,
   "file_size" integer,
   "content_type" text,
+  "is_visible" boolean NOT NULL DEFAULT true,
   "created_at" timestamptz NOT NULL DEFAULT now()
 );
+
+-- Existing DBs created before is_visible / category_id existed.
+ALTER TABLE "resources" ADD COLUMN IF NOT EXISTS "is_visible" boolean NOT NULL DEFAULT true;
+ALTER TABLE "resources" ADD COLUMN IF NOT EXISTS "category_id" integer REFERENCES "resource_categories"("id") ON DELETE SET NULL;
+
+-- Seed the three legacy folders, then backfill category_id from the string slug.
+INSERT INTO "resource_categories" ("name", "slug", "sort_order")
+VALUES
+  ('Past Papers', 'past_paper', 0),
+  ('Holiday Work', 'holiday_work', 1),
+  ('Application Forms', 'application_form', 2)
+ON CONFLICT ("slug") DO NOTHING;
+
+UPDATE "resources" r
+SET "category_id" = c."id"
+FROM "resource_categories" c
+WHERE r."category_id" IS NULL AND r."category" = c."slug";
 
 CREATE TABLE IF NOT EXISTS "news_items" (
   "id" serial PRIMARY KEY,

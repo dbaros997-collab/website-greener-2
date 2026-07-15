@@ -5,6 +5,7 @@ import {
   getListNewsItemsQueryKey,
   getListProgrammesQueryKey,
   getListResourcesQueryKey,
+  getListResourceCategoriesQueryKey,
   getListSchoolValuesQueryKey,
   getListSiteTextQueryKey,
   getListStatsQueryKey,
@@ -23,6 +24,7 @@ const RESOURCE_QUERY_KEYS: Record<string, readonly unknown[]> = {
   "admission-steps": getListAdmissionStepsQueryKey(),
   "site-text": getListSiteTextQueryKey(),
   resources: getListResourcesQueryKey(),
+  "resource-categories": getListResourceCategoriesQueryKey(),
 };
 
 export function invalidateContentQueries(

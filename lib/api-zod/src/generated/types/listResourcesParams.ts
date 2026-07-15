@@ -8,7 +8,15 @@
 
 export type ListResourcesParams = {
 /**
- * Optional filter by category (past_paper or holiday_work).
+ * Optional filter by category slug (e.g. past_paper, holiday_work, application_form).
  */
 category?: string;
+/**
+ * Optional filter by category (folder) id.
+ */
+categoryId?: number;
+/**
+ * Admin-only. When true and authenticated, include archived (hidden) resources.
+ */
+includeHidden?: boolean;
 };

@@ -15,10 +15,12 @@ export interface UpdateResourceInput {
   /** @minLength 1 */
   subject?: string;
   /**
-     * past_paper, holiday_work, or application_form.
+     * Category slug.
      * @minLength 1
      */
   category?: string;
+  /** Move the file into another folder. */
+  categoryId?: number | null;
   level?: string;
   term?: string | null;
   /** @minLength 1 */
@@ -27,4 +29,6 @@ export interface UpdateResourceInput {
   fileName?: string;
   fileSize?: number | null;
   contentType?: string | null;
+  /** Set false to archive (hide from public site without deleting). */
+  isVisible?: boolean;
 }

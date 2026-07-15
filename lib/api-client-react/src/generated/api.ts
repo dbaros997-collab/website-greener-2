@@ -25,6 +25,7 @@ import type {
   AdmissionStepList,
   AdmissionStepPatch,
   AuthUser,
+  CreateResourceCategoryInput,
   CreateResourceInput,
   CreateSubmissionInput,
   ErrorEnvelope,
@@ -55,6 +56,8 @@ import type {
   ReorderInput,
   ResetPasswordInput,
   Resource,
+  ResourceCategory,
+  ResourceCategoryList,
   ResourceList,
   SchoolValue,
   SchoolValueInput,
@@ -75,6 +78,7 @@ import type {
   TestimonialInput,
   TestimonialList,
   TestimonialPatch,
+  UpdateResourceCategoryInput,
   UpdateResourceInput,
   UpdateSubmissionInput,
   UploadUrlRequest,
@@ -484,6 +488,301 @@ export function useGetStorageObject<TData = Awaited<ReturnType<typeof getStorage
 
 
 
+export const getListResourceCategoriesUrl = () => {
+
+
+
+
+  return `/api/resource-categories`
+}
+
+/**
+ * Returns all resource categories (folders), ordered by sortOrder then name.
+ * @summary List Download Centre folders
+ */
+export const listResourceCategories = async ( options?: RequestInit): Promise<ResourceCategoryList> => {
+
+  return customFetch<ResourceCategoryList>(getListResourceCategoriesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListResourceCategoriesQueryKey = () => {
+    return [
+    `/api/resource-categories`
+    ] as const;
+    }
+
+
+export const getListResourceCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof listResourceCategories>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listResourceCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListResourceCategoriesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listResourceCategories>>> = ({ signal }) => listResourceCategories({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listResourceCategories>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListResourceCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof listResourceCategories>>>
+export type ListResourceCategoriesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List Download Centre folders
+ */
+
+export function useListResourceCategories<TData = Awaited<ReturnType<typeof listResourceCategories>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listResourceCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListResourceCategoriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateResourceCategoryUrl = () => {
+
+
+
+
+  return `/api/resource-categories`
+}
+
+/**
+ * Create a new Download Centre category. Slug is derived from the name if omitted.
+ * @summary Create a folder
+ */
+export const createResourceCategory = async (createResourceCategoryInput: CreateResourceCategoryInput, options?: RequestInit): Promise<ResourceCategory> => {
+
+  return customFetch<ResourceCategory>(getCreateResourceCategoryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createResourceCategoryInput,)
+  }
+);}
+
+
+
+
+export const getCreateResourceCategoryMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createResourceCategory>>, TError,{data: BodyType<CreateResourceCategoryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createResourceCategory>>, TError,{data: BodyType<CreateResourceCategoryInput>}, TContext> => {
+
+const mutationKey = ['createResourceCategory'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createResourceCategory>>, {data: BodyType<CreateResourceCategoryInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createResourceCategory(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateResourceCategoryMutationResult = NonNullable<Awaited<ReturnType<typeof createResourceCategory>>>
+    export type CreateResourceCategoryMutationBody = BodyType<CreateResourceCategoryInput>
+    export type CreateResourceCategoryMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Create a folder
+ */
+export const useCreateResourceCategory = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createResourceCategory>>, TError,{data: BodyType<CreateResourceCategoryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createResourceCategory>>,
+        TError,
+        {data: BodyType<CreateResourceCategoryInput>},
+        TContext
+      > => {
+      return useMutation(getCreateResourceCategoryMutationOptions(options));
+    }
+
+export const getUpdateResourceCategoryUrl = (id: number,) => {
+
+
+
+
+  return `/api/resource-categories/${id}`
+}
+
+/**
+ * @summary Rename or reorder a folder
+ */
+export const updateResourceCategory = async (id: number,
+    updateResourceCategoryInput: UpdateResourceCategoryInput, options?: RequestInit): Promise<ResourceCategory> => {
+
+  return customFetch<ResourceCategory>(getUpdateResourceCategoryUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateResourceCategoryInput,)
+  }
+);}
+
+
+
+
+export const getUpdateResourceCategoryMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateResourceCategory>>, TError,{id: number;data: BodyType<UpdateResourceCategoryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateResourceCategory>>, TError,{id: number;data: BodyType<UpdateResourceCategoryInput>}, TContext> => {
+
+const mutationKey = ['updateResourceCategory'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateResourceCategory>>, {id: number;data: BodyType<UpdateResourceCategoryInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateResourceCategory(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateResourceCategoryMutationResult = NonNullable<Awaited<ReturnType<typeof updateResourceCategory>>>
+    export type UpdateResourceCategoryMutationBody = BodyType<UpdateResourceCategoryInput>
+    export type UpdateResourceCategoryMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Rename or reorder a folder
+ */
+export const useUpdateResourceCategory = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateResourceCategory>>, TError,{id: number;data: BodyType<UpdateResourceCategoryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateResourceCategory>>,
+        TError,
+        {id: number;data: BodyType<UpdateResourceCategoryInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateResourceCategoryMutationOptions(options));
+    }
+
+export const getDeleteResourceCategoryUrl = (id: number,) => {
+
+
+
+
+  return `/api/resource-categories/${id}`
+}
+
+/**
+ * Deletes a category only when no files reference it.
+The application_form folder cannot be deleted.
+
+ * @summary Delete a folder
+ */
+export const deleteResourceCategory = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteResourceCategoryUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteResourceCategoryMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteResourceCategory>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteResourceCategory>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteResourceCategory'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteResourceCategory>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteResourceCategory(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteResourceCategoryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteResourceCategory>>>
+
+    export type DeleteResourceCategoryMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Delete a folder
+ */
+export const useDeleteResourceCategory = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteResourceCategory>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteResourceCategory>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteResourceCategoryMutationOptions(options));
+    }
+
 export const getListResourcesUrl = (params?: ListResourcesParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -500,7 +799,10 @@ export const getListResourcesUrl = (params?: ListResourcesParams,) => {
 }
 
 /**
- * Returns all past papers and holiday work, newest first.
+ * Returns past papers, holiday work, and application forms, newest first.
+By default only resources currently shown on the website (isVisible=true).
+Authenticated admins may pass includeHidden=true to also see archived files.
+
  * @summary List student resources
  */
 export const listResources = async (params?: ListResourcesParams, options?: RequestInit): Promise<ResourceList> => {

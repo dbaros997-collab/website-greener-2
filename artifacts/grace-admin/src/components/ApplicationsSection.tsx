@@ -46,8 +46,8 @@ function BlankFormsCard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const query = useListResources();
-  const queryKey = getListResourcesQueryKey();
+  const query = useListResources({ includeHidden: true });
+  const queryKey = getListResourcesQueryKey({ includeHidden: true });
   const items = (query.data ?? []).filter(
     (r: Resource) => r.category === "application_form",
   );
