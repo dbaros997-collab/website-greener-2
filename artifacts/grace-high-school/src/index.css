@@ -305,7 +305,16 @@ body.mobile-menu-open {
 .admissions-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .events-grid     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .achievements-outer { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-.values-grid     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.values-layout   { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: stretch; }
+.values-panel    { position: relative; min-height: 420px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.values-panel-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.values-panel-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(26,107,60,0.88), rgba(10,64,32,0.92)); }
+.values-panel-content { position: relative; z-index: 1; text-align: center; padding: 48px 36px; display: flex; flex-direction: column; align-items: center; }
+.values-list-wrap { display: flex; flex-direction: column; justify-content: center; padding: 12px 8px 12px 12px; }
+.values-list     { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.values-list-item { display: flex; align-items: center; gap: 18px; }
+.values-list-icon { flex-shrink: 0; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; color: var(--green-main); }
+.values-list-title { font-family: "Playfair Display", serif; font-size: 1.35rem; font-weight: 700; color: #1A1A1A; line-height: 1.2; }
 .staff-depts     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .contact-grid    { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .footer-grid     { display: grid; grid-template-columns: 1.6fr 1fr 1.1fr 1.1fr 1.2fr; gap: 36px; margin-bottom: 40px; }
@@ -342,7 +351,8 @@ body.mobile-menu-open {
   .admissions-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
   .contact-grid    { grid-template-columns: 1fr !important; gap: 36px !important; }
   .footer-grid     { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
-  .values-grid     { grid-template-columns: repeat(2, 1fr) !important; }
+  .values-layout   { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .values-panel    { min-height: 340px !important; }
   .staff-depts     { grid-template-columns: repeat(2, 1fr) !important; }
   .stats-grid      { grid-template-columns: repeat(3, 1fr) !important; }
   .welcome-grid    { grid-template-columns: 1fr !important; gap: 30px !important; }
@@ -360,7 +370,9 @@ body.mobile-menu-open {
   .resources-grid  { grid-template-columns: 1fr !important; }
   .upload-grid     { grid-template-columns: 1fr !important; }
   .events-grid     { grid-template-columns: repeat(2, 1fr) !important; }
-  .values-grid     { grid-template-columns: repeat(2, 1fr) !important; }
+  .values-panel    { min-height: 300px !important; }
+  .values-list-title { font-size: 1.2rem !important; }
+  .values-list     { gap: 18px !important; }
   .staff-depts     { grid-template-columns: repeat(2, 1fr) !important; }
   .stats-grid      { grid-template-columns: repeat(2, 1fr) !important; }
   .footer-grid     { grid-template-columns: 1fr !important; }

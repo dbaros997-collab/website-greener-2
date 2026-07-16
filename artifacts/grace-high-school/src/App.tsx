@@ -1275,7 +1275,7 @@ export default function App() {
         </div>
       </section>
 
-      <CoreValues />
+      <CoreValues onExplore={() => openDetail("/about/vision-mission")} />
 
       {/* ===== PROGRAMMES ===== */}
       <section id="programmes" className="reveal" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
