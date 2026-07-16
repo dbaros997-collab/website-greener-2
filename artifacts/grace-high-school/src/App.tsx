@@ -1210,29 +1210,48 @@ export default function App() {
       </section>
 
       {/* ===== SCHOOL LEADERSHIP ===== */}
-      <section id="leadership" className="reveal" style={{ background: OFF_WHITE, padding: "64px 5%" }}>
+      <section id="leadership" className="reveal" style={{ background: WHITE, padding: "64px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
-              Our Leadership
-              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
-            </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>Meet Our School Administrators</h2>
-            <p style={{ fontSize: 16, color: "#4A6655", lineHeight: 1.7 }}>The dedicated team guiding Grace High School day to day.</p>
+          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 44px" }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_MAIN, lineHeight: 1.2, marginBottom: 12 }}>
+              Meet Our Administrators
+            </h2>
+            <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, margin: 0 }}>
+              Our resourceful leadership
+            </p>
           </div>
           <div className="leaders-grid">
             {LEADERSHIP.map((p, i) => (
               <div key={i} className="leader-card">
-                <img className="leader-photo" src={p.img} alt={p.name} loading="lazy" decoding="async" width={700} height={875} />
-                <div className="leader-scrim" />
-                <div className="leader-info">
-                  <h3>{p.name}</h3>
-                  <span className="leader-rule" />
-                  <p className="leader-role">{p.title}</p>
+                <div className="leader-photo-ring">
+                  <img className="leader-photo" src={p.img} alt={p.name} loading="lazy" decoding="async" width={240} height={240} />
                 </div>
+                <h3 className="leader-name">{p.name}</h3>
+                <p className="leader-role">{p.title}</p>
               </div>
             ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <button
+              type="button"
+              onClick={() => scrollTo("staff")}
+              style={{
+                background: GREEN_MAIN,
+                color: WHITE,
+                border: "none",
+                borderRadius: 4,
+                padding: "12px 28px",
+                fontSize: 14,
+                fontWeight: 700,
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: "pointer",
+                transition: "background 0.2s, transform 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = GREEN_DARK; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = GREEN_MAIN; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              View our team
+            </button>
           </div>
         </div>
       </section>
