@@ -16,7 +16,7 @@ const outDir = path.join(srcDir, "optimized");
 const require = createRequire(path.join(root, "tmp-sharp", "package.json"));
 const sharp = require("sharp");
 
-/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean }[]} */
+/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean, coolSkin?: boolean }[]} */
 const jobs = [
   { in: "school_logo_transparent.png", out: "school-logo.webp", width: 256, quality: 90 },
   { in: "SSEKAMATTE_SIMON_1780946570401.png", out: "head-teacher.webp", width: 900, quality: 78 },
@@ -27,7 +27,15 @@ const jobs = [
   { in: "IMG_0062_1781375708800.jpg", out: "library.webp", width: 1400, quality: 72 },
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
   // Square face crops for circular admin portraits (retina-friendly).
-  { in: "MUGERWA_DENIS_final.png", out: "dean-students.webp", width: 640, height: 640, quality: 92, square: true },
+  {
+    in: "MUGERWA_DENIS_charcoal.png",
+    out: "dean-students.webp",
+    width: 640,
+    height: 640,
+    quality: 92,
+    square: true,
+    coolSkin: true,
+  },
   { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 640, height: 640, quality: 92, square: true },
   { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 640, height: 640, quality: 92, square: true },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
@@ -50,13 +58,19 @@ for (const job of jobs) {
   const inSize = fs.statSync(input).size;
   before += inSize;
   let pipeline = sharp(input).rotate();
+  // Soften an orange/red skin cast without turning whites cyan.
+  if (job.coolSkin) {
+    pipeline = pipeline
+      .modulate({ saturation: 0.86, brightness: 1.04 })
+      .linear([0.9, 1.0, 1.07], [6, 3, 0]);
+  }
   if (job.square) {
     pipeline = pipeline
       .resize(job.width, job.height ?? job.width, {
         fit: "cover",
         position: "attention",
       })
-      .sharpen({ sigma: 0.6 });
+      .sharpen({ sigma: 0.5 });
   } else {
     pipeline = pipeline.resize({ width: job.width, withoutEnlargement: true });
   }
