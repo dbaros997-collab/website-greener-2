@@ -40,6 +40,12 @@ const jobs = [
   { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 640, height: 640, quality: 92, square: true },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
   { in: "featured_video_thumb_1780677204039.png", out: "featured-video.webp", width: 800, quality: 75 },
+  // School Gallery — Life at Grace High School
+  { in: "gallery_hike.png", out: "gallery-hike.webp", width: 1400, quality: 85 },
+  { in: "gallery_roast.png", out: "gallery-roast.webp", width: 1400, quality: 85 },
+  { in: "gallery_library.png", out: "gallery-library.webp", width: 1400, quality: 85 },
+  { in: "gallery_girls.png", out: "gallery-girls.webp", width: 1400, quality: 85 },
+  { in: "gallery_ribbon.png", out: "gallery-ribbon.webp", width: 1400, quality: 85 },
 ];
 
 fs.mkdirSync(outDir, { recursive: true });

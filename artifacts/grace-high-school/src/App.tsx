@@ -28,6 +28,11 @@ import img_careers_mistress from "@assets/optimized/careers-mistress.webp";
 import img_viola from "@assets/optimized/viola.webp";
 import img_crafts from "@assets/optimized/crafts.webp";
 import img_featured_video from "@assets/optimized/featured-video.webp";
+import img_gallery_hike from "@assets/optimized/gallery-hike.webp";
+import img_gallery_roast from "@assets/optimized/gallery-roast.webp";
+import img_gallery_library from "@assets/optimized/gallery-library.webp";
+import img_gallery_girls from "@assets/optimized/gallery-girls.webp";
+import img_gallery_ribbon from "@assets/optimized/gallery-ribbon.webp";
 
 const downloadApplicationForm = async (level: "S1" | "S5") => {
   const { generateApplicationForm } = await import("./applicationForm");
@@ -53,13 +58,11 @@ const HERO_SLIDES = [
 ];
 
 const GALLERY_SLIDES = [
-  img_campus_hero,
-  img_students_group,
-  img_library,
-  img_hotsprings,
-  img_alevel,
-  img_dance,
-  img_crafts,
+  img_gallery_hike,
+  img_gallery_roast,
+  img_gallery_library,
+  img_gallery_girls,
+  img_gallery_ribbon,
 ];
 
 // Slides whose subject would be cropped by "cover" — show the full photo instead.
