@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 type ImageSliderProps = {
   images: string[];
@@ -17,21 +16,6 @@ type ImageSliderProps = {
   children?: ReactNode;
 };
 
-const slideVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? "100%" : "-100%",
-    opacity: 0.6,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction: number) => ({
-    x: direction > 0 ? "-100%" : "100%",
-    opacity: 0.6,
-  }),
-};
-
 export default function ImageSlider({
   images,
   intervalMs = 5000,
@@ -42,41 +26,66 @@ export default function ImageSlider({
   altPrefix = "Slide",
   children,
 }: ImageSliderProps) {
-  const [[index, direction], setSlide] = useState([0, 0]);
+  const [index, setIndex] = useState(0);
   const [resumeKey, setResumeKey] = useState(0);
+  const [animating, setAnimating] = useState(true);
+  const trackRef = useRef<HTMLDivElement>(null);
   const count = images.length;
 
   const goTo = useCallback(
-    (next: number, dir: number) => {
+    (next: number, withAnim = true) => {
       if (count === 0) return;
       const wrapped = ((next % count) + count) % count;
-      setSlide([wrapped, dir]);
+      // Instantly jump when wrapping so we don't slide across every image.
+      const wrapping =
+        (index === count - 1 && wrapped === 0) ||
+        (index === 0 && wrapped === count - 1);
+      setAnimating(withAnim && !wrapping);
+      setIndex(wrapped);
       setResumeKey((k) => k + 1);
       onIndexChange?.(wrapped);
+      if (wrapping && withAnim) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setAnimating(true));
+        });
+      }
     },
-    [count, onIndexChange],
+    [count, index, onIndexChange],
   );
 
-  const next = useCallback(() => goTo(index + 1, 1), [goTo, index]);
-  const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
+  const next = useCallback(() => goTo(index + 1), [goTo, index]);
+  const prev = useCallback(() => goTo(index - 1), [goTo, index]);
+
+  // Preload all slides so transitions never wait on decode.
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  }, [images]);
 
   useEffect(() => {
     if (count <= 1) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
-      setSlide(([i]) => {
+      setIndex((i) => {
         const wrapped = (i + 1) % count;
+        const wrapping = i === count - 1 && wrapped === 0;
+        setAnimating(!wrapping);
         onIndexChange?.(wrapped);
-        return [wrapped, 1];
+        if (wrapping) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setAnimating(true));
+          });
+        }
+        return wrapped;
       });
     }, intervalMs);
     return () => clearInterval(id);
   }, [count, intervalMs, onIndexChange, resumeKey]);
 
   if (count === 0) return null;
-
-  const src = images[index];
-  const fit = objectFitFor?.has(src) ? "contain" : "cover";
 
   return (
     <div
@@ -85,25 +94,31 @@ export default function ImageSlider({
       aria-roledescription="carousel"
       aria-label="Image slideshow"
     >
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
-        <motion.div
-          key={index}
-          className="image-slider__slide"
-          custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            backgroundImage: `url("${src}")`,
-            backgroundSize: fit,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-          aria-label={`${altPrefix} ${index + 1} of ${count}`}
-        />
-      </AnimatePresence>
+      <div className="image-slider__viewport">
+        <div
+          ref={trackRef}
+          className={`image-slider__track${animating ? " is-animating" : ""}`}
+          style={{ transform: `translate3d(-${index * 100}%, 0, 0)` }}
+        >
+          {images.map((src, i) => {
+            const fit = objectFitFor?.has(src) ? "contain" : "cover";
+            return (
+              <div
+                key={src}
+                className="image-slider__slide"
+                style={{
+                  backgroundImage: `url("${src}")`,
+                  backgroundSize: fit,
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }}
+                aria-hidden={i !== index}
+                aria-label={`${altPrefix} ${i + 1} of ${count}`}
+              />
+            );
+          })}
+        </div>
+      </div>
 
       {children && (
         <div className="image-slider__overlay">{children}</div>
@@ -137,7 +152,7 @@ export default function ImageSlider({
                 aria-selected={i === index}
                 aria-label={`Go to slide ${i + 1}`}
                 className={`image-slider__dot${i === index ? " is-active" : ""}`}
-                onClick={() => goTo(i, i > index ? 1 : -1)}
+                onClick={() => goTo(i)}
               />
             ))}
           </div>

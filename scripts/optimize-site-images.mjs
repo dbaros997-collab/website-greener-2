@@ -16,7 +16,7 @@ const outDir = path.join(srcDir, "optimized");
 const require = createRequire(path.join(root, "tmp-sharp", "package.json"));
 const sharp = require("sharp");
 
-/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean, coolSkin?: boolean }[]} */
+/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean, coolSkin?: boolean, faceCrop?: boolean }[]} */
 const jobs = [
   { in: "school_logo_transparent.png", out: "school-logo.webp", width: 256, quality: 90 },
   { in: "SSEKAMATTE_SIMON_1780946570401.png", out: "head-teacher.webp", width: 900, quality: 78 },
@@ -27,17 +27,19 @@ const jobs = [
   { in: "IMG_0062_1781375708800.jpg", out: "library.webp", width: 1400, quality: 72 },
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
   // Square face crops for circular admin portraits (retina-friendly).
+  // Crop from the upper body of the portrait so the full head stays in frame.
   {
     in: "MUGERWA_DENIS_navy.png",
     out: "dean-students.webp",
-    width: 640,
-    height: 640,
+    width: 720,
+    height: 720,
     quality: 92,
     square: true,
     coolSkin: true,
+    faceCrop: true,
   },
-  { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 640, height: 640, quality: 92, square: true },
-  { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 640, height: 640, quality: 92, square: true },
+  { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 720, height: 720, quality: 92, square: true, faceCrop: true },
+  { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 720, height: 720, quality: 92, square: true, faceCrop: true },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
   { in: "featured_video_thumb_1780677204039.png", out: "featured-video.webp", width: 800, quality: 75 },
   // School Gallery — Life at Grace High School
@@ -71,10 +73,20 @@ for (const job of jobs) {
       .linear([0.9, 1.0, 1.07], [6, 3, 0]);
   }
   if (job.square) {
+    if (job.faceCrop) {
+      // Pad headroom so circular frames don't clip the top of the head.
+      pipeline = pipeline.extend({
+        top: 120,
+        bottom: 40,
+        left: 70,
+        right: 70,
+        background: { r: 10, g: 64, b: 32, alpha: 1 },
+      });
+    }
     pipeline = pipeline
       .resize(job.width, job.height ?? job.width, {
         fit: "cover",
-        position: "attention",
+        position: job.faceCrop ? "top" : "attention",
       })
       .sharpen({ sigma: 0.5 });
   } else {
