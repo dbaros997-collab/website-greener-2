@@ -13,6 +13,7 @@ import {
   useListResourceCategories,
 } from "@workspace/api-client-react";
 import CoreValues from "./components/CoreValues";
+import ImageSlider from "./components/ImageSlider";
 
 import schoolLogo from "@assets/optimized/school-logo.webp";
 import img_about_group from "@assets/optimized/head-teacher.webp";
@@ -117,9 +118,6 @@ export default function App() {
   const [submitSent, setSubmitSent]   = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [heroSlide, setHeroSlide]     = useState(0);
-  // Only fetch hero photos that are (or soon will be) visible — avoids 6× image cost on first paint.
-  const [heroLoaded, setHeroLoaded]   = useState(() => new Set<number>([0]));
-
   // Same React Query path as news/programmes — SSE invalidation + short poll
   // keep every open tab (including shared links) in sync without a reload.
   const resourcesQuery = useListResources();
@@ -141,24 +139,6 @@ export default function App() {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => {
-      setHeroSlide(i => {
-        const next = (i + 1) % HERO_SLIDES.length;
-        setHeroLoaded(prev => {
-          if (prev.has(next) && prev.has(i)) return prev;
-          const copy = new Set(prev);
-          copy.add(i);
-          copy.add(next);
-          return copy;
-        });
-        return next;
-      });
-    }, 5000);
-    return () => clearInterval(id);
   }, []);
 
   // Scroll-reveal: fade/slide sections into view every time they enter the
@@ -1221,35 +1201,28 @@ export default function App() {
         display: "flex", alignItems: "center", justifyContent: "center",
         position: "relative", overflow: "hidden", padding: "120px 5% 64px",
       }}>
-        {/* Background slideshow — only mount slides that have been (or are about to be) shown */}
-        {HERO_SLIDES.map((src, i) => (
-          heroLoaded.has(i) ? (
-          <div key={i} style={{
+        <ImageSlider
+          images={HERO_SLIDES}
+          intervalMs={5000}
+          objectFitFor={HERO_CONTAIN}
+          onIndexChange={setHeroSlide}
+          altPrefix="Campus photo"
+        >
+          {/* Cinematic scrim — neutral charcoal so the photo colours stay true */}
+          <div style={{
             position: "absolute", inset: 0,
-            backgroundImage: `url("${src}")`,
-            backgroundSize: HERO_CONTAIN.has(src) ? "contain" : "cover",
-            backgroundPosition: "center", backgroundRepeat: "no-repeat",
-            filter: "saturate(1.08) contrast(1.04) brightness(1.03)",
-            transform: i === heroSlide ? "scale(1.08)" : "scale(1.0)",
-            opacity: i === heroSlide ? 1 : 0,
-            transition: "opacity 1.4s ease-in-out, transform 6s ease-out",
+            background: `linear-gradient(180deg, rgba(10,18,14,0.62) 0%, rgba(10,18,14,0.30) 45%, rgba(8,16,12,0.72) 100%)`,
           }} />
-          ) : null
-        ))}
-        {/* Cinematic scrim — neutral charcoal so the photo colours stay true */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(180deg, rgba(10,18,14,0.62) 0%, rgba(10,18,14,0.30) 45%, rgba(8,16,12,0.72) 100%)`,
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `radial-gradient(ellipse 70% 60% at 50% 44%, rgba(201,162,75,0.14) 0%, transparent 60%),
-                        radial-gradient(ellipse 120% 90% at 50% 50%, transparent 38%, rgba(8,16,12,0.5) 100%)`,
-        }} />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: `radial-gradient(ellipse 70% 60% at 50% 44%, rgba(201,162,75,0.14) 0%, transparent 60%),
+                          radial-gradient(ellipse 120% 90% at 50% 50%, transparent 38%, rgba(8,16,12,0.5) 100%)`,
+          }} />
+        </ImageSlider>
 
         <div className="hero-center" style={{
           maxWidth: 880, margin: "0 auto", textAlign: "center",
-          position: "relative", zIndex: 1,
+          position: "relative", zIndex: 2,
           display: "flex", flexDirection: "column", alignItems: "center",
         }}>
           {/* Eyebrow — "Be Part of Our Story" */}

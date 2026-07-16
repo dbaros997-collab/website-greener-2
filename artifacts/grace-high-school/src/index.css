@@ -437,6 +437,101 @@ body.mobile-menu-open {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
+
+/* ========== IMAGE SLIDER ========== */
+.image-slider {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0A4020;
+}
+.image-slider__slide {
+  position: absolute;
+  inset: 0;
+  filter: saturate(1.08) contrast(1.04) brightness(1.03);
+  will-change: transform, opacity;
+}
+.image-slider__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.image-slider__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(10, 64, 32, 0.35);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.image-slider__arrow:hover {
+  background: rgba(10, 64, 32, 0.65);
+  border-color: #E6C66E;
+}
+.image-slider__arrow:active {
+  transform: translateY(-50%) scale(0.96);
+}
+.image-slider__arrow--prev { left: clamp(10px, 2.5vw, 28px); }
+.image-slider__arrow--next { right: clamp(10px, 2.5vw, 28px); }
+.image-slider__dots {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(14px, 3vw, 28px);
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.image-slider__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.2s, transform 0.2s, width 0.2s;
+}
+.image-slider__dot.is-active {
+  background: #E6C66E;
+  width: 22px;
+  border-radius: 999px;
+}
+.image-slider__dot:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 768px) {
+  .image-slider__arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  .image-slider__dots {
+    bottom: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image-slider__slide {
+    transition: none !important;
+  }
+}
+
 /* Sticky header drop-in (mirrors jonahs.ac.ug sticky behaviour) */
 .nav-drop { animation: navDrop 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes navDrop {
