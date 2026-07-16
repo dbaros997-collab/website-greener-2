@@ -28,7 +28,7 @@ const jobs = [
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
   // Square face crops for circular admin portraits (retina-friendly).
   {
-    in: "MUGERWA_DENIS_charcoal.png",
+    in: "MUGERWA_DENIS_navy.png",
     out: "dean-students.webp",
     width: 640,
     height: 640,
