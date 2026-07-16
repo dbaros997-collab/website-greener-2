@@ -27,19 +27,34 @@ const jobs = [
   { in: "IMG_0062_1781375708800.jpg", out: "library.webp", width: 1400, quality: 72 },
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
   // Square face crops for circular admin portraits (retina-friendly).
-  // Crop from the upper body of the portrait so the full head stays in frame.
+  // Use highest-res sources; crop from top so the full head stays clear.
   {
     in: "MUGERWA_DENIS_navy.png",
     out: "dean-students.webp",
-    width: 720,
-    height: 720,
-    quality: 92,
+    width: 960,
+    height: 960,
+    quality: 96,
     square: true,
-    coolSkin: true,
     faceCrop: true,
   },
-  { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 720, height: 720, quality: 92, square: true, faceCrop: true },
-  { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 720, height: 720, quality: 92, square: true, faceCrop: true },
+  {
+    in: "Nakabiito_Linda_studio_v3.png",
+    out: "careers-mistress.webp",
+    width: 960,
+    height: 960,
+    quality: 96,
+    square: true,
+    faceCrop: true,
+  },
+  {
+    in: "Namuyomba_Viola_studio.png",
+    out: "viola.webp",
+    width: 960,
+    height: 960,
+    quality: 96,
+    square: true,
+    faceCrop: true,
+  },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
   { in: "featured_video_thumb_1780677204039.png", out: "featured-video.webp", width: 800, quality: 75 },
   // School Gallery — Life at Grace High School
@@ -74,25 +89,41 @@ for (const job of jobs) {
   }
   if (job.square) {
     if (job.faceCrop) {
-      // Pad headroom so circular frames don't clip the top of the head.
-      pipeline = pipeline.extend({
-        top: 120,
-        bottom: 40,
-        left: 70,
-        right: 70,
-        background: { r: 10, g: 64, b: 32, alpha: 1 },
-      });
+      const meta = await sharp(input).metadata();
+      const padTop = Math.round((meta.width ?? job.width) * 0.04);
+      pipeline = pipeline
+        .extend({
+          top: padTop,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: { r: 10, g: 64, b: 32, alpha: 1 },
+        })
+        .resize(job.width, job.height ?? job.width, {
+          fit: "cover",
+          position: "top",
+          kernel: sharp.kernel.lanczos3,
+        })
+        .sharpen({ sigma: 1.0, m1: 0.85, m2: 0.4 });
+    } else {
+      pipeline = pipeline
+        .resize(job.width, job.height ?? job.width, {
+          fit: "cover",
+          position: "attention",
+        })
+        .sharpen({ sigma: 0.5 });
     }
-    pipeline = pipeline
-      .resize(job.width, job.height ?? job.width, {
-        fit: "cover",
-        position: job.faceCrop ? "top" : "attention",
-      })
-      .sharpen({ sigma: 0.5 });
   } else {
     pipeline = pipeline.resize({ width: job.width, withoutEnlargement: true });
   }
-  await pipeline.webp({ quality: job.quality ?? 75, effort: 5 }).toFile(output);
+  await pipeline
+    .webp({
+      quality: job.quality ?? 75,
+      effort: 6,
+      smartSubsample: true,
+      alphaQuality: 100,
+    })
+    .toFile(output);
   const outSize = fs.statSync(output).size;
   after += outSize;
   console.log(

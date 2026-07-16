@@ -393,11 +393,11 @@ body.mobile-menu-open {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 16%;
   background: #0A4020;
+  /* Keep faces crisp on retina — avoid GPU layer tricks that soften photos */
   image-rendering: auto;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
 }
 .leader-name {
   margin: 0 0 6px;
