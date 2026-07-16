@@ -52,6 +52,16 @@ const HERO_SLIDES = [
   img_dance,
 ];
 
+const GALLERY_SLIDES = [
+  img_campus_hero,
+  img_students_group,
+  img_library,
+  img_hotsprings,
+  img_alevel,
+  img_dance,
+  img_crafts,
+];
+
 // Slides whose subject would be cropped by "cover" — show the full photo instead.
 const HERO_CONTAIN = new Set<string>([img_dance]);
 
@@ -356,7 +366,7 @@ export default function App() {
             title: "Our Community",
             links: [
               { label: "Core Values", id: "values" },
-              { label: "School in Pictures", id: "videos" },
+              { label: "School in Pictures", id: "gallery" },
               { label: "Student Resources", id: "resources" },
               { label: "School Updates", path: "/updates" },
             ],
@@ -1613,6 +1623,34 @@ export default function App() {
         </div>
       </section>
 
+      {/* ===== SCHOOL GALLERY (mid-page slider, St. Julian–style) ===== */}
+      <section id="gallery" className="reveal" style={{ background: WHITE, padding: "64px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div className="reveal-child" style={{ textAlign: "center", marginBottom: 36 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
+              School Gallery
+              <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>
+              Life at Grace High School
+            </h2>
+            <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, margin: "0 auto" }}>
+              A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore.
+            </p>
+          </div>
+          <div className="reveal-child">
+            <ImageSlider
+              images={GALLERY_SLIDES}
+              layout="section"
+              intervalMs={5000}
+              objectFitFor={HERO_CONTAIN}
+              altPrefix="Gallery photo"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ===== RESOURCES ===== */}
       <section id="resources" className="reveal" style={{ background: OFF_WHITE, padding: "72px 5%", position: "relative", overflow: "hidden" }}>
         {/* soft decorative blobs */}
@@ -2308,6 +2346,15 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      <button
+        type="button"
+        className={`back-to-top${scrolledY ? " is-visible" : ""}`}
+        aria-label="Back to top"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        ˄
+      </button>
     </div>
   );
 }

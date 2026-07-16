@@ -6,6 +6,8 @@ type ImageSliderProps = {
   /** Auto-advance interval in ms. Default 5000. */
   intervalMs?: number;
   className?: string;
+  /** `hero` fills a positioned parent; `section` is a mid-page gallery block. */
+  layout?: "hero" | "section";
   /** Called whenever the active slide index changes. */
   onIndexChange?: (index: number) => void;
   /** Optional per-image object-fit override (e.g. contain for tall photos). */
@@ -34,6 +36,7 @@ export default function ImageSlider({
   images,
   intervalMs = 5000,
   className,
+  layout = "hero",
   onIndexChange,
   objectFitFor,
   altPrefix = "Slide",
@@ -77,7 +80,7 @@ export default function ImageSlider({
 
   return (
     <div
-      className={`image-slider${className ? ` ${className}` : ""}`}
+      className={`image-slider image-slider--${layout}${className ? ` ${className}` : ""}`}
       role="region"
       aria-roledescription="carousel"
       aria-label="Image slideshow"
