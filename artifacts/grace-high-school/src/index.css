@@ -365,6 +365,20 @@ body.mobile-menu-open {
   line-height: 1.35;
 }
 
+.about-mega-menu { animation: megaIn 0.22s ease-out; }
+@keyframes megaIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 1100px) {
+  .about-mega-menu > div > div:first-child {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .about-mega-menu > div > div:first-child > div:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ========== TABLET BREAKPOINT (≤ 900px) ========== */
 @media (max-width: 900px) {
   .about-grid      { grid-template-columns: 1fr !important; gap: 36px !important; }

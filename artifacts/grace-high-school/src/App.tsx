@@ -99,6 +99,15 @@ export default function App() {
   const [menuOpen, setMenuOpen]       = useState(false);
   const [openGroup, setOpenGroup]     = useState<string | null>(null);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
+  const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openNavGroup = (label: string) => {
+    if (megaCloseTimer.current) clearTimeout(megaCloseTimer.current);
+    setOpenGroup(label);
+  };
+  const scheduleCloseNavGroup = () => {
+    if (megaCloseTimer.current) clearTimeout(megaCloseTimer.current);
+    megaCloseTimer.current = setTimeout(() => setOpenGroup(null), 160);
+  };
   const [videoModal, setVideoModal]   = useState<string | null>(null);
   const [formSent, setFormSent]       = useState(false);
   const [formSending, setFormSending] = useState(false);
@@ -279,6 +288,7 @@ export default function App() {
   }, [queryClient]);
 
   const closeMenus = () => {
+    if (megaCloseTimer.current) clearTimeout(megaCloseTimer.current);
     setMenuOpen(false);
     setOpenGroup(null);
     setOpenMobileGroup(null);
@@ -334,25 +344,93 @@ export default function App() {
     navigate("/");
   };
 
-  const NAV_GROUPS: { label: string; id?: string; children?: { label: string; id: string; desc: string }[] }[] = [
+  type NavLink = { label: string; id?: string; path?: string; href?: string; desc?: string };
+  type NavColumn = { title: string; links: NavLink[] };
+  type NavGroup = {
+    label: string;
+    id?: string;
+    children?: NavLink[];
+    mega?: {
+      columns: NavColumn[];
+      feature: { quote: string; ctaLabel: string; ctaId: string; image: string };
+      actions: { label: string; id?: string; href?: string; primary?: boolean }[];
+    };
+  };
+
+  const NAV_GROUPS: NavGroup[] = [
     { label: "Home", id: "__home" },
-    { label: "About", children: [
-      { label: "About Us", id: "about", desc: "Our story, Christian foundation & values" },
-      { label: "Core Values", id: "values", desc: "Godliness, respect, integrity & more" },
-    ] },
+    {
+      label: "About",
+      mega: {
+        columns: [
+          {
+            title: "Our Story & Leadership",
+            links: [
+              { label: "About Us", id: "about" },
+              { label: "Vision & Mission", path: "/about/vision-mission" },
+              { label: "Leadership", id: "leadership" },
+              { label: "Teaching & Non-Teaching Staff", id: "staff" },
+            ],
+          },
+          {
+            title: "Our Community",
+            links: [
+              { label: "Core Values", id: "values" },
+              { label: "School in Pictures", id: "videos" },
+              { label: "Student Resources", id: "resources" },
+              { label: "School Updates", path: "/updates" },
+            ],
+          },
+        ],
+        feature: {
+          quote:
+            "Everything I learned at Grace High School Gayaza prepared me to excel with confidence — in class, in character, and beyond.",
+          ctaLabel: "Apply Now",
+          ctaId: "admissions",
+          image: img_students_group,
+        },
+        actions: [
+          { label: "UNEB Performance", id: "programmes" },
+          { label: "Admissions", id: "admissions", primary: true },
+          { label: "Student Portal", href: "/dashboard/" },
+        ],
+      },
+      // Flat list used by the mobile accordion
+      children: [
+        { label: "About Us", id: "about", desc: "Our story, Christian foundation & values" },
+        { label: "Vision & Mission", path: "/about/vision-mission", desc: "What guides teaching and student life" },
+        { label: "Leadership", id: "leadership", desc: "Meet the team guiding our school" },
+        { label: "Staff", id: "staff", desc: "Teaching and non-teaching team" },
+        { label: "Core Values", id: "values", desc: "Godliness, respect, integrity & more" },
+        { label: "School Updates", path: "/updates", desc: "Notices for parents & guardians" },
+      ],
+    },
     { label: "Academics", children: [
       { label: "Programmes", id: "programmes", desc: "O-Level, A-Level & vocational skills" },
       { label: "Student Resources", id: "resources", desc: "Download past papers & holiday work" },
       { label: "Videos", id: "videos", desc: "Watch everyday life at Grace" },
     ] },
     { label: "School Life", children: [
-      { label: "Updates", id: "updates", desc: "Notices for parents & guardians" },
+      { label: "Updates", path: "/updates", desc: "Notices for parents & guardians" },
     ] },
     { label: "Admissions", id: "admissions" },
     { label: "Contact", id: "contact" },
   ];
 
   const navGo = (id: string) => (id === "__home" ? goHome() : scrollTo(id));
+
+  const navLinkGo = (link: { id?: string; path?: string; href?: string }) => {
+    if (link.href) {
+      closeMenus();
+      window.location.assign(link.href);
+      return;
+    }
+    if (link.path) {
+      openDetail(link.path);
+      return;
+    }
+    if (link.id) navGo(link.id);
+  };
 
   const schoolVideos = [
     { thumb: img_featured_video,cat: "Featured", title: "Grace High School — Featured Video", youtubeId: "c6dBmvv4BLQ" },
@@ -869,12 +947,14 @@ export default function App() {
         {/* Desktop nav */}
         <ul style={{ gap: "1.4rem", listStyle: "none", alignItems: "center" }}
             className="hidden md:flex">
-          {NAV_GROUPS.map(group => (
+          {NAV_GROUPS.map(group => {
+            const hasMenu = !!(group.children || group.mega);
+            return (
             <li key={group.label} style={{ position: "relative" }}
-              onMouseEnter={() => group.children && setOpenGroup(group.label)}
-              onMouseLeave={() => group.children && setOpenGroup(null)}
+              onMouseEnter={() => hasMenu && openNavGroup(group.label)}
+              onMouseLeave={() => hasMenu && scheduleCloseNavGroup()}
             >
-              <button onClick={() => !group.children && group.id && navGo(group.id)} style={{
+              <button onClick={() => !hasMenu && group.id && navGo(group.id)} style={{
                 background: "none", border: "none", cursor: "pointer",
                 color: openGroup === group.label ? GOLD : navText, fontSize: 14, fontWeight: 600,
                 letterSpacing: "0.01em", transition: "color 0.2s",
@@ -885,11 +965,12 @@ export default function App() {
               onMouseLeave={e => (e.currentTarget.style.color = openGroup === group.label ? GOLD : navText)}
               >
                 {group.label}
-                {group.children && (
+                {hasMenu && (
                   <span style={{ fontSize: 9, transition: "transform 0.2s", transform: openGroup === group.label ? "rotate(180deg)" : "none", display: "inline-block" }}>▼</span>
                 )}
               </button>
-              {group.children && openGroup === group.label && (
+              {/* Simple dropdown */}
+              {group.children && !group.mega && openGroup === group.label && (
                 <div style={{
                   position: "absolute", top: "100%", left: 0, paddingTop: 12,
                 }}>
@@ -900,7 +981,7 @@ export default function App() {
                     display: "flex", flexDirection: "column", padding: "8px",
                   }}>
                     {group.children.map(child => (
-                      <button key={child.id} onClick={() => scrollTo(child.id)} style={{
+                      <button key={child.label} onClick={() => navLinkGo(child)} style={{
                         background: "none", border: "none", cursor: "pointer", borderRadius: 8,
                         textAlign: "left", padding: "10px 12px", transition: "background 0.15s",
                         display: "block",
@@ -909,14 +990,15 @@ export default function App() {
                       onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
                       >
                         <span style={{ display: "block", color: GREEN_DARK, fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{child.label}</span>
-                        <span style={{ display: "block", color: "#6A7A70", fontSize: 12, lineHeight: 1.45 }}>{child.desc}</span>
+                        {child.desc && <span style={{ display: "block", color: "#6A7A70", fontSize: 12, lineHeight: 1.45 }}>{child.desc}</span>}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
             </li>
-          ))}
+            );
+          })}
           <li>
             <button onClick={() => scrollTo("admissions")} style={{
               background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2D08",
@@ -930,6 +1012,125 @@ export default function App() {
             >Apply Now</button>
           </li>
         </ul>
+
+        {/* About mega-menu — full-width panel under the nav */}
+        {(() => {
+          const aboutGroup = NAV_GROUPS.find(g => g.label === "About");
+          if (!aboutGroup?.mega || openGroup !== "About") return null;
+          const { columns, feature, actions } = aboutGroup.mega;
+          return (
+            <div
+              className="hidden md:block about-mega-menu"
+              onMouseEnter={() => openNavGroup("About")}
+              onMouseLeave={scheduleCloseNavGroup}
+              style={{
+                position: "absolute", top: "100%", left: "5%", right: "5%",
+                paddingTop: 10, zIndex: 1001,
+              }}
+            >
+              <div style={{
+                background: WHITE, borderRadius: 14,
+                boxShadow: "0 18px 48px rgba(10,64,32,0.18)",
+                border: `1px solid ${GREEN_LIGHT}`,
+                overflow: "hidden",
+              }}>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1.15fr",
+                  gap: 0,
+                  padding: "28px 28px 20px",
+                }}>
+                  {columns.map(col => (
+                    <div key={col.title} style={{ paddingRight: 20 }}>
+                      <h3 style={{
+                        margin: "0 0 14px", fontSize: 13, fontWeight: 700,
+                        letterSpacing: "0.06em", textTransform: "uppercase",
+                        color: GREEN_MAIN,
+                      }}>{col.title}</h3>
+                      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                        {col.links.map(link => (
+                          <li key={link.label}>
+                            <button
+                              onClick={() => navLinkGo(link)}
+                              style={{
+                                background: "none", border: "none", cursor: "pointer",
+                                textAlign: "left", padding: "8px 10px", borderRadius: 8,
+                                color: GREEN_DARK, fontSize: 14.5, fontWeight: 600,
+                                width: "100%", transition: "background 0.15s, color 0.15s",
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = GREEN_LIGHT; e.currentTarget.style.color = GREEN_MAIN; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = GREEN_DARK; }}
+                            >{link.label}</button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                  <div style={{
+                    background: `linear-gradient(145deg, ${GREEN_LIGHT} 0%, #f0faf4 100%)`,
+                    borderRadius: 12, padding: "22px 20px",
+                    display: "flex", gap: 16, alignItems: "center",
+                    border: "1px solid rgba(26,107,60,0.1)",
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontFamily: "'Playfair Display', serif", fontSize: 36,
+                        lineHeight: 1, color: GREEN_MAIN, opacity: 0.35, marginBottom: 6,
+                      }}>&ldquo;</div>
+                      <p style={{
+                        margin: "0 0 16px", color: GREEN_DARK, fontSize: 13.5,
+                        lineHeight: 1.55, fontStyle: "italic",
+                      }}>{feature.quote}</p>
+                      <button
+                        onClick={() => scrollTo(feature.ctaId)}
+                        style={{
+                          background: "none", border: "none", cursor: "pointer",
+                          color: GREEN_MAIN, fontWeight: 700, fontSize: 14,
+                          padding: 0, display: "inline-flex", alignItems: "center", gap: 6,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = GOLD; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = GREEN_MAIN; }}
+                      >{feature.ctaLabel} →</button>
+                    </div>
+                    <img
+                      src={feature.image}
+                      alt=""
+                      style={{
+                        width: 110, height: 130, objectFit: "cover",
+                        borderRadius: 10, flexShrink: 0,
+                        boxShadow: "0 8px 20px rgba(10,64,32,0.15)",
+                      }}
+                    />
+                  </div>
+                </div>
+                <div style={{
+                  display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12,
+                  padding: "0 28px 24px",
+                }}>
+                  {actions.map(action => (
+                    <button
+                      key={action.label}
+                      onClick={() => navLinkGo(action)}
+                      style={{
+                        border: "none", cursor: "pointer",
+                        borderRadius: 999, padding: "14px 18px",
+                        fontSize: 14, fontWeight: 700, letterSpacing: "0.02em",
+                        background: action.primary
+                          ? `linear-gradient(135deg, ${GREEN_MID}, ${GREEN_DARK})`
+                          : GREEN_LIGHT,
+                        color: action.primary ? WHITE : GREEN_DARK,
+                        boxShadow: action.primary ? "0 8px 20px rgba(10,64,32,0.22)" : "none",
+                        transition: "transform 0.15s, box-shadow 0.2s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
+                    >{action.label}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Hamburger */}
         <button
@@ -955,10 +1156,12 @@ export default function App() {
           borderBottom: `2px solid #4CAF82`,
           display: "flex", flexDirection: "column", gap: 4,
         }}>
-          {NAV_GROUPS.map(group => (
+          {NAV_GROUPS.map(group => {
+            const hasMenu = !!(group.children || group.mega);
+            return (
             <div key={group.label}>
               <button
-                onClick={() => group.children ? setOpenMobileGroup(openMobileGroup === group.label ? null : group.label) : (group.id && navGo(group.id))}
+                onClick={() => hasMenu ? setOpenMobileGroup(openMobileGroup === group.label ? null : group.label) : (group.id && navGo(group.id))}
                 style={{
                   width: "100%", background: "none", border: "none", cursor: "pointer",
                   color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500,
@@ -966,25 +1169,42 @@ export default function App() {
                   textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between",
                 }}>
                 {group.label}
-                {group.children && (
+                {hasMenu && (
                   <span style={{ fontSize: 10, transition: "transform 0.2s", transform: openMobileGroup === group.label ? "rotate(180deg)" : "none" }}>▼</span>
                 )}
               </button>
               {group.children && openMobileGroup === group.label && (
                 <div style={{ display: "flex", flexDirection: "column", paddingLeft: 14 }}>
                   {group.children.map(child => (
-                    <button key={child.id} onClick={() => scrollTo(child.id)} style={{
+                    <button key={child.label} onClick={() => navLinkGo(child)} style={{
                       background: "none", border: "none", cursor: "pointer",
                       padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", textAlign: "left",
                     }}>
                       <span style={{ display: "block", color: "#8EEDC0", fontSize: 14.5, fontWeight: 600 }}>{child.label}</span>
-                      <span style={{ display: "block", color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{child.desc}</span>
+                      {child.desc && <span style={{ display: "block", color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{child.desc}</span>}
                     </button>
                   ))}
+                  {group.mega?.actions && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12, marginBottom: 8 }}>
+                      {group.mega.actions.map(action => (
+                        <button
+                          key={action.label}
+                          onClick={() => navLinkGo(action)}
+                          style={{
+                            border: "none", cursor: "pointer", borderRadius: 999, padding: "12px 14px",
+                            fontSize: 13.5, fontWeight: 700,
+                            background: action.primary ? "#4CAF82" : "rgba(255,255,255,0.1)",
+                            color: action.primary ? GREEN_DARK : "rgba(255,255,255,0.9)",
+                          }}
+                        >{action.label}</button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
           <button onClick={() => scrollTo("admissions")} style={{
             background: "#4CAF82", color: GREEN_DARK, border: "none",
             padding: 14, borderRadius: 6, fontWeight: 700, marginTop: 12, cursor: "pointer",
