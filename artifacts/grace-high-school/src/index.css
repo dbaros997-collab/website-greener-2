@@ -386,6 +386,8 @@ body.mobile-menu-open {
   border: 1.5px dashed rgba(90, 90, 90, 0.45);
   padding: 6px;
   box-sizing: border-box;
+  overflow: hidden;
+  background: #0A4020;
 }
 .leader-photo {
   display: block;
@@ -393,11 +395,8 @@ body.mobile-menu-open {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center 16%;
+  object-position: center 22%;
   background: #0A4020;
-  /* Keep faces crisp on retina — avoid GPU layer tricks that soften photos */
-  image-rendering: auto;
-  -webkit-font-smoothing: antialiased;
 }
 .leader-name {
   margin: 0 0 6px;

@@ -29,29 +29,29 @@ const jobs = [
   // Square face crops for circular admin portraits (retina-friendly).
   // Use highest-res sources; crop from top so the full head stays clear.
   {
-    in: "MUGERWA_DENIS_navy.png",
+    in: "MUGERWA_DENIS_studio.png",
     out: "dean-students.webp",
-    width: 960,
-    height: 960,
-    quality: 96,
+    width: 800,
+    height: 800,
+    quality: 92,
     square: true,
     faceCrop: true,
   },
   {
-    in: "Nakabiito_Linda_studio_v3.png",
+    in: "Nakabiito_Linda_final.png",
     out: "careers-mistress.webp",
-    width: 960,
-    height: 960,
-    quality: 96,
+    width: 800,
+    height: 800,
+    quality: 92,
     square: true,
     faceCrop: true,
   },
   {
-    in: "Namuyomba_Viola_studio.png",
+    in: "Namuyomba_Viola_final.png",
     out: "viola.webp",
-    width: 960,
-    height: 960,
-    quality: 96,
+    width: 800,
+    height: 800,
+    quality: 92,
     square: true,
     faceCrop: true,
   },
@@ -89,22 +89,42 @@ for (const job of jobs) {
   }
   if (job.square) {
     if (job.faceCrop) {
+      // Sample studio background so padding doesn't leave a halo ring.
+      const { data, info } = await sharp(input)
+        .rotate()
+        .extract({ left: 8, top: 8, width: 24, height: 24 })
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let r = 0, g = 0, b = 0;
+      const n = info.width * info.height;
+      for (let i = 0; i < data.length; i += info.channels) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+      }
+      const bg = {
+        r: Math.round(r / n),
+        g: Math.round(g / n),
+        b: Math.round(b / n),
+        alpha: 1,
+      };
       const meta = await sharp(input).metadata();
-      const padTop = Math.round((meta.width ?? job.width) * 0.04);
-      pipeline = pipeline
+      const pad = Math.round((meta.width ?? job.width) * 0.08);
+      pipeline = sharp(input)
+        .rotate()
         .extend({
-          top: padTop,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: { r: 10, g: 64, b: 32, alpha: 1 },
+          top: Math.round((meta.width ?? job.width) * 0.12),
+          bottom: 20,
+          left: pad,
+          right: pad,
+          background: bg,
         })
         .resize(job.width, job.height ?? job.width, {
           fit: "cover",
           position: "top",
           kernel: sharp.kernel.lanczos3,
         })
-        .sharpen({ sigma: 1.0, m1: 0.85, m2: 0.4 });
+        .sharpen({ sigma: 0.5, m1: 0.45, m2: 0.22 });
     } else {
       pipeline = pipeline
         .resize(job.width, job.height ?? job.width, {
