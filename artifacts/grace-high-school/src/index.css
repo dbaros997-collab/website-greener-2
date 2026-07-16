@@ -305,7 +305,7 @@ body.mobile-menu-open {
 .admissions-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .events-grid     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .achievements-outer { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-.values-grid     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.values-grid     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .staff-depts     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .contact-grid    { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .footer-grid     { display: grid; grid-template-columns: 1.6fr 1fr 1.1fr 1.1fr 1.2fr; gap: 36px; margin-bottom: 40px; }

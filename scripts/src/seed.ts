@@ -181,27 +181,35 @@ async function main(): Promise<void> {
   await seedTable("school_values", schoolValuesTable, [
     {
       icon: "✝️",
-      title: "Faith",
-      description:
-        "Grounded in Christian teaching, we nurture a deep, personal faith in every student.",
-    },
-    {
-      icon: "🎓",
-      title: "Excellence",
-      description:
-        "We push every student to reach their full academic and personal potential.",
+      title: "Godliness",
+      description: "To lead a life according to Christian values.",
     },
     {
       icon: "🤝",
-      title: "Integrity",
+      title: "Respect",
       description:
-        "Honesty, respect, and moral uprightness are non-negotiable at Grace.",
+        "To have respect for self, others, property, and the environment.",
     },
     {
-      icon: "🌱",
-      title: "Growth",
+      icon: "🛡️",
+      title: "Integrity",
+      description: "To practice honesty in every word and action.",
+    },
+    {
+      icon: "⏰",
+      title: "Time Management",
+      description: "To plan for and use time efficiently and effectively.",
+    },
+    {
+      icon: "⭐",
+      title: "Excellence",
+      description: "To shine in all that we do.",
+    },
+    {
+      icon: "⛰️",
+      title: "Perseverance",
       description:
-        "Continuous improvement — spiritually, intellectually, and as a community.",
+        "To have determination, diligence, and endurance in all aspects of life.",
     },
   ]);
 

@@ -12,6 +12,7 @@ import {
   useListResources,
   useListResourceCategories,
 } from "@workspace/api-client-react";
+import CoreValues from "./components/CoreValues";
 
 import schoolLogo from "@assets/optimized/school-logo.webp";
 import img_about_group from "@assets/optimized/head-teacher.webp";
@@ -337,6 +338,7 @@ export default function App() {
     { label: "Home", id: "__home" },
     { label: "About", children: [
       { label: "About Us", id: "about", desc: "Our story, Christian foundation & values" },
+      { label: "Core Values", id: "values", desc: "Godliness, respect, integrity & more" },
     ] },
     { label: "Academics", children: [
       { label: "Programmes", id: "programmes", desc: "O-Level, A-Level & vocational skills" },
@@ -1272,6 +1274,8 @@ export default function App() {
 
         </div>
       </section>
+
+      <CoreValues />
 
       {/* ===== ACHIEVEMENTS ===== */}
       <section id="achievements" className="reveal" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
