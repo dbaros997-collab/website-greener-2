@@ -1129,7 +1129,7 @@ export default function App() {
               icon: <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></>,
               title: "Academic Results",
               desc: "A consistent record of strong UNEB performance at O-Level and A-Level, with graduates advancing to leading universities.",
-              id: "achievements",
+              id: "programmes",
             },
             {
               icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></>,
@@ -1277,41 +1277,8 @@ export default function App() {
 
       <CoreValues />
 
-      {/* ===== ACHIEVEMENTS ===== */}
-      <section id="achievements" className="reveal" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />
-              Our Achievements
-              <span style={{ width: 24, height: 2, background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD})`, display: "block", borderRadius: 2 }} />
-            </div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, lineHeight: 1.2, marginBottom: 14 }}>A Tradition of Excellence</h2>
-            <p style={{ fontSize: 16, color: "#4A6655", lineHeight: 1.7 }}>Year after year, our students excel in the classroom and beyond — growing into confident, capable, and Christ-like leaders.</p>
-          </div>
-          <div className="achv-grid">
-            {[
-              { icon: <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></>, title: "Consistent Results", desc: "Strong first-grade performances at O-Level and solid A-Level passes, term after term." },
-              { icon: <><path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" /></>, title: "University Pathways", desc: "A-Level graduates progressing to universities and tertiary institutions at home and abroad." },
-              { icon: <><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></>, title: "Beyond the Classroom", desc: "Achievements in sports, music, dance & drama, debate, and student leadership." },
-              { icon: <><path d="M12 2v20M5 6h14M5 6v8a7 7 0 0 0 14 0V6" /></>, title: "Christ-Centred Character", desc: "Graduates who are disciplined, morally upright, and God-fearing." },
-            ].map((a, i) => (
-              <div key={i} style={{ background: WHITE, border: "1px solid rgba(10,64,32,0.07)", borderRadius: 16, padding: "30px 24px", textAlign: "center", boxShadow: "0 10px 30px rgba(10,64,32,0.07)", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 18px 40px rgba(10,64,32,0.14)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(10,64,32,0.07)"; }}>
-                <div style={{ width: 60, height: 60, margin: "0 auto 18px", borderRadius: 18, background: `linear-gradient(135deg, ${GREEN_MAIN}, ${GREEN_DARK})`, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE, boxShadow: "0 8px 18px rgba(26,107,60,0.32)" }}>
-                  <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{a.icon}</svg>
-                </div>
-                <h3 style={{ fontSize: 16.5, fontWeight: 700, color: GREEN_DARK, marginBottom: 8 }}>{a.title}</h3>
-                <p style={{ fontSize: 13.5, color: "#5A6B60", lineHeight: 1.6 }}>{a.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== PROGRAMMES ===== */}
-      <section id="programmes" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="programmes" className="reveal" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Academics
@@ -1351,7 +1318,7 @@ export default function App() {
       </section>
 
       {/* ===== UPDATES / PARENT NOTICEBOARD ===== */}
-      <section id="updates" className="reveal" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
+      <section id="updates" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />Updates for Parents
@@ -1384,7 +1351,7 @@ export default function App() {
       </section>
 
       {/* ===== VIDEOS ===== */}
-      <section id="videos" className="reveal" style={{ background: OFF_WHITE, padding: "56px 5%" }}>
+      <section id="videos" className="reveal" style={{ background: GREEN_LIGHT, padding: "56px 5%" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />School Videos
