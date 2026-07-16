@@ -1224,7 +1224,16 @@ export default function App() {
             {LEADERSHIP.map((p, i) => (
               <div key={i} className="leader-card">
                 <div className="leader-photo-ring">
-                  <img className="leader-photo" src={p.img} alt={p.name} loading="lazy" decoding="async" width={240} height={240} />
+                  <img
+                    className="leader-photo"
+                    src={p.img}
+                    alt={p.name}
+                    loading="lazy"
+                    decoding="async"
+                    width={640}
+                    height={640}
+                    sizes="(max-width: 580px) 148px, 196px"
+                  />
                 </div>
                 <h3 className="leader-name">{p.name}</h3>
                 <p className="leader-role">{p.title}</p>

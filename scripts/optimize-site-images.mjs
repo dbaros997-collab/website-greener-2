@@ -16,7 +16,7 @@ const outDir = path.join(srcDir, "optimized");
 const require = createRequire(path.join(root, "tmp-sharp", "package.json"));
 const sharp = require("sharp");
 
-/** @type {{ in: string, out: string, width: number, quality?: number }[]} */
+/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean }[]} */
 const jobs = [
   { in: "school_logo_transparent.png", out: "school-logo.webp", width: 256, quality: 90 },
   { in: "SSEKAMATTE_SIMON_1780946570401.png", out: "head-teacher.webp", width: 900, quality: 78 },
@@ -26,9 +26,10 @@ const jobs = [
   { in: "IMG_20230304_115149_291_1781375070289.jpg", out: "hotsprings.webp", width: 1400, quality: 72 },
   { in: "IMG_0062_1781375708800.jpg", out: "library.webp", width: 1400, quality: 72 },
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
-  { in: "MUGERWA_DENIS_charcoal.png", out: "dean-students.webp", width: 700, quality: 78 },
-  { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 700, quality: 78 },
-  { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 700, quality: 78 },
+  // Square face crops for circular admin portraits (retina-friendly).
+  { in: "MUGERWA_DENIS_final.png", out: "dean-students.webp", width: 640, height: 640, quality: 92, square: true },
+  { in: "Nakabiito_Linda_final.png", out: "careers-mistress.webp", width: 640, height: 640, quality: 92, square: true },
+  { in: "Namuyomba_Viola_final.png", out: "viola.webp", width: 640, height: 640, quality: 92, square: true },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
   { in: "featured_video_thumb_1780677204039.png", out: "featured-video.webp", width: 800, quality: 75 },
 ];
@@ -48,11 +49,18 @@ for (const job of jobs) {
   }
   const inSize = fs.statSync(input).size;
   before += inSize;
-  await sharp(input)
-    .rotate()
-    .resize({ width: job.width, withoutEnlargement: true })
-    .webp({ quality: job.quality ?? 75, effort: 5 })
-    .toFile(output);
+  let pipeline = sharp(input).rotate();
+  if (job.square) {
+    pipeline = pipeline
+      .resize(job.width, job.height ?? job.width, {
+        fit: "cover",
+        position: "attention",
+      })
+      .sharpen({ sigma: 0.6 });
+  } else {
+    pipeline = pipeline.resize({ width: job.width, withoutEnlargement: true });
+  }
+  await pipeline.webp({ quality: job.quality ?? 75, effort: 5 }).toFile(output);
   const outSize = fs.statSync(output).size;
   after += outSize;
   console.log(
