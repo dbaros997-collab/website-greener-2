@@ -395,7 +395,8 @@ body.mobile-menu-open {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center 22%;
+  /* True square face crops — keep crown + chin inside the circle */
+  object-position: center 14%;
   background: #0A4020;
 }
 .leader-name {

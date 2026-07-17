@@ -1436,8 +1436,8 @@ export default function App() {
                     alt={p.name}
                     loading="lazy"
                     decoding="async"
-                    width={800}
-                    height={800}
+                    width={1000}
+                    height={1000}
                     sizes="(max-width: 580px) 148px, 196px"
                   />
                 </div>

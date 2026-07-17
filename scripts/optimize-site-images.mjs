@@ -16,7 +16,7 @@ const outDir = path.join(srcDir, "optimized");
 const require = createRequire(path.join(root, "tmp-sharp", "package.json"));
 const sharp = require("sharp");
 
-/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean, coolSkin?: boolean, faceCrop?: boolean }[]} */
+/** @type {{ in: string, out: string, width: number, height?: number, quality?: number, square?: boolean, coolSkin?: boolean, faceCrop?: boolean, zoom?: number, topBias?: number }[]} */
 const jobs = [
   { in: "school_logo_transparent.png", out: "school-logo.webp", width: 256, quality: 90 },
   { in: "SSEKAMATTE_SIMON_1780946570401.png", out: "head-teacher.webp", width: 900, quality: 78 },
@@ -27,33 +27,39 @@ const jobs = [
   { in: "IMG_0062_1781375708800.jpg", out: "library.webp", width: 1400, quality: 72 },
   { in: "IMG_3673_1781376146283.JPG", out: "dance.webp", width: 1400, quality: 72 },
   // Square face crops for circular admin portraits (retina-friendly).
-  // Use highest-res sources; crop from top so the full head stays clear.
+  // Use highest-res sources; tight upper crop so full faces fill the circle.
   {
-    in: "MUGERWA_DENIS_studio.png",
+    in: "MUGERWA_DENIS_card.png",
     out: "dean-students.webp",
-    width: 800,
-    height: 800,
-    quality: 92,
+    width: 1000,
+    height: 1000,
+    quality: 94,
     square: true,
     faceCrop: true,
+    zoom: 0.82,
+    topBias: 0.05,
   },
   {
-    in: "Nakabiito_Linda_final.png",
+    in: "Nakabiito_Linda_1781380457906.png",
     out: "careers-mistress.webp",
-    width: 800,
-    height: 800,
-    quality: 92,
+    width: 1000,
+    height: 1000,
+    quality: 94,
     square: true,
     faceCrop: true,
+    zoom: 0.78,
+    topBias: 0.04,
   },
   {
-    in: "Namuyomba_Viola_final.png",
+    in: "Namuyomba_Viola_1781381959925.png",
     out: "viola.webp",
-    width: 800,
-    height: 800,
-    quality: 92,
+    width: 1000,
+    height: 1000,
+    quality: 94,
     square: true,
     faceCrop: true,
+    zoom: 0.8,
+    topBias: 0.035,
   },
   { in: "Gemini_Generated_Image_y5ddwmy5ddwmy5dd_1781256435846.png", out: "crafts.webp", width: 1200, quality: 75 },
   { in: "featured_video_thumb_1780677204039.png", out: "featured-video.webp", width: 800, quality: 75 },
@@ -89,42 +95,23 @@ for (const job of jobs) {
   }
   if (job.square) {
     if (job.faceCrop) {
-      // Sample studio background so padding doesn't leave a halo ring.
-      const { data, info } = await sharp(input)
-        .rotate()
-        .extract({ left: 8, top: 8, width: 24, height: 24 })
-        .raw()
-        .toBuffer({ resolveWithObject: true });
-      let r = 0, g = 0, b = 0;
-      const n = info.width * info.height;
-      for (let i = 0; i < data.length; i += info.channels) {
-        r += data[i];
-        g += data[i + 1];
-        b += data[i + 2];
-      }
-      const bg = {
-        r: Math.round(r / n),
-        g: Math.round(g / n),
-        b: Math.round(b / n),
-        alpha: 1,
-      };
-      const meta = await sharp(input).metadata();
-      const pad = Math.round((meta.width ?? job.width) * 0.08);
+      // Tight face square — no letterbox padding (that broke circular framing).
+      const meta = await sharp(input).rotate().metadata();
+      const w = meta.width ?? job.width;
+      const h = meta.height ?? job.width;
+      const zoom = job.zoom ?? 0.85;
+      const topBias = job.topBias ?? 0.04;
+      const side = Math.round(w * zoom);
+      const left = Math.round((w - side) / 2);
+      const maxTop = Math.max(0, h - side);
+      const top = Math.min(maxTop, Math.round(h * topBias));
       pipeline = sharp(input)
         .rotate()
-        .extend({
-          top: Math.round((meta.width ?? job.width) * 0.12),
-          bottom: 20,
-          left: pad,
-          right: pad,
-          background: bg,
-        })
+        .extract({ left, top, width: side, height: side })
         .resize(job.width, job.height ?? job.width, {
-          fit: "cover",
-          position: "top",
           kernel: sharp.kernel.lanczos3,
         })
-        .sharpen({ sigma: 0.5, m1: 0.45, m2: 0.22 });
+        .sharpen({ sigma: 0.65, m1: 0.55, m2: 0.28 });
     } else {
       pipeline = pipeline
         .resize(job.width, job.height ?? job.width, {
