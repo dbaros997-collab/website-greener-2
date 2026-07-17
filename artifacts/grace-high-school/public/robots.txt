@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://grace-high-school-gayaza.onrender.com/sitemap.xml
+Sitemap: https://grace-high-school-gayaza-t7p6.onrender.com/sitemap.xml
