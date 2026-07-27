@@ -33,7 +33,7 @@ function spaFallback(publicDir: string): RequestHandler {
 }
 
 const SEO_ASSET_RE =
-  /(?:^|[/\\])(?:sitemap\.xml|robots\.txt|site\.webmanifest|favicon\.ico|icon-\d+\.png|school-icon-\d+\.png|favicon-\d+x\d+\.png|logo(?:-\d+)?\.png)$/i;
+  /(?:^|[/\\])(?:sitemap\.xml|robots\.txt|site\.webmanifest|favicon\.ico|ghs-\d+\.png|icon-\d+\.png|school-icon-\d+\.png|favicon-\d+x\d+\.png|logo(?:-\d+)?\.png)$/i;
 
 function staticOptions() {
   return {
