@@ -32,9 +32,23 @@ function spaFallback(publicDir: string): RequestHandler {
   };
 }
 
+const SEO_ASSET_RE =
+  /(?:^|[/\\])(?:sitemap\.xml|robots\.txt|site\.webmanifest|favicon\.ico|icon-\d+\.png|school-icon-\d+\.png|favicon-\d+x\d+\.png|logo(?:-\d+)?\.png)$/i;
+
+function staticOptions() {
+  return {
+    setHeaders(res: express.Response, filePath: string) {
+      if (SEO_ASSET_RE.test(filePath)) {
+        // Let Cloudflare cache crawler assets even when the free instance sleeps.
+        res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+      }
+    },
+  };
+}
+
 function mountSpa(app: Express, mount: string, publicDir: string): void {
   if (mount === "/") {
-    app.use(express.static(publicDir));
+    app.use(express.static(publicDir, staticOptions()));
     app.use((req, res, next) => {
       if (req.path.startsWith("/api") || req.path.startsWith("/dashboard")) {
         next();
@@ -45,7 +59,7 @@ function mountSpa(app: Express, mount: string, publicDir: string): void {
     return;
   }
 
-  app.use(mount, express.static(publicDir));
+  app.use(mount, express.static(publicDir, staticOptions()));
   // Express 5 / path-to-regexp v8 requires a named wildcard (/* is invalid).
   app.get(`${mount}/*path`, spaFallback(publicDir));
 }

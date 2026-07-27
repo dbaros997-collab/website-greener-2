@@ -92,6 +92,10 @@ export function createBaseApp(): Express {
     res.json({ status: "ok" });
   });
 
+  // Serve public HTML/icons/sitemap before CORS so Googlebot and Cloudflare
+  // can cache SEO assets without Vary: Origin / credential headers.
+  registerStaticSites(app);
+
   app.use(
     cors({
       credentials: true,
@@ -114,10 +118,6 @@ export function createBaseApp(): Express {
     jsonParser(req, res, next);
   });
   app.use(express.urlencoded({ extended: true }));
-
-  // Static sites before API so HTML is available as soon as we listen.
-  // SPA fallback skips /api so later-mounted API routes still receive traffic.
-  registerStaticSites(app);
 
   return app;
 }
