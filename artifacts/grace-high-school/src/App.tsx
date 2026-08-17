@@ -12,6 +12,7 @@ import {
   useListResources,
   useListResourceCategories,
 } from "@workspace/api-client-react";
+import { FaTiktok, FaYoutube } from "react-icons/fa6";
 import CoreValues from "./components/CoreValues";
 import ImageSlider from "./components/ImageSlider";
 
@@ -78,6 +79,66 @@ const LEADERSHIP: Leader[] = [
 ];
 
 const API = "/api";
+
+const SOCIAL_LINKS = [
+  { href: "https://vm.tiktok.com/ZS9kheM7BN5EF-2xQhV/", label: "TikTok", Icon: FaTiktok },
+  { href: "https://youtube.com/@gracehighschoolgayaza?si=l8s0mE_OHfTxS098", label: "YouTube", Icon: FaYoutube },
+] as const;
+
+function SocialLinks({ size = 18, color = "#8EEDC0", pill = false }: { size?: number; color?: string; pill?: boolean }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: pill ? 10 : 12 }}>
+      {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Grace High School on ${label}`}
+          style={pill ? {
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.1)",
+            color,
+            fontSize: size,
+            transition: "background 0.2s, color 0.2s, transform 0.2s",
+            textDecoration: "none",
+          } : {
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color,
+            transition: "color 0.2s, transform 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (pill) {
+              e.currentTarget.style.color = WHITE;
+              e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+            } else {
+              e.currentTarget.style.color = GOLD_LIGHT;
+            }
+            e.currentTarget.style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            if (pill) {
+              e.currentTarget.style.color = color;
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+            } else {
+              e.currentTarget.style.color = color;
+            }
+            e.currentTarget.style.transform = "translateY(0)";
+          }}
+        >
+          <Icon size={pill ? undefined : size} aria-hidden="true" />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 const formatSize = (bytes: number | null | undefined): string => {
   if (!bytes) return "";
@@ -908,6 +969,9 @@ export default function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span className="utility-links" style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>✉ gracehighschoolgayaza@gmail.com</span>
+          <div className="utility-links">
+            <SocialLinks size={16} color="rgba(255,255,255,0.75)" />
+          </div>
           <a href="/dashboard/" className="utility-bar-staff" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             color: GOLD_LIGHT, fontSize: 12, fontWeight: 600, textDecoration: "none",
@@ -2338,6 +2402,9 @@ export default function App() {
                   <a href="mailto:gracehighschoolgayaza@gmail.com" style={{ color: "#8EEDC0", textDecoration: "none" }}>gracehighschoolgayaza@gmail.com</a>
                 </li>
               </ul>
+              <div style={{ marginTop: 16 }}>
+                <SocialLinks pill size={16} />
+              </div>
             </div>
           </div>
 
