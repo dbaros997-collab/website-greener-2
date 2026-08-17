@@ -16,6 +16,10 @@
     "start": "node ./scripts/src/setup-db.mjs; node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
   },
   "private": true,
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "prettier": "^3.8.3",
     "typescript": "~5.9.3"
