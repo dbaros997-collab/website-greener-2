@@ -7,6 +7,7 @@ import {
   updateResource,
   deleteResource,
   requestUploadUrl,
+  getStoragePrefix,
   type Resource,
 } from "@workspace/api-client-react";
 import { SubmissionsSection } from "@/components/SubmissionsSection";
@@ -32,7 +33,6 @@ import { useToast } from "@/hooks/use-toast";
 import { toFriendlyError } from "@/lib/errors";
 import { Download, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 
-const STORAGE_PREFIX = "/api/storage";
 const LEVELS = ["All", "S1", "S2", "S3", "S4", "S5", "S6", "O-Level", "A-Level"];
 
 function formatSize(bytes: number | null | undefined): string {
@@ -286,7 +286,7 @@ function BlankFormsCard() {
                 <Badge variant="secondary">{r.fileName}</Badge>
                 <div className="flex items-center gap-2">
                   <a
-                    href={`${STORAGE_PREFIX}${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
+                    href={`${getStoragePrefix()}${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Download"

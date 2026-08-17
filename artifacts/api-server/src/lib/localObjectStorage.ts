@@ -166,28 +166,33 @@ export function createLocalUpload(
     fileName,
   });
 
-  // Prefer the browser Origin so Vite-proxied admin/site keep a same-origin URL
-  // (required by the OpenAPI `format: uri` response schema).
-  let origin = "";
-  const rawOrigin = req?.get("origin") ?? "";
-  if (rawOrigin) {
-    try {
-      origin = new URL(rawOrigin).origin;
-    } catch {
-      origin = "";
-    }
-  }
-  if (!origin) {
-    const host = req?.get("x-forwarded-host") ?? req?.get("host") ?? "localhost:8080";
-    const protoHeader = req?.get("x-forwarded-proto");
-    const proto = (protoHeader ?? req?.protocol ?? "http").split(",")[0]!.trim();
-    origin = `${proto}://${host}`;
-  }
+  const origin = resolveUploadOrigin(req);
 
   return {
     uploadURL: `${origin}/api/storage/local-upload/${token}`,
     objectPath: objectPathFor(prefix, objectId),
   };
+}
+
+function requestApiOrigin(req?: Request): string {
+  const host = req?.get("x-forwarded-host") ?? req?.get("host") ?? "localhost:8080";
+  const protoHeader = req?.get("x-forwarded-proto");
+  const proto = (protoHeader ?? req?.protocol ?? "http").split(",")[0]!.trim();
+  return `${proto}://${host}`;
+}
+
+/** Same host keeps Vite-proxy URLs; cross-origin hybrid uses the API host for PUTs. */
+function resolveUploadOrigin(req?: Request): string {
+  const apiOrigin = requestApiOrigin(req);
+  const rawOrigin = req?.get("origin") ?? "";
+  if (!rawOrigin) return apiOrigin;
+
+  try {
+    const browserOrigin = new URL(rawOrigin).origin;
+    return browserOrigin === apiOrigin ? browserOrigin : apiOrigin;
+  } catch {
+    return apiOrigin;
+  }
 }
 
 export async function handleLocalUploadPut(

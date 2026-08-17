@@ -2,16 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://grace-high-school-gayaza-t7p6.onrender.com/</loc>
+    <loc>https://gracehighschoolgayaza.academy/</loc>
     <lastmod>2026-07-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://grace-high-school-gayaza-t7p6.onrender.com/ghs-192.png</image:loc>
+      <image:loc>https://gracehighschoolgayaza.academy/ghs-192.png</image:loc>
       <image:title>Grace High School Gayaza crest</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://grace-high-school-gayaza-t7p6.onrender.com/ghs-512.png</image:loc>
+      <image:loc>https://gracehighschoolgayaza.academy/ghs-512.png</image:loc>
       <image:title>Grace High School Gayaza logo</image:title>
     </image:image>
   </url>

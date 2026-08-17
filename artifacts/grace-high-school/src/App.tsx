@@ -11,6 +11,7 @@ import {
   useListSiteText,
   useListResources,
   useListResourceCategories,
+  getApiRoot,
 } from "@workspace/api-client-react";
 import { FaTiktok, FaYoutube } from "react-icons/fa6";
 import CoreValues from "./components/CoreValues";
@@ -77,8 +78,6 @@ const LEADERSHIP: Leader[] = [
   { name: "Nakabiito Linda", title: "Careers Mistress", img: img_careers_mistress },
   { name: "Namuyomba Viola", title: "Director of Studies", img: img_viola },
 ];
-
-const API = "/api";
 
 const SOCIAL_LINKS = [
   { href: "https://vm.tiktok.com/ZS9kheM7BN5EF-2xQhV/", label: "TikTok", Icon: FaTiktok },
@@ -338,7 +337,7 @@ export default function App() {
 
   // Live updates: admin changes broadcast over SSE and refresh the public site.
   useEffect(() => {
-    return subscribeToContentEvents(API, queryClient);
+    return subscribeToContentEvents(getApiRoot(), queryClient);
   }, [queryClient]);
 
   const closeMenus = () => {
@@ -559,7 +558,7 @@ export default function App() {
     Array.isArray(programmesQ.data) && programmesQ.data.length > 0
       ? programmesQ.data.map((p) => ({
           tag: p.tag, title: p.title,
-          img: p.objectPath ? `${API}/storage${p.objectPath}` : programmeImg(p.title),
+          img: p.objectPath ? `${getApiRoot()}/storage${p.objectPath}` : programmeImg(p.title),
           desc: p.description, subjects: p.subjects,
         }))
       : PROGRAMMES_FALLBACK;
@@ -992,8 +991,8 @@ export default function App() {
       }}>
         <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none", alignSelf: "flex-start", marginTop: scrolled ? 6 : 8 }}>
           <img
-            src={schoolLogo}
-            alt="Grace High School Logo"
+            src="/logo.png"
+            alt="Grace High School Gayaza"
             className={`site-logo${scrolled ? " is-scrolled" : ""}`}
             style={{
               width: "auto",
@@ -1867,7 +1866,7 @@ export default function App() {
                               {items.map(r => (
                                 <a
                                   key={r.id}
-                                  href={`${API}/storage${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
+                                  href={`${getApiRoot()}/storage${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   style={{
@@ -2081,7 +2080,7 @@ export default function App() {
                   setSubmitError(null);
                   try {
                     const contentType = submitFile.type || "application/octet-stream";
-                    const up = await fetch(`${API}/storage/application-uploads/request-url`, {
+                    const up = await fetch(`${getApiRoot()}/storage/application-uploads/request-url`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ name: submitFile.name, size: submitFile.size, contentType }),
@@ -2093,7 +2092,7 @@ export default function App() {
                     const { uploadURL, objectPath } = await up.json();
                     const put = await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": contentType }, body: submitFile });
                     if (!put.ok) throw new Error(`Upload failed (${put.status})`);
-                    const res = await fetch(`${API}/submissions`, {
+                    const res = await fetch(`${getApiRoot()}/submissions`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -2179,7 +2178,7 @@ export default function App() {
                 if (!firstName) return;
                 setFormSending(true);
                 try {
-                  const res = await fetch(`${API}/submissions`, {
+                  const res = await fetch(`${getApiRoot()}/submissions`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

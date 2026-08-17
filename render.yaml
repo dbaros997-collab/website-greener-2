@@ -37,3 +37,5 @@ services:
         sync: false
       - key: ADMIN_SYNC_PASSWORD
         sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://gracehighschoolgayaza.academy,https://www.gracehighschoolgayaza.academy

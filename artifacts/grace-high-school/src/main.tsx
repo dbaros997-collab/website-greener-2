@@ -1,8 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Router } from "wouter";
+import { ensureApiClientConfigured } from "@workspace/api-client-react";
 import App from "./App";
 import "./index.css";
+
+ensureApiClientConfigured();
 
 const routerBase = import.meta.env.BASE_URL.replace(/\/$/, "");
 

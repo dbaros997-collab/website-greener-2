@@ -4,7 +4,7 @@ import {
   type UseQueryResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import { requestUploadUrl } from "@workspace/api-client-react";
+import { requestUploadUrl, getStoragePrefix } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,11 +112,8 @@ function valuesToPayload(
   return out;
 }
 
-// Always hit the API root — BASE_URL is `/dashboard/` in this app.
-const STORAGE_PREFIX = "/api/storage";
-
 function imageSrc(objectPath: string): string {
-  return `${STORAGE_PREFIX}${objectPath}`;
+  return `${getStoragePrefix()}${objectPath}`;
 }
 
 export function ContentSection<T extends BaseItem>(

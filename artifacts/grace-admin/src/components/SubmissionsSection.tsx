@@ -6,6 +6,7 @@ import {
   deleteSubmission,
   type Submission,
   type UpdateSubmissionInputStatus,
+  getStoragePrefix,
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +20,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { toFriendlyError } from "@/lib/errors";
 import { Download, FileText, Mail, Phone, Trash2 } from "lucide-react";
-
-const STORAGE_PREFIX = "/api/storage";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -234,7 +233,7 @@ export function SubmissionsSection({
 
                 {s.fileUrl ? (
                   <a
-                    href={`${STORAGE_PREFIX}${s.fileUrl}`}
+                    href={`${getStoragePrefix()}${s.fileUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 inline-flex items-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100"

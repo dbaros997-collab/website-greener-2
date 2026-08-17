@@ -12,6 +12,7 @@ import {
   updateResourceCategory,
   deleteResourceCategory,
   requestUploadUrl,
+  getStoragePrefix,
   type Resource,
   type ResourceCategory,
 } from "@workspace/api-client-react";
@@ -47,7 +48,6 @@ import {
   X,
 } from "lucide-react";
 
-const STORAGE_PREFIX = "/api/storage";
 const adminParams = { includeHidden: true } as const;
 const LEVELS = ["All", "O-Level", "A-Level", "S1", "S2", "S3", "S4", "S5", "S6"];
 /** Managed in the Applications tab — hide from Resources folder admin. */
@@ -162,7 +162,7 @@ function ResourceList({
                       <Badge variant="secondary">{r.fileName}</Badge>
                       <div className="flex items-center gap-1">
                         <a
-                          href={`${STORAGE_PREFIX}${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
+                          href={`${getStoragePrefix()}${r.objectPath}?v=${encodeURIComponent(`${r.id}-${r.fileName}-${r.objectPath}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label="Download"

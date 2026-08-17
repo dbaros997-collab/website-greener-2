@@ -13,6 +13,7 @@ import {
   getListSubmissionsQueryKey,
   getListTestimonialsQueryKey,
   getListVideosQueryKey,
+  getApiRoot,
 } from "@workspace/api-client-react";
 
 const adminParams = { includeHidden: true } as const;
@@ -70,7 +71,7 @@ export function useContentEvents(): void {
     const connect = () => {
       if (closed) return;
       source?.close();
-      source = new EventSource("/api/events");
+      source = new EventSource(`${getApiRoot()}/events`);
       source.addEventListener("content-changed", onChange);
       source.onopen = () => {
         attempt = 0;
