@@ -5,9 +5,17 @@ FROM node:20-bookworm AS builder
 WORKDIR /app
 
 ENV CI=true
-# Avoid corepack (ERR_UNKNOWN_BUILTIN_MODULE on some Coolify hosts); pin pnpm to match package.json.
-RUN npm install -g pnpm@11.10.0 \
- && pnpm --version
+ENV PNPM_HOME=/pnpm
+ENV PATH="/pnpm:${PATH}"
+
+# Standalone pnpm install — avoids corepack/npm (ERR_UNKNOWN_BUILTIN_MODULE on some Coolify hosts).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates wget bash \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /pnpm \
+  && wget -qO- https://get.pnpm.io/install.sh | SHELL=/bin/bash PNPM_HOME=/pnpm bash - \
+  && node --version \
+  && pnpm --version
 
 COPY . .
 
