@@ -7,29 +7,23 @@ WORKDIR /app
 ENV CI=true
 ENV npm_config_update_notifier=false
 
-RUN corepack enable \
-  && corepack prepare pnpm@11.10.0 --activate \
+COPY . .
+
+RUN npm install -g pnpm \
   && node --version \
   && pnpm --version
 
-COPY . .
-
-RUN echo ">>> Installing dependencies..." \
-  && pnpm install --frozen-lockfile \
-    --filter @workspace/api-server... \
-    --filter @workspace/grace-high-school... \
-    --filter @workspace/grace-admin...
+RUN pnpm install --frozen-lockfile \
+  --filter @workspace/api-server... \
+  --filter @workspace/grace-high-school... \
+  --filter @workspace/grace-admin...
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 
-RUN echo ">>> Building api-server..." \
-  && pnpm --filter @workspace/api-server run build \
-  && echo ">>> Building grace-high-school..." \
+RUN pnpm --filter @workspace/api-server run build \
   && pnpm --filter @workspace/grace-high-school run build \
-  && echo ">>> Building grace-admin..." \
-  && pnpm --filter @workspace/grace-admin run build \
-  && echo ">>> All builds finished."
+  && pnpm --filter @workspace/grace-admin run build
 
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
