@@ -14,6 +14,7 @@ RUN npm install -g pnpm \
   && pnpm --version
 
 RUN pnpm install --frozen-lockfile \
+  --config.dangerouslyAllowAllBuilds=true \
   --filter @workspace/api-server... \
   --filter @workspace/grace-high-school... \
   --filter @workspace/grace-admin...
