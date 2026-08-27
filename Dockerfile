@@ -1,5 +1,5 @@
 # Full-stack Grace High School — site + /dashboard + /api in one container.
-# Coolify: Build Pack = Dockerfile. Set DATABASE_URL + SESSION_SECRET + PORT.
+# Coolify: Build Pack = Dockerfile. Set DATABASE_URL + SESSION_SECRET (+ PORT auto).
 
 FROM node:20-bookworm AS builder
 WORKDIR /app
@@ -9,34 +9,34 @@ ENV PNPM_HOME=/pnpm
 ENV PATH="/pnpm:${PATH}"
 ENV npm_config_update_notifier=false
 
-# Direct pnpm binary — no corepack, npm global, or install.sh (all hang/fail on some Coolify hosts).
+# Install pnpm for the host CPU (Coolify servers may be amd64 or arm64).
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates wget \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /pnpm \
-  && wget -qO /pnpm/pnpm "https://github.com/pnpm/pnpm/releases/download/v11.10.0/pnpm-linux-x64" \
+  && arch="$(uname -m)" \
+  && case "$arch" in \
+    x86_64) pnpm_arch="linux-x64" ;; \
+    aarch64|arm64) pnpm_arch="linux-arm64" ;; \
+    *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+  esac \
+  && wget -qO /pnpm/pnpm "https://github.com/pnpm/pnpm/releases/download/v11.10.0/pnpm-${pnpm_arch}" \
   && chmod +x /pnpm/pnpm \
   && node --version \
   && /pnpm/pnpm --version
 
-# Manifests first so dependency install is cached when only source changes.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY lib ./lib
-COPY scripts/package.json ./scripts/package.json
-COPY artifacts/api-server/package.json ./artifacts/api-server/package.json
-COPY artifacts/grace-high-school/package.json ./artifacts/grace-high-school/package.json
-COPY artifacts/grace-admin/package.json ./artifacts/grace-admin/package.json
+COPY . .
 
-RUN echo ">>> Installing production workspace dependencies..." \
+RUN echo ">>> Installing dependencies..." \
   && pnpm install --frozen-lockfile \
     --filter @workspace/api-server... \
     --filter @workspace/grace-high-school... \
-    --filter @workspace/grace-admin...
-
-COPY . .
+    --filter @workspace/grace-admin... \
+  && echo ">>> Verifying esbuild..." \
+  && node ./node_modules/esbuild/bin/esbuild --version
 
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NODE_OPTIONS="--max-old-space-size=1536"
 
 RUN echo ">>> Building api-server..." \
   && pnpm --filter @workspace/api-server run build \

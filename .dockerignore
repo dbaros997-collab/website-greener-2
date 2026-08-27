@@ -20,12 +20,10 @@ tmp-sharp
 .DS_Store
 Thumbs.db
 
-# Not needed for production image — keeps Coolify build context small (~500MB → ~3MB).
+# Shrink Coolify build context (~500MB -> ~15MB). Site build needs optimized webp only.
 .canvas
-artifacts/admin
-artifacts/mockup-sandbox
 **/*.zip
 grace-high-school-public_html.zip
-attached_assets/**
-!attached_assets/optimized/
+attached_assets/*
+!attached_assets/optimized
 !attached_assets/optimized/**

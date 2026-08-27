@@ -4,17 +4,17 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
+const port = process.env.PORT ?? "8080";
 console.log("[start] Grace High School");
 console.log("[start] NODE_ENV:", process.env.NODE_ENV ?? "(unset)");
-console.log("[start] PORT:", process.env.PORT ?? "(unset)");
+console.log("[start] PORT:", port);
 console.log(
   "[start] DATABASE_URL:",
   process.env.DATABASE_URL ? "set" : "missing (API routes may fail)",
 );
 
 if (!process.env.PORT) {
-  console.error("[start] FATAL: PORT environment variable is required.");
-  process.exit(1);
+  process.env.PORT = "8080";
 }
 
 function runNode(script, args = []) {

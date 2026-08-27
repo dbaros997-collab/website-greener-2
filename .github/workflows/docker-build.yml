@@ -1,0 +1,30 @@
+name: Docker build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build production image
+        run: docker build --progress=plain -t website-greener:test .
+
+      - name: Smoke test container
+        run: |
+          docker run -d --name ghs-test -e PORT=8080 -p 8080:8080 website-greener:test
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8080/healthz >/dev/null; then
+              echo "healthz OK"
+              docker logs ghs-test
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container failed health check"
+          docker logs ghs-test
+          exit 1
