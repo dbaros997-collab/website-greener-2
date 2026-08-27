@@ -1,9 +1,5 @@
 node_modules
 **/node_modules
-**/dist
-# Production builds only import attached_assets/optimized (webp).
-attached_assets/**
-!attached_assets/optimized/**
 .git
 .github
 .cursor

@@ -88,8 +88,12 @@ export function createBaseApp(): Express {
     }),
   );
 
+  const healthPayload = { status: "ok" as const };
+  app.get("/healthz", (_req, res) => {
+    res.json(healthPayload);
+  });
   app.get("/api/healthz", (_req, res) => {
-    res.json({ status: "ok" });
+    res.json(healthPayload);
   });
 
   // Serve public HTML/icons/sitemap before CORS so Googlebot and Cloudflare

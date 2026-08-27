@@ -4,8 +4,6 @@ import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
 } from "@workspace/api-zod";
-import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { ObjectPermission } from "../lib/objectAcl";
 import { requireAuth } from "../lib/auth";
 import {
   createLocalUpload,
@@ -15,7 +13,22 @@ import {
 } from "../lib/localObjectStorage";
 
 const router: IRouter = Router();
-const objectStorageService = new ObjectStorageService();
+
+type CloudStorageModule = typeof import("../lib/objectStorage");
+
+let cloudStorageModule: CloudStorageModule | null = null;
+
+async function loadCloudStorage(): Promise<CloudStorageModule> {
+  if (!cloudStorageModule) {
+    cloudStorageModule = await import("../lib/objectStorage");
+  }
+  return cloudStorageModule;
+}
+
+async function cloudStorageService() {
+  const mod = await loadCloudStorage();
+  return new mod.ObjectStorageService();
+}
 
 /**
  * PUT /storage/local-upload/:token
@@ -121,6 +134,7 @@ router.post(
         return;
       }
 
+      const objectStorageService = await cloudStorageService();
       const uploadURL = await objectStorageService.getApplicationUploadURL();
       const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
       res.json(
@@ -169,6 +183,7 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
       return;
     }
 
+    const objectStorageService = await cloudStorageService();
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
 
@@ -193,7 +208,13 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
  * IMPORTANT: Always provide this endpoint when object storage is set up.
  */
 router.get("/storage/public-objects/*filePath", async (req: Request, res: Response) => {
+  if (isLocalObjectStorage()) {
+    res.status(404).json({ error: "File not found" });
+    return;
+  }
+
   try {
+    const objectStorageService = await cloudStorageService();
     const raw = req.params.filePath;
     const filePath = Array.isArray(raw) ? raw.join("/") : raw;
     const file = await objectStorageService.searchPublicObject(filePath);
@@ -247,22 +268,8 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
       return;
     }
 
+    const objectStorageService = await cloudStorageService();
     const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-
-    // --- Protected route example (uncomment when using replit-auth) ---
-    // if (!req.isAuthenticated()) {
-    //   res.status(401).json({ error: "Unauthorized" });
-    //   return;
-    // }
-    // const canAccess = await objectStorageService.canAccessObjectEntity({
-    //   userId: req.user.id,
-    //   objectFile,
-    //   requestedPermission: ObjectPermission.READ,
-    // });
-    // if (!canAccess) {
-    //   res.status(403).json({ error: "Forbidden" });
-    //   return;
-    // }
 
     const response = await objectStorageService.downloadObject(objectFile);
 
@@ -276,7 +283,8 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
       res.end();
     }
   } catch (error) {
-    if (error instanceof ObjectNotFoundError) {
+    const mod = await loadCloudStorage().catch(() => null);
+    if (mod && error instanceof mod.ObjectNotFoundError) {
       req.log.warn({ err: error }, "Object not found");
       res.status(404).json({ error: "Object not found" });
       return;
