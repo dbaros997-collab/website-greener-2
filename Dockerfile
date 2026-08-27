@@ -1,7 +1,8 @@
 # Full-stack Grace High School — public site, /dashboard admin, and /api on one service.
 # Coolify: use this Dockerfile, set DATABASE_URL + SESSION_SECRET, map your custom domain.
+# Force amd64 so esbuild/tailwind native binaries match on mixed-arch Coolify hosts.
 
-FROM node:20-bookworm-slim AS base
+FROM --platform=linux/amd64 node:20-bookworm-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 RUN corepack enable && corepack prepare pnpm@11.10.0 --activate
@@ -31,34 +32,30 @@ COPY scripts ./scripts
 COPY tsconfig.json tsconfig.base.json ./
 
 ENV NODE_ENV=production
-RUN pnpm run build
-RUN CI=true pnpm prune --prod
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-FROM base AS runner
+# Skip typecheck and build sequentially to reduce peak memory on small Coolify servers.
+RUN pnpm run build:docker
+
+FROM --platform=linux/amd64 node:20-bookworm-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=8080
 ENV ALLOWED_ORIGINS=https://gracehighschoolgayaza.academy,https://www.gracehighschoolgayaza.academy
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends tini \
-  && rm -rf /var/lib/apt/lists/* \
-  && groupadd --system --gid 1001 nodejs \
-  && useradd --system --uid 1001 --gid nodejs appuser
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/artifacts/api-server/dist ./artifacts/api-server/dist
+COPY --from=build /app/artifacts/grace-high-school/dist ./artifacts/grace-high-school/dist
+COPY --from=build /app/artifacts/grace-admin/dist ./artifacts/grace-admin/dist
+COPY --from=build /app/scripts/src/setup-db.mjs ./scripts/src/setup-db.mjs
 
-COPY --from=build --chown=appuser:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=appuser:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build --chown=appuser:nodejs /app/artifacts/api-server/dist ./artifacts/api-server/dist
-COPY --from=build --chown=appuser:nodejs /app/artifacts/grace-high-school/dist ./artifacts/grace-high-school/dist
-COPY --from=build --chown=appuser:nodejs /app/artifacts/grace-admin/dist ./artifacts/grace-admin/dist
-COPY --from=build --chown=appuser:nodejs /app/scripts/src/setup-db.mjs ./scripts/src/setup-db.mjs
+RUN chown -R node:node /app
 
-USER appuser
+USER node
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 8080) + '/api/healthz').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["sh", "-c", "node ./scripts/src/setup-db.mjs && exec node --enable-source-maps ./artifacts/api-server/dist/index.mjs"]
