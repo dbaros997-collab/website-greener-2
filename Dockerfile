@@ -4,10 +4,10 @@
 FROM node:20-bookworm AS builder
 WORKDIR /app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="${PNPM_HOME}:${PATH}"
 ENV CI=true
-RUN corepack enable && corepack prepare pnpm@11.10.0 --activate
+# Avoid corepack (ERR_UNKNOWN_BUILTIN_MODULE on some Coolify hosts); pin pnpm to match package.json.
+RUN npm install -g pnpm@11.10.0 \
+ && pnpm --version
 
 COPY . .
 
