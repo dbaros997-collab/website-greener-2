@@ -5,25 +5,12 @@ FROM node:20-bookworm AS builder
 WORKDIR /app
 
 ENV CI=true
-ENV PNPM_HOME=/pnpm
-ENV PATH="/pnpm:${PATH}"
 ENV npm_config_update_notifier=false
 
-# Install pnpm for the host CPU (Coolify servers may be amd64 or arm64).
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates wget \
-  && rm -rf /var/lib/apt/lists/* \
-  && mkdir -p /pnpm \
-  && arch="$(uname -m)" \
-  && case "$arch" in \
-    x86_64) pnpm_arch="linux-x64" ;; \
-    aarch64|arm64) pnpm_arch="linux-arm64" ;; \
-    *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
-  esac \
-  && wget -qO /pnpm/pnpm "https://github.com/pnpm/pnpm/releases/download/v11.10.0/pnpm-${pnpm_arch}" \
-  && chmod +x /pnpm/pnpm \
+RUN corepack enable \
+  && corepack prepare pnpm@11.10.0 --activate \
   && node --version \
-  && /pnpm/pnpm --version
+  && pnpm --version
 
 COPY . .
 
@@ -31,9 +18,7 @@ RUN echo ">>> Installing dependencies..." \
   && pnpm install --frozen-lockfile \
     --filter @workspace/api-server... \
     --filter @workspace/grace-high-school... \
-    --filter @workspace/grace-admin... \
-  && echo ">>> Verifying esbuild..." \
-  && node ./node_modules/esbuild/bin/esbuild --version
+    --filter @workspace/grace-admin...
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
