@@ -17,7 +17,7 @@ if (!process.env.PORT) {
   process.exit(1);
 }
 
-function runNode(script: string, args: string[] = []): Promise<number> {
+function runNode(script, args = []) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [script, ...args], {
       stdio: "inherit",

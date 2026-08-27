@@ -1,5 +1,5 @@
 # Full-stack Grace High School — site + /dashboard + /api in one container.
-# Coolify: Build Pack = Dockerfile. Set DATABASE_URL + SESSION_SECRET.
+# Coolify: Build Pack = Dockerfile. Set DATABASE_URL + SESSION_SECRET + PORT.
 
 FROM node:20-bookworm AS builder
 WORKDIR /app
@@ -7,27 +7,44 @@ WORKDIR /app
 ENV CI=true
 ENV PNPM_HOME=/pnpm
 ENV PATH="/pnpm:${PATH}"
+ENV npm_config_update_notifier=false
 
-# Standalone pnpm install — avoids corepack/npm (ERR_UNKNOWN_BUILTIN_MODULE on some Coolify hosts).
+# Direct pnpm binary — no corepack, npm global, or install.sh (all hang/fail on some Coolify hosts).
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates wget bash \
+  && apt-get install -y --no-install-recommends ca-certificates wget \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /pnpm \
-  && wget -qO- https://get.pnpm.io/install.sh | SHELL=/bin/bash PNPM_HOME=/pnpm bash - \
+  && wget -qO /pnpm/pnpm "https://github.com/pnpm/pnpm/releases/download/v11.10.0/pnpm-linux-x64" \
+  && chmod +x /pnpm/pnpm \
   && node --version \
-  && pnpm --version
+  && /pnpm/pnpm --version
+
+# Manifests first so dependency install is cached when only source changes.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY lib ./lib
+COPY scripts/package.json ./scripts/package.json
+COPY artifacts/api-server/package.json ./artifacts/api-server/package.json
+COPY artifacts/grace-high-school/package.json ./artifacts/grace-high-school/package.json
+COPY artifacts/grace-admin/package.json ./artifacts/grace-admin/package.json
+
+RUN echo ">>> Installing production workspace dependencies..." \
+  && pnpm install --frozen-lockfile \
+    --filter @workspace/api-server... \
+    --filter @workspace/grace-high-school... \
+    --filter @workspace/grace-admin...
 
 COPY . .
 
-RUN pnpm install --frozen-lockfile --ignore-scripts
-
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
-RUN node ./node_modules/esbuild/bin/esbuild --version \
- && pnpm --filter @workspace/api-server run build \
- && pnpm --filter @workspace/grace-high-school run build \
- && pnpm --filter @workspace/grace-admin run build
+RUN echo ">>> Building api-server..." \
+  && pnpm --filter @workspace/api-server run build \
+  && echo ">>> Building grace-high-school..." \
+  && pnpm --filter @workspace/grace-high-school run build \
+  && echo ">>> Building grace-admin..." \
+  && pnpm --filter @workspace/grace-admin run build \
+  && echo ">>> All builds finished."
 
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app

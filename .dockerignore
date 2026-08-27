@@ -5,6 +5,8 @@ node_modules
 .cursor
 .agents
 .replit
+**/.replit
+**/.replit-artifact
 .env
 .env.*
 !.env.example
@@ -14,7 +16,16 @@ artifacts/api-server/.local
 coverage
 tmp-sharp
 .tmp-sharp
-grace-high-school-public_html.zip
 *.log
 .DS_Store
 Thumbs.db
+
+# Not needed for production image — keeps Coolify build context small (~500MB → ~3MB).
+.canvas
+artifacts/admin
+artifacts/mockup-sandbox
+**/*.zip
+grace-high-school-public_html.zip
+attached_assets/**
+!attached_assets/optimized/
+!attached_assets/optimized/**
