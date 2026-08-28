@@ -1,0 +1,14 @@
+# Coolify / Nixpacks — native pnpm monorepo build.
+# package.json "packageManager" selects pnpm 11; pnpm-workspace.yaml defines the workspace.
+
+[variables]
+NODE_ENV = "production"
+
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["pnpm run build:docker"]
+
+[start]
+cmd = "node ./scripts/src/docker-start.mjs"
