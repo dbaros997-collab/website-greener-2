@@ -7,30 +7,22 @@ WORKDIR /app
 ENV CI=true
 ENV npm_config_update_notifier=false
 
-# Self-contained pnpm CLI: plain Node script from the npm registry tarball.
-# Avoids corepack, npm exec/npx, and global npm installs (all crash on some Coolify hosts).
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl \
-  && rm -rf /var/lib/apt/lists/* \
-  && mkdir -p /opt/pnpm-cli \
-  && curl -fsSL https://registry.npmjs.org/pnpm/-/pnpm-11.10.0.tgz \
-     | tar -xz --strip-components=1 -C /opt/pnpm-cli \
-  && node /opt/pnpm-cli/bin/pnpm.cjs --version
-
 COPY . .
 
-RUN node /opt/pnpm-cli/bin/pnpm.cjs install --frozen-lockfile \
-  --filter @workspace/api-server... \
-  --filter @workspace/grace-high-school... \
-  --filter @workspace/grace-admin... \
+# Expand pnpm catalog: entries and configure npm workspaces (no pnpm in this image).
+RUN node ./scripts/docker-prepare-npm.mjs \
+  && node --version \
+  && npm --version
+
+RUN npm install --workspaces --include-workspace-root \
   && node ./node_modules/esbuild/bin/esbuild --version
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 
-RUN node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/api-server run build \
-  && node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/grace-high-school run build \
-  && node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/grace-admin run build
+RUN npm run build --workspace=@workspace/api-server \
+  && npm run build --workspace=@workspace/grace-high-school \
+  && npm run build --workspace=@workspace/grace-admin
 
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
@@ -43,7 +35,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
+COPY --from=builder /app/package.json /app/.npmrc ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/scripts/package.json ./scripts/package.json
