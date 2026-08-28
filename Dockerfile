@@ -9,14 +9,11 @@ ENV npm_config_update_notifier=false
 
 COPY . .
 
-# Match packageManager in package.json so pnpm 11 reads allowBuilds from pnpm-workspace.yaml.
-RUN npm install -g pnpm@11.10.0 \
-  && node --version \
-  && pnpm --version \
-  && pnpm config set dangerouslyAllowAllBuilds true \
-  && pnpm approve-builds esbuild core-js @swc/core msw unrs-resolver
+RUN node --version \
+  && npm --version \
+  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --version
 
-RUN pnpm install --frozen-lockfile \
+RUN npm exec --yes --package=pnpm@11.10.0 -- pnpm install --frozen-lockfile \
   --filter @workspace/api-server... \
   --filter @workspace/grace-high-school... \
   --filter @workspace/grace-admin... \
@@ -25,9 +22,9 @@ RUN pnpm install --frozen-lockfile \
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 
-RUN pnpm --filter @workspace/api-server run build \
-  && pnpm --filter @workspace/grace-high-school run build \
-  && pnpm --filter @workspace/grace-admin run build
+RUN npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/api-server run build \
+  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/grace-high-school run build \
+  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/grace-admin run build
 
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
