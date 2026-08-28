@@ -1,11 +1,19 @@
 # Coolify / Nixpacks — native pnpm monorepo build.
 # package.json "packageManager" selects pnpm 11; pnpm-workspace.yaml defines the workspace.
+# Nixpacks' default pnpm (9.x) cannot read pnpm 11 lockfile overrides — activate corepack first.
+
+providers = ["node"]
 
 [variables]
 NODE_ENV = "production"
 
 [phases.install]
-cmds = ["pnpm install --frozen-lockfile"]
+cmds = [
+  "npm install -g corepack@latest",
+  "corepack enable",
+  "corepack prepare pnpm@11.10.0 --activate",
+  "pnpm install --frozen-lockfile",
+]
 
 [phases.build]
 cmds = ["pnpm run build:docker"]
