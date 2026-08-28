@@ -9,15 +9,18 @@ ENV npm_config_update_notifier=false
 
 COPY . .
 
-RUN npm install -g pnpm \
+# Match packageManager in package.json so pnpm 11 reads allowBuilds from pnpm-workspace.yaml.
+RUN npm install -g pnpm@11.10.0 \
   && node --version \
-  && pnpm --version
+  && pnpm --version \
+  && pnpm config set dangerouslyAllowAllBuilds true \
+  && pnpm approve-builds esbuild core-js @swc/core msw unrs-resolver
 
 RUN pnpm install --frozen-lockfile \
-  --config.dangerouslyAllowAllBuilds=true \
   --filter @workspace/api-server... \
   --filter @workspace/grace-high-school... \
-  --filter @workspace/grace-admin...
+  --filter @workspace/grace-admin... \
+  && node ./node_modules/esbuild/bin/esbuild --version
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"

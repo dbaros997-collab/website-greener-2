@@ -35,18 +35,14 @@ minimumReleaseAgeExclude:
   - '@replit/*'
   - stripe-replit-sync
 
+# pnpm 11+: allow native/postinstall builds required for esbuild, vite, etc.
+dangerouslyAllowAllBuilds: true
 allowBuilds:
   '@swc/core': true
   core-js: true
   esbuild: true
   msw: true
   unrs-resolver: true
-
-onlyBuiltDependencies:
-  - '@swc/core'
-  - esbuild
-  - msw
-  - unrs-resolver
 
 overrides:
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
