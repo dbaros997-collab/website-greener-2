@@ -7,13 +7,19 @@ WORKDIR /app
 ENV CI=true
 ENV npm_config_update_notifier=false
 
+# Self-contained pnpm CLI: plain Node script from the npm registry tarball.
+# Avoids corepack, npm exec/npx, and global npm installs (all crash on some Coolify hosts).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /opt/pnpm-cli \
+  && curl -fsSL https://registry.npmjs.org/pnpm/-/pnpm-11.10.0.tgz \
+     | tar -xz --strip-components=1 -C /opt/pnpm-cli \
+  && node /opt/pnpm-cli/bin/pnpm.cjs --version
+
 COPY . .
 
-RUN node --version \
-  && npm --version \
-  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --version
-
-RUN npm exec --yes --package=pnpm@11.10.0 -- pnpm install --frozen-lockfile \
+RUN node /opt/pnpm-cli/bin/pnpm.cjs install --frozen-lockfile \
   --filter @workspace/api-server... \
   --filter @workspace/grace-high-school... \
   --filter @workspace/grace-admin... \
@@ -22,9 +28,9 @@ RUN npm exec --yes --package=pnpm@11.10.0 -- pnpm install --frozen-lockfile \
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 
-RUN npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/api-server run build \
-  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/grace-high-school run build \
-  && npm exec --yes --package=pnpm@11.10.0 -- pnpm --filter @workspace/grace-admin run build
+RUN node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/api-server run build \
+  && node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/grace-high-school run build \
+  && node /opt/pnpm-cli/bin/pnpm.cjs --filter @workspace/grace-admin run build
 
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
