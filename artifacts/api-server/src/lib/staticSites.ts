@@ -43,14 +43,32 @@ function hasStaticExtension(requestPath: string): boolean {
   return /\.[a-z0-9]+$/i.test(requestPath);
 }
 
+function readGoogleSiteVerificationBody(publicDir: string): string {
+  const filePath = path.join(publicDir, GOOGLE_SITE_VERIFICATION_FILE);
+  try {
+    return fs.readFileSync(filePath, "utf8");
+  } catch {
+    return GOOGLE_SITE_VERIFICATION_BODY;
+  }
+}
+
 function registerGoogleSiteVerification(app: Express, publicDir: string): void {
-  app.get(`/${GOOGLE_SITE_VERIFICATION_FILE}`, (_req, res) => {
-    const filePath = path.join(publicDir, GOOGLE_SITE_VERIFICATION_FILE);
-    if (fs.existsSync(filePath)) {
-      res.type("text/html; charset=utf-8").sendFile(filePath);
-      return;
-    }
-    res.type("text/html; charset=utf-8").send(GOOGLE_SITE_VERIFICATION_BODY);
+  const verificationPath = `/${GOOGLE_SITE_VERIFICATION_FILE}`;
+
+  app.get(verificationPath, (_req, res) => {
+    res
+      .status(200)
+      .type("text/html; charset=utf-8")
+      .set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800")
+      .send(readGoogleSiteVerificationBody(publicDir));
+  });
+
+  app.head(verificationPath, (_req, res) => {
+    res
+      .status(200)
+      .type("text/html; charset=utf-8")
+      .set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800")
+      .end();
   });
 }
 
@@ -67,7 +85,6 @@ function staticOptions() {
 
 function mountSpa(app: Express, mount: string, publicDir: string): void {
   if (mount === "/") {
-    registerGoogleSiteVerification(app, publicDir);
     app.use(express.static(publicDir, staticOptions()));
     app.use((req, res, next) => {
       if (req.path.startsWith("/api") || req.path.startsWith("/dashboard")) {
@@ -91,6 +108,10 @@ function mountSpa(app: Express, mount: string, publicDir: string): void {
 
 /** Serve Vite build output for the public site and admin dashboards (Render / single-service deploys). */
 export function registerStaticSites(app: Express): void {
+  const homeDir = path.join(artifactsRoot, "grace-high-school", "dist/public");
+  // Register before static/SPA middleware so Search Console gets 200 + raw body (no redirect).
+  registerGoogleSiteVerification(app, homeDir);
+
   // Legacy /admin bookmarks → grace-admin
   app.get(["/admin", "/admin/", "/admin/*path"], (_req, res) => {
     res.redirect(302, "/dashboard/");
@@ -110,7 +131,6 @@ export function registerStaticSites(app: Express): void {
     logger.info({ mount: site.mount, publicDir }, "Serving static site");
   }
 
-  const homeDir = path.join(artifactsRoot, "grace-high-school", "dist/public");
   const homeIndex = path.join(homeDir, "index.html");
   if (fs.existsSync(homeIndex)) {
     mountSpa(app, "/", homeDir);
