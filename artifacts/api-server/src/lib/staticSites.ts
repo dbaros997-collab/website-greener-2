@@ -33,7 +33,26 @@ function spaFallback(publicDir: string): RequestHandler {
 }
 
 const SEO_ASSET_RE =
-  /(?:^|[/\\])(?:sitemap\.xml|robots\.txt|site\.webmanifest|favicon\.ico|favicon\.png|ghs-\d+\.png|icon-\d+\.png|school-icon-\d+\.png|favicon-\d+x\d+\.png|logo(?:-\d+)?\.png)$/i;
+  /(?:^|[/\\])(?:sitemap\.xml|robots\.txt|site\.webmanifest|google[a-z0-9]+\.html|favicon\.ico|favicon\.png|ghs-\d+\.png|icon-\d+\.png|school-icon-\d+\.png|favicon-\d+x\d+\.png|logo(?:-\d+)?\.png)$/i;
+
+const GOOGLE_SITE_VERIFICATION_FILE = "google9d7169ba6cc50173.html";
+const GOOGLE_SITE_VERIFICATION_BODY =
+  "google-site-verification: google9d7169ba6cc50173.html\n";
+
+function hasStaticExtension(requestPath: string): boolean {
+  return /\.[a-z0-9]+$/i.test(requestPath);
+}
+
+function registerGoogleSiteVerification(app: Express, publicDir: string): void {
+  app.get(`/${GOOGLE_SITE_VERIFICATION_FILE}`, (_req, res) => {
+    const filePath = path.join(publicDir, GOOGLE_SITE_VERIFICATION_FILE);
+    if (fs.existsSync(filePath)) {
+      res.type("text/html; charset=utf-8").sendFile(filePath);
+      return;
+    }
+    res.type("text/html; charset=utf-8").send(GOOGLE_SITE_VERIFICATION_BODY);
+  });
+}
 
 function staticOptions() {
   return {
@@ -48,10 +67,16 @@ function staticOptions() {
 
 function mountSpa(app: Express, mount: string, publicDir: string): void {
   if (mount === "/") {
+    registerGoogleSiteVerification(app, publicDir);
     app.use(express.static(publicDir, staticOptions()));
     app.use((req, res, next) => {
       if (req.path.startsWith("/api") || req.path.startsWith("/dashboard")) {
         next();
+        return;
+      }
+      // Don't serve the SPA shell for missing static files (e.g. Search Console HTML).
+      if (hasStaticExtension(req.path)) {
+        res.status(404).type("text/plain").send("Not found");
         return;
       }
       spaFallback(publicDir)(req, res, next);

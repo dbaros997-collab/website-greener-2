@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -14,13 +15,32 @@ if (Number.isNaN(port) || port <= 0) {
 
 const isReplit = process.env.REPL_ID !== undefined;
 const apiProxyTarget = process.env.API_PROXY_TARGET ?? "http://localhost:8080";
+const artifactDir = path.resolve(import.meta.dirname);
+const publicDir = path.resolve(artifactDir, "public");
+const outDir = path.resolve(artifactDir, "dist/public");
+
+/** Belt-and-suspenders: ensure Search Console HTML files land at the dist root. */
+function copyRootVerificationFiles(): void {
+  if (!fs.existsSync(publicDir)) return;
+  fs.mkdirSync(outDir, { recursive: true });
+  for (const name of fs.readdirSync(publicDir)) {
+    if (/^google[a-z0-9]+\.html$/i.test(name)) {
+      fs.copyFileSync(path.join(publicDir, name), path.join(outDir, name));
+    }
+  }
+}
 
 export default defineConfig({
   base: basePath,
+  publicDir,
   plugins: [
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
+    {
+      name: "copy-google-verification",
+      closeBundle: copyRootVerificationFiles,
+    },
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -42,9 +62,9 @@ export default defineConfig({
     },
     dedupe: ["react", "react-dom"],
   },
-  root: path.resolve(import.meta.dirname),
+  root: artifactDir,
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir,
     emptyOutDir: true,
   },
   server: {
