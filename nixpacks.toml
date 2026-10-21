@@ -2,6 +2,8 @@ providers = ["node"]
 
 [variables]
 NIXPACKS_NODE_VERSION = "20"
+NEXT_TELEMETRY_DISABLED = "1"
+NPM_CONFIG_PRODUCTION = "false"
 
 [phases.setup]
 nixPkgs = ["nodejs_20", "pnpm-9_x"]
@@ -10,4 +12,7 @@ nixPkgs = ["nodejs_20", "pnpm-9_x"]
 cmds = ["pnpm install --no-frozen-lockfile"]
 
 [phases.build]
-cmds = ["pnpm build"]
+cmds = ["pnpm run build:docker"]
+
+[start]
+cmd = "NODE_ENV=production node ./scripts/src/docker-start.mjs"
