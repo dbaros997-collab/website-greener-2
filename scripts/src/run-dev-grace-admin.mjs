@@ -21,9 +21,8 @@ function readEnvFileValue(key) {
   return undefined;
 }
 
-// Live Render site that hosts the public school pages + the same /api the admin uses.
-const LIVE_API =
-  "https://grace-high-school-gayaza-t7p6.onrender.com";
+// Live site (custom domain) — public pages + /api + /dashboard.
+const LIVE_API = "https://gracehighschoolgayaza.academy";
 
 const apiProxyTarget =
   process.env.API_PROXY_TARGET ??
@@ -38,7 +37,7 @@ const env = {
 };
 
 console.log(`[grace-admin] API proxy → ${apiProxyTarget}`);
-if (apiProxyTarget.includes("onrender.com")) {
+if (apiProxyTarget.includes("gracehighschoolgayaza.academy")) {
   console.log(
     "[grace-admin] Saves go to the live site; open visitors will update over SSE as soon as you save.",
   );
