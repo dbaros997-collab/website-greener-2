@@ -30,6 +30,7 @@ if (!secretFromEnv) {
 
 const isLocalDev =
   process.env.NODE_ENV !== "production" && process.env.REPL_ID === undefined;
+const isReplit = process.env.REPL_ID !== undefined;
 
 // Session table is created by ensureSchema() after the HTTP server listens.
 // Session middleware backed by Postgres. The Replit preview runs in a
@@ -48,7 +49,8 @@ export const sessionMiddleware: RequestHandler = session({
   cookie: {
     httpOnly: true,
     secure: !isLocalDev,
-    sameSite: isLocalDev ? "lax" : "none",
+    // Replit preview iframe needs None; same-host Coolify/Render uses Lax on /dashboard → /api.
+    sameSite: isLocalDev || !isReplit ? "lax" : "none",
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },

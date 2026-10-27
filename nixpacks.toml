@@ -4,6 +4,7 @@ providers = ["node"]
 NIXPACKS_NODE_VERSION = "20"
 NEXT_TELEMETRY_DISABLED = "1"
 NPM_CONFIG_PRODUCTION = "false"
+ALLOWED_ORIGINS = "https://gracehighschoolgayaza.academy,https://www.gracehighschoolgayaza.academy"
 
 [phases.setup]
 nixPkgs = ["nodejs_20", "pnpm-9_x"]

@@ -42,6 +42,12 @@ function isAllowedOrigin(origin: string): boolean {
   try {
     const { hostname } = new URL(origin);
     if (hostname.endsWith(".onrender.com")) return true;
+    if (
+      hostname === "gracehighschoolgayaza.academy" ||
+      hostname === "www.gracehighschoolgayaza.academy"
+    ) {
+      return true;
+    }
   } catch {
     return false;
   }

@@ -1,7 +1,8 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetCurrentUser,
+  useLogin,
   getGetCurrentUserQueryKey,
   type AuthUser,
 } from "@workspace/api-client-react";
@@ -20,8 +21,23 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
+  const loginMutation = useLogin();
 
-  // Establishes a passwordless session in the background for API writes.
+  // Same-origin production: open a passwordless session before staff edit content.
+  useEffect(() => {
+    loginMutation.mutate(
+      { data: { username: "admin", password: "passwordless" } },
+      {
+        onSuccess: () => {
+          void queryClient.invalidateQueries({
+            queryKey: getGetCurrentUserQueryKey(),
+          });
+        },
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once on mount
+  }, []);
+
   const meQuery = useGetCurrentUser({
     query: {
       queryKey: getGetCurrentUserQueryKey(),

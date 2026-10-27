@@ -4,6 +4,8 @@ import { SubmissionsSection } from "@/components/SubmissionsSection";
 import { ApplicationsSection } from "@/components/ApplicationsSection";
 import { SiteTextSection } from "@/components/SiteTextSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ApiError } from "@workspace/api-client-react";
 import {
   useListNewsItems,
   useCreateNewsItem,
@@ -176,6 +178,16 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-6">
+        {news.isError ? (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Cannot sync with the public website</AlertTitle>
+            <AlertDescription>
+              {news.error instanceof ApiError && news.error.status >= 500
+                ? "The server database is not connected. Set DATABASE_URL (and SESSION_SECRET) on Coolify or Render, redeploy, then reload this page. Until then, saves will not appear on gracehighschoolgayaza.academy."
+                : "The dashboard could not load content from /api on this domain. Check that the API is running and that your browser allows cookies for this site."}
+            </AlertDescription>
+          </Alert>
+        ) : null}
         <Tabs defaultValue="news">
           <TabsList className="mb-4 flex h-auto flex-wrap justify-start gap-1">
             {TABS.map((t) => (
