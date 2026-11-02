@@ -26,8 +26,8 @@ COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
 COPY scripts/package.json scripts/package.json
 
-# Install from the lockfile at the workspace root.
-RUN corepack enable && pnpm install --frozen-lockfile
+# Install workspace dependencies at the repo root.
+RUN corepack enable && pnpm install --no-frozen-lockfile
 
 COPY . .
 
