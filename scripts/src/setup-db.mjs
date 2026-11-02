@@ -1,5 +1,14 @@
-import pg from "pg";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { postgresPoolSsl } from "../lib/postgres-ssl.mjs";
+
+// Resolve pg from the db package so production installs can skip the scripts
+// workspace (and its embedded-postgres download).
+const require = createRequire(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "../../lib/db/package.json"),
+);
+const pg = require("pg");
 
 // Never hard-fail the process: Render start commands often chain this with
 // `&& node …`, and a DB blip must not prevent the HTTP server from binding.

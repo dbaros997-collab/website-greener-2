@@ -1,16 +1,26 @@
+# Coolify's Nix phase was installing pnpm from Nix (pnpm-9_x), which is often
+# built from source and blows the 3600s deploy limit. Node comes from the
+# binary cache; pnpm is the official tarball via corepack.
 providers = ["node"]
 
 [variables]
 NIXPACKS_NODE_VERSION = "20"
+NIXPACKS_PNPM_VERSION = "11.10.0"
+CI = "true"
 NEXT_TELEMETRY_DISABLED = "1"
 NPM_CONFIG_PRODUCTION = "false"
+COREPACK_ENABLE_DOWNLOAD_PROMPT = "0"
 ALLOWED_ORIGINS = "https://gracehighschoolgayaza.academy,https://www.gracehighschoolgayaza.academy"
 
 [phases.setup]
-nixPkgs = ["nodejs_20", "pnpm-9_x"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["pnpm install --no-frozen-lockfile"]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@11.10.0 --activate",
+  "pnpm run install:docker",
+]
 
 [phases.build]
 cmds = ["pnpm run build:docker"]

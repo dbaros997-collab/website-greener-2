@@ -111,7 +111,8 @@ async function main() {
     const patchBody = {
       git_repository: GIT_REPO,
       git_branch: GIT_BRANCH,
-      build_pack: "nixpacks",
+      build_pack: "dockerfile",
+      dockerfile_location: "Dockerfile",
       install_command: "",
       build_command: "",
       start_command: "",

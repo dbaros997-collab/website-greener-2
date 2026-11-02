@@ -2,6 +2,7 @@ node_modules
 **/node_modules
 .git
 .github
+**/.git
 .cursor
 .agents
 .replit
@@ -14,11 +15,15 @@ node_modules
 **/.local
 artifacts/api-server/.local
 coverage
+tmp
 tmp-sharp
 .tmp-sharp
 *.log
 .DS_Store
 Thumbs.db
+**/dist
+**/.tsbuildinfo
+.cache
 
 # Shrink Coolify build context (~500MB -> ~15MB). Site build needs optimized webp only.
 .canvas
