@@ -26,7 +26,8 @@ COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
 COPY scripts/package.json scripts/package.json
 
-RUN pnpm run install:docker
+# Install from the lockfile at the workspace root.
+RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY . .
 
