@@ -60,6 +60,42 @@ import {
 import { requireAuth } from "../lib/auth";
 import { broadcast } from "../lib/events";
 import { deleteStoredObject } from "../lib/localObjectStorage";
+import {
+  DATABASE_UNAVAILABLE_MESSAGE,
+  isPostgresConnectionError,
+} from "../lib/pg-errors";
+
+function presentRow(row: Record<string, unknown>): Record<string, unknown> {
+  const next: Record<string, unknown> = { ...row };
+  for (const [key, value] of Object.entries(next)) {
+    if (value !== null && value !== undefined) continue;
+    if (key === "wide" || key === "isVisible" || key === "multiline") {
+      next[key] = false;
+    } else if (key === "sortOrder" || key === "id" || key === "fileSize") {
+      next[key] = 0;
+    } else if (key === "subjects") {
+      next[key] = [];
+    } else if (key === "createdAt") {
+      next[key] = new Date();
+    } else {
+      next[key] = "";
+    }
+  }
+  if (next.createdAt == null || next.createdAt === "") next.createdAt = new Date();
+  return next;
+}
+
+function respondToContentError(
+  err: unknown,
+  res: { status: (code: number) => { json: (body: unknown) => void } },
+  next: (err?: unknown) => void,
+): void {
+  if (isPostgresConnectionError(err)) {
+    res.status(503).json({ error: DATABASE_UNAVAILABLE_MESSAGE });
+    return;
+  }
+  next(err);
+}
 
 // drizzle's generic table types make a fully-typed factory awkward; zod
 // validation is the real safety net, so we use loose casts on the query builder.
@@ -90,46 +126,59 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
 
   // Public list. Hidden items are only included for authenticated admins that
   // explicitly request them via ?includeHidden=true.
-  router.get(`/${resource}`, async (req, res): Promise<void> => {
-    const includeHidden =
-      req.query.includeHidden === "true" || req.query.includeHidden === "1";
-    const showAll = includeHidden && Boolean(req.session.userId);
+  router.get(`/${resource}`, async (req, res, next): Promise<void> => {
+    try {
+      const includeHidden =
+        req.query.includeHidden === "true" || req.query.includeHidden === "1";
+      const showAll = includeHidden && Boolean(req.session.userId);
 
-    const rows = (await db
-      .select()
-      .from(table as PgTable)
-      .orderBy(asc(table.sortOrder), asc(table.id))) as Array<
-      Record<string, unknown>
-    >;
+      const rows = (await db
+        .select()
+        .from(table as PgTable)
+        .orderBy(asc(table.sortOrder), asc(table.id))) as Array<
+        Record<string, unknown>
+      >;
 
-    const visible = showAll ? rows : rows.filter((r) => r["isVisible"]);
-    res.json(cfg.listResponse.parse(visible));
+      const visible = showAll ? rows : rows.filter((r) => r["isVisible"]);
+      res.json(cfg.listResponse.parse(visible.map(presentRow)));
+    } catch (err) {
+      req.log.error({ err, resource }, "Failed to list content");
+      respondToContentError(err, res, next);
+    }
   });
 
-  router.post(`/${resource}`, requireAuth, async (req, res): Promise<void> => {
+  router.post(`/${resource}`, requireAuth, async (req, res, next): Promise<void> => {
     const parsed = cfg.createBody.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.message });
       return;
     }
 
-    // Place new items at the end.
-    const existing = (await db
-      .select()
-      .from(table as PgTable)) as Array<Record<string, unknown>>;
-    const maxSort = existing.reduce(
-      (m, r) => Math.max(m, Number(r["sortOrder"]) || 0),
-      0,
-    );
+    try {
+      // Place new items at the end.
+      const existing = (await db
+        .select()
+        .from(table as PgTable)) as Array<Record<string, unknown>>;
+      const maxSort = existing.reduce(
+        (m, r) => Math.max(m, Number(r["sortOrder"]) || 0),
+        0,
+      );
 
-    const [created] = (await db
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .insert(table as any)
-      .values({ ...parsed.data, sortOrder: maxSort + 1 })
-      .returning()) as Array<Record<string, unknown>>;
+      const [created] = (await db
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(table as any)
+        .values({ ...parsed.data, sortOrder: maxSort + 1 })
+        .returning()) as Array<Record<string, unknown>>;
 
-    broadcast(resource);
-    res.status(201).json(created);
+      broadcast(resource);
+      res.status(201).json(created);
+    } catch (err) {
+      if (resource === "gallery-images") {
+        console.error("Gallery Upload Error:", err);
+      }
+      req.log.error({ err, resource }, "Failed to create content");
+      respondToContentError(err, res, next);
+    }
   });
 
   router.post(

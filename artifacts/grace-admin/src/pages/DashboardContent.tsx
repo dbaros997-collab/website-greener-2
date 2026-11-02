@@ -56,12 +56,18 @@ const statsFields: FieldDef[] = [
   { key: "label", label: "Label", type: "text", required: true, placeholder: "Acre Campus" },
 ];
 const galleryFields: FieldDef[] = [
-  { key: "caption", label: "Caption", type: "text", required: true },
+  {
+    key: "caption",
+    label: "Caption",
+    type: "text",
+    required: true,
+    placeholder: "Electrical presentation",
+  },
   {
     key: "category",
     label: "Category",
     type: "text",
-    placeholder: "campus / academics / events / vocational / achievements",
+    placeholder: "events",
   },
   { key: "wide", label: "Wide (spans two columns)", type: "boolean" },
 ];
@@ -175,7 +181,7 @@ export function DashboardContent({ section }: { section: string }) {
       return (
         <ContentSection
           title="Gallery"
-          description="Campus photos — uploads use this site's /api and appear on the public gallery."
+          description="Campus photos. Upload an image and add a caption."
           fields={galleryFields}
           primaryKey="caption"
           secondaryKey="category"

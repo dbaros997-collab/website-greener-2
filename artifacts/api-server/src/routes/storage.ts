@@ -1,16 +1,26 @@
+import { mkdir } from "node:fs/promises";
+import path from "node:path";
 import { Router, type IRouter, type Request, type Response } from "express";
+import { logger } from "../lib/logger";
 import { Readable } from "stream";
 import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
 } from "@workspace/api-zod";
 import { requireAuth } from "../lib/auth";
+import { MultipartError, readMultipartRequest } from "../lib/multipart";
 import {
   createLocalUpload,
+  ensureLocalUploadDirs,
   handleLocalUploadPut,
   isLocalObjectStorage,
+  saveLocalObjectBytes,
   serveLocalObject,
 } from "../lib/localObjectStorage";
+import {
+  DATABASE_UNAVAILABLE_MESSAGE,
+  isPostgresConnectionError,
+} from "../lib/pg-errors";
 
 const router: IRouter = Router();
 
@@ -151,6 +161,100 @@ router.post(
   },
 );
 
+const MAX_IMAGE_UPLOAD_BYTES = 15 * 1024 * 1024;
+const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic", ".avif"];
+
+function isImageUpload(fileName: string, contentType: string): boolean {
+  const type = contentType.toLowerCase().split(";")[0]?.trim() ?? "";
+  if (type.startsWith("image/")) return true;
+  const lower = fileName.toLowerCase();
+  return IMAGE_EXTENSIONS.some((ext) => lower.endsWith(ext));
+}
+
+async function storeImageUpload(args: {
+  fileName: string;
+  contentType: string;
+  body: Buffer;
+}): Promise<string> {
+  if (!isLocalObjectStorage()) {
+    try {
+      const service = await cloudStorageService();
+      return await service.saveUploadedBytes({
+        prefix: "uploads",
+        contentType: args.contentType,
+        body: args.body,
+      });
+    } catch (error) {
+      logger.warn(
+        { err: error },
+        "Cloud image upload failed; storing the file in the database",
+      );
+    }
+  }
+
+  return saveLocalObjectBytes({
+    prefix: "uploads",
+    fileName: args.fileName,
+    contentType: args.contentType,
+    body: args.body,
+  });
+}
+
+/**
+ * POST /storage/uploads
+ *
+ * Multipart image upload used by the gallery form. The client must send
+ * FormData and must NOT set Content-Type (the browser adds the boundary).
+ */
+router.post("/storage/uploads", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const form = await readMultipartRequest(req, MAX_IMAGE_UPLOAD_BYTES);
+    const file =
+      form.files.find((item) => item.fieldName === "file" || item.fieldName === "image") ??
+      form.files[0];
+    if (!file || file.data.length === 0) {
+      res.status(400).json({ error: "Choose an image file to upload." });
+      return;
+    }
+    if (!isImageUpload(file.fileName, file.contentType)) {
+      res.status(400).json({
+        error: "Unsupported file type. Please upload a JPEG, PNG, or WebP image.",
+      });
+      return;
+    }
+
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
+    await ensureLocalUploadDirs();
+
+    const objectPath = await storeImageUpload({
+      fileName: file.fileName,
+      contentType: file.contentType,
+      body: file.data,
+    });
+    res.status(201).json({
+      objectPath,
+      metadata: {
+        name: file.fileName,
+        size: file.data.length,
+        contentType: file.contentType || "application/octet-stream",
+      },
+    });
+  } catch (error) {
+    console.error("Gallery Upload Error:", error);
+    if (error instanceof MultipartError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
+    if (isPostgresConnectionError(error)) {
+      res.status(503).json({ error: DATABASE_UNAVAILABLE_MESSAGE });
+      return;
+    }
+    req.log.error({ err: error }, "Error storing multipart image upload");
+    res.status(500).json({ error: "Failed to store upload" });
+  }
+});
+
 /**
  * POST /storage/uploads/request-url
  *
@@ -260,11 +364,13 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
 
     const objectPath = `/objects/${wildcardPath}`;
 
+    // Database copies are checked first so gallery images saved with the
+    // multipart upload still load when cloud storage is not configured.
+    const served = await serveLocalObject(objectPath, res);
+    if (served) return;
+
     if (isLocalObjectStorage()) {
-      const served = await serveLocalObject(objectPath, res);
-      if (!served) {
-        res.status(404).json({ error: "Object not found" });
-      }
+      res.status(404).json({ error: "Object not found" });
       return;
     }
 

@@ -75,6 +75,32 @@ export async function ensureLocalUploadDirs(): Promise<void> {
   await mkdir(path.join(root, "applications"), { recursive: true });
 }
 
+export async function saveLocalObjectBytes(args: {
+  prefix: LocalUploadPrefix;
+  fileName: string;
+  contentType: string;
+  body: Buffer;
+}): Promise<string> {
+  const objectId = randomUUID();
+  const objectPath = objectPathFor(args.prefix, objectId);
+  const contentType = guessContentType(args.fileName, args.contentType);
+  await upsertStoredObject({
+    objectPath,
+    contentType,
+    fileName: args.fileName.trim() || objectId,
+    body: args.body,
+  });
+
+  try {
+    await ensureLocalUploadDirs();
+    await writeFile(absoluteFilePath(args.prefix, objectId), args.body);
+  } catch {
+    // Disk is optional; Postgres already has the file.
+  }
+
+  return objectPath;
+}
+
 async function upsertStoredObject(args: {
   objectPath: string;
   contentType: string;

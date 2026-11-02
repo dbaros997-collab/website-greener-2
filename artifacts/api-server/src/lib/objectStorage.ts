@@ -106,6 +106,22 @@ export class ObjectStorageService {
     return new Response(webStream, { headers });
   }
 
+  /** Store an uploaded image directly, without a Replit signed URL. */
+  async saveUploadedBytes(args: {
+    prefix: "uploads" | "applications";
+    contentType: string;
+    body: Buffer;
+  }): Promise<string> {
+    const objectId = randomUUID();
+    const fullPath = `${this.getPrivateObjectDir()}/${args.prefix}/${objectId}`;
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    await objectStorageClient.bucket(bucketName).file(objectName).save(args.body, {
+      contentType: args.contentType || "application/octet-stream",
+      resumable: false,
+    });
+    return `/objects/${args.prefix}/${objectId}`;
+  }
+
   async getObjectEntityUploadURL(): Promise<string> {
     const privateObjectDir = this.getPrivateObjectDir();
     if (!privateObjectDir) {

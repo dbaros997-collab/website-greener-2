@@ -337,7 +337,12 @@ export async function customFetch<T = unknown>(
 
   const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
 
-  if (
+  const bodyIsFormData =
+    typeof FormData !== "undefined" && init.body instanceof FormData;
+  if (bodyIsFormData) {
+    // Leave Content-Type unset so the runtime adds the multipart boundary.
+    headers.delete("content-type");
+  } else if (
     typeof init.body === "string" &&
     !headers.has("content-type") &&
     looksLikeJson(init.body)

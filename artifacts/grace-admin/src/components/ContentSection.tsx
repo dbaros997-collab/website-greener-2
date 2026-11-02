@@ -4,7 +4,7 @@ import {
   type UseQueryResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import { requestUploadUrl, getStoragePrefix } from "@workspace/api-client-react";
+import { customFetch, getStoragePrefix } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -172,18 +172,17 @@ export function ContentSection<T extends BaseItem>(
 
   const uploadFile = async (): Promise<string | null> => {
     if (!file) return null;
-    const res = await requestUploadUrl({
-      name: file.name,
-      size: file.size,
-      contentType: file.type || "application/octet-stream",
+    // FormData must be sent without a Content-Type header so the browser can
+    // attach the multipart boundary. A bare "multipart/form-data" header makes
+    // the API fail to read the file and respond with Internal server error.
+    const body = new FormData();
+    body.append("file", file, file.name);
+    const res = await customFetch<{ objectPath?: string }>("/api/storage/uploads", {
+      method: "POST",
+      body,
     });
-    const putRes = await fetch(res.uploadURL, {
-      method: "PUT",
-      headers: { "Content-Type": file.type || "application/octet-stream" },
-      body: file,
-    });
-    if (!putRes.ok) {
-      throw new Error(`Upload failed (${putRes.status})`);
+    if (!res?.objectPath) {
+      throw new Error("Upload did not return a stored image path.");
     }
     return res.objectPath;
   };
@@ -269,10 +268,10 @@ export function ContentSection<T extends BaseItem>(
   };
 
   const renderForm = () => (
-    <Card className="border-emerald-200 bg-emerald-50/40">
+    <Card className="rounded-xl border border-emerald-300 bg-emerald-50/50">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">
-          {editingId === "new" ? `Add ${title} item` : `Edit ${title} item`}
+          {editingId === "new" ? `Add ${title} Item` : `Edit ${title} Item`}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -345,6 +344,7 @@ export function ContentSection<T extends BaseItem>(
         <div className="flex gap-2 pt-1">
           <Button
             onClick={submit}
+            className="bg-[#0a4020] text-white hover:bg-[#083318]"
             disabled={
               createMutation.isPending ||
               updateMutation.isPending ||
@@ -356,7 +356,7 @@ export function ContentSection<T extends BaseItem>(
             ) : null}
             Save
           </Button>
-          <Button variant="outline" onClick={cancel}>
+          <Button variant="outline" className="bg-white" onClick={cancel}>
             <X className="mr-2 h-4 w-4" />
             Cancel
           </Button>
@@ -384,8 +384,14 @@ export function ContentSection<T extends BaseItem>(
 
         {query.isLoading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : query.isError ? (
+          <p className="text-sm text-destructive">
+            {toFriendlyError(query.error).description}
+          </p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No items yet.</p>
+          <div className="rounded-md border px-3 py-6 text-sm text-muted-foreground">
+            No items yet.
+          </div>
         ) : (
           <ul className="divide-y rounded-md border">
             {items.map((item, index) => (

@@ -77,6 +77,13 @@ CREATE TABLE IF NOT EXISTS "gallery_images" (
   "created_at" timestamptz NOT NULL DEFAULT now()
 );
 
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "category" text NOT NULL DEFAULT 'campus';
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "object_path" text NOT NULL DEFAULT '';
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "wide" boolean NOT NULL DEFAULT false;
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "is_visible" boolean NOT NULL DEFAULT true;
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "sort_order" integer NOT NULL DEFAULT 0;
+ALTER TABLE "gallery_images" ADD COLUMN IF NOT EXISTS "created_at" timestamptz NOT NULL DEFAULT now();
+
 CREATE TABLE IF NOT EXISTS "testimonials" (
   "id" serial PRIMARY KEY,
   "quote" text NOT NULL,
