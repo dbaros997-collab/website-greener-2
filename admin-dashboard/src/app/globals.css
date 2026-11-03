@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-dm), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --color-forest-950: #07140d;
+  --color-forest-900: #0a4020;
+  --color-forest-800: #135231;
+  --color-forest-700: #1a6b3c;
+  --color-forest-100: #e7f5ec;
+  --color-gold-500: #c9a24b;
+  --color-gold-300: #e6c66e;
+  --color-paper: #f6f4ef;
+  --color-ink: #14241b;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100%;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+html.dark body {
+  background: var(--color-forest-950);
+  color: #ecf6ef;
+}
+
+::selection {
+  background: #c9a24b;
+  color: #0a4020;
+}
+
+:focus-visible {
+  outline: 2px solid #c9a24b;
+  outline-offset: 2px;
+}

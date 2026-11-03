@@ -3,6 +3,16 @@ import { useLocation, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { subscribeToContentEvents } from "./lib/contentEvents";
 import {
+  categoryLabel,
+  eventTypeLabel,
+  eventWhen,
+  galleryImageSrc,
+  noticeDateLabel,
+  plainNotice,
+  priorityLabel,
+  usePublicContent,
+} from "./lib/publicContent";
+import {
   useListNewsItems,
   useListStats,
   useListVideos,
@@ -430,6 +440,7 @@ export default function App() {
             links: [
               { label: "Core Values", id: "values" },
               { label: "School in Pictures", id: "gallery" },
+              { label: "School Calendar", id: "events" },
               { label: "Student Resources", id: "resources" },
               { label: "School Updates", path: "/updates" },
             ],
@@ -499,6 +510,7 @@ export default function App() {
   };
 
   const newsQ = useListNewsItems();
+  const desk = usePublicContent();
   const statsQ = useListStats();
   const videosQ = useListVideos();
   const programmesQ = useListProgrammes();
@@ -519,9 +531,11 @@ export default function App() {
     "New Term III begins 14 July 2025 — All students report",
   ];
   const tickerMessages =
-    Array.isArray(newsQ.data) && newsQ.data.length > 0
-      ? newsQ.data.map((n) => n.message)
-      : NEWS_FALLBACK;
+    desk && desk.announcements.length > 0
+      ? desk.announcements.map((item) => item.title)
+      : Array.isArray(newsQ.data) && newsQ.data.length > 0
+        ? newsQ.data.map((n) => n.message)
+        : NEWS_FALLBACK;
 
   const STATS_FALLBACK = [
     { num: "28", label: "Acre Campus" },
@@ -730,13 +744,34 @@ export default function App() {
 
   // Parent noticeboard items (static). Shown as a short teaser on the home page;
   // the full list lives on the dedicated /updates page so the home stays short.
-  const updateItems = [
+  const staticUpdates = [
     { date: "02 Jun 2026", cat: "Programmes", tag: "PROGRAMME", title: "Term II Co-Curricular Programme Released", body: "The full schedule for Music, Dance & Drama, sports, and the vocational skills exhibition is now available. Parents are encouraged to support their children's participation." },
     { date: "28 May 2026", cat: "Fees", tag: "FEES", title: "Term II Fees Payment Reminder", body: "Kindly clear all outstanding school fees before the mid-term break. Bank details and payment plans are available at the bursar's office." },
     { date: "20 May 2026", cat: "Academics", tag: "ACADEMICS", title: "Mid-Term Examinations Timetable", body: "Mid-term assessments for all classes (S1–S6) will run during the third week. The detailed timetable has been shared with class teachers." },
     { date: "12 May 2026", cat: "Events", tag: "EVENT", title: "Parents' Visitation Day — Save the Date", body: "Our next Visitation Day is scheduled for the first Saturday of next month. Come meet your child's teachers and tour the campus." },
     { date: "05 May 2026", cat: "General", tag: "GENERAL", title: "New Library Resources & Science Equipment", body: "Thanks to your continued support, the school has acquired new textbooks and laboratory equipment to enrich our students' learning experience." },
   ];
+  const updateItems =
+    desk && desk.announcements.length > 0
+      ? desk.announcements.map((item) => ({
+          date: noticeDateLabel(item.publishAt),
+          cat: priorityLabel(item.priority),
+          tag: priorityLabel(item.priority).toUpperCase(),
+          title: item.title,
+          body: plainNotice(item.body),
+        }))
+      : staticUpdates;
+  const galleryPhotos = (desk?.landingGallery ?? [])
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      category: categoryLabel(item.category),
+      src: galleryImageSrc(item.mediaType, item.mediaUrl),
+      href: item.mediaType === "video" && /^https?:\/\//i.test(item.mediaUrl) ? item.mediaUrl : undefined,
+    }))
+    .filter((item) => item.src);
+  const calendarEvents = desk?.upcomingEvents ?? [];
 
   const updateCard = (u: { date: string; cat: string; tag: string; title: string; body: string }, i: number) => (
     <div key={i} style={{
@@ -1702,18 +1737,89 @@ export default function App() {
               Life at Grace High School
             </h2>
             <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, margin: "0 auto" }}>
-              A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore.
+              {galleryPhotos.length > 0
+                ? "Photos published from the school dashboard. New pictures appear here as soon as they are saved."
+                : "A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore."}
             </p>
           </div>
           <div className="reveal-child">
-            <ImageSlider
-              images={GALLERY_SLIDES}
-              layout="section"
-              intervalMs={5000}
-              objectFitFor={HERO_CONTAIN}
-              altPrefix="Gallery photo"
-            />
+            {galleryPhotos.length > 0 ? (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+                {galleryPhotos.map((photo) => {
+                  const card = (
+                    <>
+                      <img src={photo.src} alt={photo.title} loading="lazy" decoding="async" width={800} height={520} style={{ width: "100%", height: 190, objectFit: "cover", display: "block", background: GREEN_LIGHT }} />
+                      <div style={{ padding: "14px 16px 16px" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{photo.category}</div>
+                        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", color: GREEN_DARK, lineHeight: 1.3, margin: 0 }}>{photo.title}</h3>
+                        {photo.description ? <p style={{ fontSize: 13.5, color: "#5A5A5A", lineHeight: 1.55, margin: "8px 0 0" }}>{photo.description}</p> : null}
+                      </div>
+                    </>
+                  );
+                  const frame = {
+                    background: WHITE,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    boxShadow: "0 8px 24px rgba(10,64,32,0.06)",
+                    textDecoration: "none",
+                    color: "inherit",
+                    display: "block",
+                  } as const;
+                  return photo.href ? (
+                    <a key={photo.id} href={photo.href} target="_blank" rel="noreferrer" style={frame}>
+                      {card}
+                    </a>
+                  ) : (
+                    <figure key={photo.id} style={{ ...frame, margin: 0 }}>
+                      {card}
+                    </figure>
+                  );
+                })}
+              </div>
+            ) : (
+              <ImageSlider
+                images={GALLERY_SLIDES}
+                layout="section"
+                intervalMs={5000}
+                objectFitFor={HERO_CONTAIN}
+                altPrefix="Gallery photo"
+              />
+            )}
           </div>
+        </div>
+      </section>
+
+      <section id="events" className="reveal" style={{ background: GREEN_LIGHT, padding: "64px 5%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: GREEN_MAIN, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <span style={{ width: 34, height: 2, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, display: "block", borderRadius: 2 }} />School Calendar
+          </div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", color: GREEN_DARK, marginBottom: 12 }}>Upcoming Events</h2>
+          <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 640, marginBottom: 32 }}>
+            Term dates, exams, open days, and sports fixtures published from the school dashboard.
+          </p>
+          {calendarEvents.length === 0 ? (
+            <p style={{ fontSize: 14, color: "#5A5A5A" }}>The calendar will appear here once the school publishes dates.</p>
+          ) : (
+            <div style={{ display: "grid", gap: 14 }}>
+              {calendarEvents.map((item) => (
+                <article key={item.id} style={{
+                  background: WHITE, borderRadius: 12, padding: "18px 22px",
+                  border: "1px solid rgba(0,0,0,0.06)", borderLeft: `4px solid ${GOLD}`,
+                  display: "grid", gap: 6,
+                }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: GREEN_LIGHT, color: GREEN_DARK, padding: "3px 10px", borderRadius: 100 }}>{eventTypeLabel(item.eventType)}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: GREEN_MAIN }}>{eventWhen(item.startsAt)}</span>
+                  </div>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: GREEN_DARK, margin: 0 }}>{item.title}</h3>
+                  {item.description ? <p style={{ fontSize: 14, color: "#5A5A5A", lineHeight: 1.6, margin: 0 }}>{item.description}</p> : null}
+                  <p style={{ fontSize: 13, color: "#3A4A40", margin: 0 }}>{item.venue}</p>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
