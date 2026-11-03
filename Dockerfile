@@ -38,7 +38,7 @@ RUN corepack enable && pnpm fetch \
 COPY . .
 
 # Link node_modules from the store. This step does not contact the registry.
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --offline --no-frozen-lockfile
 
 RUN pnpm run build:docker
 
