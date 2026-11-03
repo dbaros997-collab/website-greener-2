@@ -26,8 +26,14 @@ COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
 COPY scripts/package.json scripts/package.json
 
-# Install workspace dependencies at the repo root.
-RUN corepack enable && pnpm install --no-frozen-lockfile
+# Fewer parallel registry requests, with retries, so a dropped npm connection can recover.
+RUN corepack enable && pnpm install --no-frozen-lockfile \
+  --network-concurrency 2 \
+  --fetch-retries 5 \
+  --fetch-retry-factor 2 \
+  --fetch-retry-mintimeout 10000 \
+  --fetch-retry-maxtimeout 120000 \
+  --fetch-timeout 120000
 
 COPY . .
 
