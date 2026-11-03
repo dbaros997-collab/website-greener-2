@@ -17,6 +17,7 @@ RUN corepack enable \
  && pnpm --version
 
 # Manifests only, so this dependency layer stays cached until a package.json or the lockfile changes.
+# .npmrc is included here so pnpm install uses the registry mirror before any package download.
 # Every workspace manifest stays in the image so the lockfile still matches; install below is filtered.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY artifacts/api-server/package.json artifacts/api-server/package.json
