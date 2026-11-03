@@ -26,8 +26,8 @@ COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
 COPY scripts/package.json scripts/package.json
 
-# Fewer parallel registry requests, with retries, so a dropped npm connection can recover.
-RUN corepack enable && pnpm install --no-frozen-lockfile \
+# Download every locked package into the pnpm store before the rest of the source is copied.
+RUN corepack enable && pnpm fetch \
   --network-concurrency 2 \
   --fetch-retries 5 \
   --fetch-retry-factor 2 \
@@ -36,6 +36,9 @@ RUN corepack enable && pnpm install --no-frozen-lockfile \
   --fetch-timeout 120000
 
 COPY . .
+
+# Link node_modules from the store. This step does not contact the registry.
+RUN pnpm install --offline --frozen-lockfile
 
 RUN pnpm run build:docker
 
