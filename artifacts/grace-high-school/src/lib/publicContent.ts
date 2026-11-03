@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 
-/** Admin dashboard feed. Override with VITE_ADMIN_CONTENT_URL when the dashboard is hosted. */
+/**
+ * Admin dashboard feed. Vite inlines VITE_ADMIN_CONTENT_URL at build time
+ * (Coolify: mark the variable Available at Buildtime).
+ */
 const env = import.meta.env as ImportMetaEnv & { VITE_ADMIN_CONTENT_URL?: string };
+
+const DEV_PUBLIC_CONTENT_URL = "http://localhost:3100/api/public/content?raw=1";
+const LIVE_PUBLIC_CONTENT_URL =
+  "https://gracehighschoolgayaza.academy/api/public/content?raw=1";
 
 export const PUBLIC_CONTENT_URL =
   env.VITE_ADMIN_CONTENT_URL?.trim() ||
-  "http://localhost:3100/api/public/content?raw=1";
+  (import.meta.env.PROD ? LIVE_PUBLIC_CONTENT_URL : DEV_PUBLIC_CONTENT_URL);
 
 export type FeedPhoto = {
   id: number;

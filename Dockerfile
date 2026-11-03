@@ -1,57 +1,65 @@
 # syntax=docker/dockerfile:1
-# Coolify: Build strategy = Dockerfile. pnpm 11 needs Node >= 22.13 (node:sqlite).
+# Coolify: Build strategy = Dockerfile.
+# npm ci uses registry.npmjs.org with a small socket pool so package downloads
+# do not stall the way pnpm's parallel fetches did.
 FROM node:22-bookworm-slim
 
 ENV CI=true \
     NEXT_TELEMETRY_DISABLED=1 \
     NPM_CONFIG_PRODUCTION=false \
-    COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
     NODE_ENV=development \
-    npm_config_store_dir=/pnpm/store
+    ALLOW_NPM=1 \
+    npm_config_registry=https://registry.npmjs.org \
+    npm_config_fetch_retries=5 \
+    npm_config_fetch_retry_factor=2 \
+    npm_config_fetch_retry_mintimeout=20000 \
+    npm_config_fetch_retry_maxtimeout=120000 \
+    npm_config_fetch_timeout=300000 \
+    npm_config_maxsockets=2 \
+    npm_config_audit=false \
+    npm_config_fund=false \
+    npm_config_update_notifier=false
 
 WORKDIR /app
 
-# Activate the pinned pnpm before any pnpm command. Node 20.20 has no node:sqlite.
-RUN corepack enable \
- && corepack prepare pnpm@11.10.0 --activate \
- && pnpm --version
-
-# Manifests only, so this dependency layer stays cached until a package.json or the lockfile changes.
-# .npmrc is included here so pnpm install uses the registry mirror before any package download.
-# Every workspace manifest stays in the image so the lockfile still matches; install below is filtered.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+# Manifests and the npm lockfile only. Dependency layers stay cached until one of these changes.
+# The repo .npmrc is intentionally not copied here: it carries pnpm settings. npm ci gets
+# registry.npmjs.org and a low maxsockets from the file written below.
+COPY package.json package-lock.json pnpm-workspace.yaml ./
+COPY scripts/materialize-npm-manifests.mjs scripts/materialize-npm-manifests.mjs
+COPY scripts/preinstall-guard.mjs scripts/preinstall-guard.mjs
 COPY artifacts/api-server/package.json artifacts/api-server/package.json
 COPY artifacts/grace-high-school/package.json artifacts/grace-high-school/package.json
 COPY artifacts/grace-admin/package.json artifacts/grace-admin/package.json
-COPY artifacts/admin/package.json artifacts/admin/package.json
-COPY artifacts/mockup-sandbox/package.json artifacts/mockup-sandbox/package.json
 COPY lib/api-client-react/package.json lib/api-client-react/package.json
-COPY lib/api-spec/package.json lib/api-spec/package.json
 COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
-COPY scripts/package.json scripts/package.json
 
-# Deployed apps plus their workspace dependencies only.
-# Skips admin, mockup-sandbox, api-spec, and scripts (scripts pulls embedded-postgres).
-# --no-frozen-lockfile: this repo's lockfile settings differ from pnpm-workspace.yaml.
-# Prefer the store, and fetch anything still missing. The mount reuses unchanged
-# packages; Docker reuses this whole layer until a manifest or the lockfile changes.
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --no-frozen-lockfile --prefer-offline \
-      --filter @workspace/api-server... \
-      --filter @workspace/grace-high-school... \
-      --filter @workspace/grace-admin... \
-      --store-dir /pnpm/store \
-      --network-concurrency 2 \
-      --fetch-retries 5 \
-      --fetch-retry-factor 2 \
-      --fetch-retry-mintimeout 10000 \
-      --fetch-retry-maxtimeout 120000 \
-      --fetch-timeout 120000
+RUN printf '%s\n' \
+      'registry=https://registry.npmjs.org' \
+      'fetch-retries=5' \
+      'fetch-retry-factor=2' \
+      'fetch-retry-mintimeout=20000' \
+      'fetch-retry-maxtimeout=120000' \
+      'fetch-timeout=300000' \
+      'maxsockets=2' \
+      'legacy-peer-deps=true' \
+      'audit=false' \
+      'fund=false' \
+      > .npmrc \
+ && node scripts/materialize-npm-manifests.mjs \
+ && npm ci --no-audit --no-fund --legacy-peer-deps
 
 COPY . .
 
-RUN pnpm run build:docker
+# Vite inlines VITE_* during `vite build`. Coolify must mark this Available at Buildtime
+# when the dashboard feed is not on the public site origin. Empty is ignored by the app.
+ARG VITE_ADMIN_CONTENT_URL=https://gracehighschoolgayaza.academy/api/public/content?raw=1
+ENV VITE_ADMIN_CONTENT_URL=${VITE_ADMIN_CONTENT_URL}
+
+RUN npm --prefix artifacts/api-server run build \
+ && npm --prefix artifacts/grace-high-school run build \
+ && npm --prefix artifacts/grace-admin run build
 
 ENV NODE_ENV=production
 EXPOSE 8080

@@ -77,7 +77,7 @@ async function resolveAppUuid() {
   return match.uuid;
 }
 
-async function upsertEnv(uuid, key, value) {
+async function upsertEnv(uuid, key, value, { runtime = true, buildtime = false } = {}) {
   await api(`/applications/${uuid}/envs`, {
     method: "PATCH",
     headers: authHeaders({ "Content-Type": "application/json" }),
@@ -85,11 +85,11 @@ async function upsertEnv(uuid, key, value) {
       key,
       value,
       is_literal: true,
-      is_runtime: true,
-      is_buildtime: false,
+      is_runtime: runtime,
+      is_buildtime: buildtime,
     }),
   });
-  console.log("[coolify] env set:", key);
+  console.log("[coolify] env set:", key, buildtime ? "(build)" : "(runtime)");
 }
 
 async function main() {
@@ -126,6 +126,14 @@ async function main() {
   await upsertEnv(uuid, "ALLOWED_ORIGINS", ALLOWED_ORIGINS);
   await upsertEnv(uuid, "NODE_ENV", "production");
   await upsertEnv(uuid, "PGSSL", "false");
+  // Vite reads this while the image builds. Runtime-only values never reach the browser bundle.
+  await upsertEnv(
+    uuid,
+    "VITE_ADMIN_CONTENT_URL",
+    process.env.COOLIFY_ADMIN_CONTENT_URL?.trim() ||
+      "https://gracehighschoolgayaza.academy/api/public/content?raw=1",
+    { runtime: false, buildtime: true },
+  );
   // Ensure no Render API / DB URLs remain in the runtime env.
   for (const key of ["VITE_API_BASE_URL", "RENDER_EXTERNAL_URL"]) {
     await upsertEnv(uuid, key, "");

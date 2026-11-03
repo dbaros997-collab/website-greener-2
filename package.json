@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "preinstall": "node ./scripts/preinstall-guard.mjs",
     "build": "pnpm run typecheck && pnpm -r --if-present --filter \"!./artifacts/mockup-sandbox\" run build",
     "install:docker": "pnpm install --frozen-lockfile --filter @workspace/api-server... --filter @workspace/grace-high-school... --filter @workspace/grace-admin...",
     "build:docker": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/grace-high-school run build && pnpm --filter @workspace/grace-admin run build",

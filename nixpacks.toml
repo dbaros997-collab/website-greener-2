@@ -1,29 +1,37 @@
-# Coolify's Nix phase was installing pnpm from Nix (pnpm-9_x), which is often
-# built from source and blows the 3600s deploy limit. Node comes from the
-# binary cache; pnpm is the official tarball via corepack.
+# Prefer the Dockerfile on Coolify. This file is the fallback if the build pack is Nixpacks.
+# Installs with npm ci against registry.npmjs.org (low concurrency) instead of pnpm.
 providers = ["node"]
 
 [variables]
-NIXPACKS_NODE_VERSION = "20"
-NIXPACKS_PNPM_VERSION = "11.10.0"
+NIXPACKS_NODE_VERSION = "22"
 CI = "true"
 NEXT_TELEMETRY_DISABLED = "1"
 NPM_CONFIG_PRODUCTION = "false"
-COREPACK_ENABLE_DOWNLOAD_PROMPT = "0"
+NODE_ENV = "development"
+ALLOW_NPM = "1"
+npm_config_registry = "https://registry.npmjs.org"
+npm_config_maxsockets = "2"
+npm_config_fetch_retries = "5"
+npm_config_fetch_timeout = "300000"
 ALLOWED_ORIGINS = "https://gracehighschoolgayaza.academy,https://www.gracehighschoolgayaza.academy"
+VITE_ADMIN_CONTENT_URL = "https://gracehighschoolgayaza.academy/api/public/content?raw=1"
 
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_22"]
 
 [phases.install]
 cmds = [
-  "corepack enable",
-  "corepack prepare pnpm@11.10.0 --activate",
-  "pnpm run install:docker",
+  "node scripts/materialize-npm-manifests.mjs",
+  "npm ci --no-audit --no-fund --legacy-peer-deps",
 ]
 
 [phases.build]
-cmds = ["pnpm run build:docker"]
+cmds = [
+  "node scripts/materialize-npm-manifests.mjs",
+  "npm --prefix artifacts/api-server run build",
+  "npm --prefix artifacts/grace-high-school run build",
+  "npm --prefix artifacts/grace-admin run build",
+]
 
 [start]
 cmd = "NODE_ENV=production node ./scripts/src/docker-start.mjs"

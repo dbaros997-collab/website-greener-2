@@ -34,7 +34,14 @@ export default defineConfig(async ({ mode }) => ({
   base: basePath,
   envDir: artifactDir,
   ...(mode === "production"
-    ? { env: { VITE_API_BASE_URL: "" } as Record<string, string> }
+    ? {
+        env: {
+          VITE_API_BASE_URL: "",
+          ...(process.env.VITE_ADMIN_CONTENT_URL
+            ? { VITE_ADMIN_CONTENT_URL: process.env.VITE_ADMIN_CONTENT_URL }
+            : {}),
+        } as Record<string, string>,
+      }
     : {}),
   publicDir,
   plugins: [
