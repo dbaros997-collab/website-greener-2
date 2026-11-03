@@ -37,8 +37,8 @@ RUN corepack enable && pnpm fetch \
 
 COPY . .
 
-# Link node_modules from the store. This step does not contact the registry.
-RUN pnpm install --offline --no-frozen-lockfile
+# Install online so missing package metadata can be fetched, with retries for registry timeouts.
+RUN corepack enable && pnpm install --no-frozen-lockfile --fetch-retries 5 --fetch-retry-mintimeout 20000 --fetch-retry-maxtimeout 120000
 
 RUN pnpm run build:docker
 
