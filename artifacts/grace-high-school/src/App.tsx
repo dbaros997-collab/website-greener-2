@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { useLocation, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { subscribeToContentEvents } from "./lib/contentEvents";
@@ -70,12 +70,18 @@ const HERO_SLIDES = [
   img_dance,
 ];
 
-const GALLERY_SLIDES = [
-  img_gallery_hike,
-  img_gallery_roast,
-  img_gallery_library,
-  img_gallery_girls,
-  img_gallery_ribbon,
+function galleryActivity(title: string) {
+  const line = title.trim();
+  if (/^electrical presentation$/i.test(line)) return "Students giving an electrical presentation";
+  return line;
+}
+
+const GALLERY_SLIDES: { src: string; caption: string }[] = [
+  { src: img_gallery_hike, caption: "Students hiking up a hillside" },
+  { src: img_gallery_roast, caption: "Students roasting meat over an open fire" },
+  { src: img_gallery_library, caption: "Students reading in the library" },
+  { src: img_gallery_girls, caption: "Students studying together outdoors" },
+  { src: img_gallery_ribbon, caption: "Guests cutting the ribbon at a school ceremony" },
 ];
 
 // Slides whose subject would be cropped by "cover" — show the full photo instead.
@@ -773,17 +779,29 @@ export default function App() {
           body: plainNotice(item.body),
         }))
       : staticUpdates;
-  const galleryPhotos = (Array.isArray(galleryQ.data) ? galleryQ.data : [])
-    .filter((item) => item.isVisible !== false && item.objectPath)
-    .map((item) => {
-      const path = item.objectPath.startsWith("/") ? item.objectPath : `/${item.objectPath}`;
-      return {
-        id: item.id,
-        title: item.caption,
-        category: item.category,
-        src: `${getStoragePrefix()}${path}?v=${encodeURIComponent(`${item.id}-${item.sortOrder}-${item.objectPath}`)}`,
-      };
-    });
+  const movingGallery = useMemo(() => {
+    const photos = (Array.isArray(galleryQ.data) ? galleryQ.data : [])
+      .filter((item) => item.isVisible !== false && item.objectPath)
+      .map((item) => {
+        const path = item.objectPath.startsWith("/") ? item.objectPath : `/${item.objectPath}`;
+        return {
+          id: item.id,
+          title: item.caption,
+          category: item.category,
+          src: `${getStoragePrefix()}${path}?v=${encodeURIComponent(`${item.id}-${item.sortOrder}-${item.objectPath}`)}`,
+        };
+      });
+    const slides = [
+      ...GALLERY_SLIDES,
+      ...photos.map((photo) => ({ src: photo.src, caption: galleryActivity(photo.title) })),
+    ];
+    return {
+      photos,
+      images: slides.map((slide) => slide.src),
+      captions: slides.map((slide) => slide.caption),
+    };
+  }, [galleryQ.data]);
+  const galleryPhotos = movingGallery.photos;
   const calendarEvents = desk?.upcomingEvents ?? [];
 
   const updateCard = (u: { date: string; cat: string; tag: string; title: string; body: string }, i: number) => (
@@ -1750,15 +1768,16 @@ export default function App() {
               Life at Grace High School
             </h2>
             <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, margin: "0 auto" }}>
-              A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore.
+              A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore. Each photo names the activity in the picture.
               {galleryPhotos.length > 0
-                ? " Photos saved in the dashboard are added below and do not replace these pictures."
+                ? " Photos saved in the dashboard are included in the slideshow."
                 : ""}
             </p>
           </div>
           <div className="reveal-child">
             <ImageSlider
-              images={GALLERY_SLIDES}
+              images={movingGallery.images}
+              captions={movingGallery.captions}
               layout="section"
               intervalMs={5000}
               objectFitFor={HERO_CONTAIN}

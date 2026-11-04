@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 
 type ImageSliderProps = {
   images: string[];
+  /** Activity line for each slide, aligned with `images`. */
+  captions?: string[];
   /** Auto-advance interval in ms. Default 5000. */
   intervalMs?: number;
   className?: string;
@@ -18,6 +20,7 @@ type ImageSliderProps = {
 
 export default function ImageSlider({
   images,
+  captions,
   intervalMs = 5000,
   className,
   layout = "hero",
@@ -87,9 +90,12 @@ export default function ImageSlider({
 
   if (count === 0) return null;
 
+  const caption = captions?.[index]?.trim() ?? "";
+  const hasCaptions = Boolean(captions?.some((line) => line.trim()));
+
   return (
     <div
-      className={`image-slider image-slider--${layout}${className ? ` ${className}` : ""}`}
+      className={`image-slider image-slider--${layout}${hasCaptions ? " image-slider--captioned" : ""}${className ? ` ${className}` : ""}`}
       role="region"
       aria-roledescription="carousel"
       aria-label="Image slideshow"
@@ -113,7 +119,7 @@ export default function ImageSlider({
                   backgroundRepeat: "no-repeat",
                 }}
                 aria-hidden={i !== index}
-                aria-label={`${altPrefix} ${i + 1} of ${count}`}
+                aria-label={captions?.[i]?.trim() || `${altPrefix} ${i + 1} of ${count}`}
               />
             );
           })}
@@ -123,6 +129,12 @@ export default function ImageSlider({
       {children && (
         <div className="image-slider__overlay">{children}</div>
       )}
+
+      {caption ? (
+        <div className="image-slider__caption" aria-live="polite">
+          <p key={index} className="image-slider__caption-text">{caption}</p>
+        </div>
+      ) : null}
 
       {count > 1 && (
         <>
