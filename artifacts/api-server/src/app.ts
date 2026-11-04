@@ -159,6 +159,7 @@ export async function mountApiRoutes(app: Express): Promise<void> {
       next();
       return;
     }
+    res.setHeader("Cache-Control", "no-store");
     res.status(503).json({ error: DATABASE_UNAVAILABLE_MESSAGE });
   });
 

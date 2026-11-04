@@ -140,6 +140,8 @@ function makeCrudRouter(cfg: CrudConfig): IRouter {
       >;
 
       const visible = showAll ? rows : rows.filter((r) => r["isVisible"]);
+      // Public pages poll this list. Do not let a proxy or browser keep a copy.
+      res.setHeader("Cache-Control", "no-store");
       res.json(cfg.listResponse.parse(visible.map(presentRow)));
     } catch (err) {
       req.log.error({ err, resource }, "Failed to list content");

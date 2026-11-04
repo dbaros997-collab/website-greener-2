@@ -3,10 +3,8 @@ import { useLocation, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { subscribeToContentEvents } from "./lib/contentEvents";
 import {
-  categoryLabel,
   eventTypeLabel,
   eventWhen,
-  galleryImageSrc,
   noticeDateLabel,
   plainNotice,
   priorityLabel,
@@ -14,6 +12,8 @@ import {
 } from "./lib/publicContent";
 import {
   useListNewsItems,
+  useListGalleryImages,
+  getListGalleryImagesQueryKey,
   useListStats,
   useListVideos,
   useListProgrammes,
@@ -22,6 +22,7 @@ import {
   useListResources,
   useListResourceCategories,
   getApiRoot,
+  getStoragePrefix,
 } from "@workspace/api-client-react";
 import { FaTiktok, FaYoutube } from "react-icons/fa6";
 import CoreValues from "./components/CoreValues";
@@ -510,6 +511,17 @@ export default function App() {
   };
 
   const newsQ = useListNewsItems();
+  // Gallery rows saved in /dashboard live in PostgreSQL. Refetch on focus and
+  // on a short interval so a save shows up even if the SSE stream is dropped.
+  const galleryQ = useListGalleryImages(undefined, {
+    query: {
+      queryKey: getListGalleryImagesQueryKey(),
+      staleTime: 0,
+      refetchOnMount: "always",
+      refetchOnWindowFocus: true,
+      refetchInterval: 10_000,
+    },
+  });
   const desk = usePublicContent();
   const statsQ = useListStats();
   const videosQ = useListVideos();
@@ -761,16 +773,17 @@ export default function App() {
           body: plainNotice(item.body),
         }))
       : staticUpdates;
-  const galleryPhotos = (desk?.landingGallery ?? [])
-    .map((item) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      category: categoryLabel(item.category),
-      src: galleryImageSrc(item.mediaType, item.mediaUrl),
-      href: item.mediaType === "video" && /^https?:\/\//i.test(item.mediaUrl) ? item.mediaUrl : undefined,
-    }))
-    .filter((item) => item.src);
+  const galleryPhotos = (Array.isArray(galleryQ.data) ? galleryQ.data : [])
+    .filter((item) => item.isVisible !== false && item.objectPath)
+    .map((item) => {
+      const path = item.objectPath.startsWith("/") ? item.objectPath : `/${item.objectPath}`;
+      return {
+        id: item.id,
+        title: item.caption,
+        category: item.category,
+        src: `${getStoragePrefix()}${path}?v=${encodeURIComponent(`${item.id}-${item.sortOrder}-${item.objectPath}`)}`,
+      };
+    });
   const calendarEvents = desk?.upcomingEvents ?? [];
 
   const updateCard = (u: { date: string; cat: string; tag: string; title: string; body: string }, i: number) => (
@@ -1745,37 +1758,22 @@ export default function App() {
           <div className="reveal-child">
             {galleryPhotos.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
-                {galleryPhotos.map((photo) => {
-                  const card = (
-                    <>
-                      <img src={photo.src} alt={photo.title} loading="lazy" decoding="async" width={800} height={520} style={{ width: "100%", height: 190, objectFit: "cover", display: "block", background: GREEN_LIGHT }} />
-                      <div style={{ padding: "14px 16px 16px" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{photo.category}</div>
-                        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", color: GREEN_DARK, lineHeight: 1.3, margin: 0 }}>{photo.title}</h3>
-                        {photo.description ? <p style={{ fontSize: 13.5, color: "#5A5A5A", lineHeight: 1.55, margin: "8px 0 0" }}>{photo.description}</p> : null}
-                      </div>
-                    </>
-                  );
-                  const frame = {
+                {galleryPhotos.map((photo) => (
+                  <figure key={photo.id} style={{
+                    margin: 0,
                     background: WHITE,
                     borderRadius: 12,
                     overflow: "hidden",
                     border: "1px solid rgba(0,0,0,0.08)",
                     boxShadow: "0 8px 24px rgba(10,64,32,0.06)",
-                    textDecoration: "none",
-                    color: "inherit",
-                    display: "block",
-                  } as const;
-                  return photo.href ? (
-                    <a key={photo.id} href={photo.href} target="_blank" rel="noreferrer" style={frame}>
-                      {card}
-                    </a>
-                  ) : (
-                    <figure key={photo.id} style={{ ...frame, margin: 0 }}>
-                      {card}
-                    </figure>
-                  );
-                })}
+                  }}>
+                    <img src={photo.src} alt={photo.title} loading="lazy" decoding="async" width={800} height={520} style={{ width: "100%", height: 190, objectFit: "cover", display: "block", background: GREEN_LIGHT }} />
+                    <div style={{ padding: "14px 16px 16px" }}>
+                      {photo.category ? <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: GREEN_MAIN, marginBottom: 6 }}>{photo.category}</div> : null}
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", color: GREEN_DARK, lineHeight: 1.3, margin: 0 }}>{photo.title}</h3>
+                    </div>
+                  </figure>
+                ))}
               </div>
             ) : (
               <ImageSlider
