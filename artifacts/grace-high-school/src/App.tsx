@@ -1750,14 +1750,22 @@ export default function App() {
               Life at Grace High School
             </h2>
             <p style={{ fontSize: 16, color: "#5A5A5A", lineHeight: 1.7, maxWidth: 620, margin: "0 auto" }}>
+              A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore.
               {galleryPhotos.length > 0
-                ? "Photos published from the school dashboard. New pictures appear here as soon as they are saved."
-                : "A glimpse of campus, classrooms, and student life — swipe or use the arrows to explore."}
+                ? " Photos saved in the dashboard are added below and do not replace these pictures."
+                : ""}
             </p>
           </div>
           <div className="reveal-child">
+            <ImageSlider
+              images={GALLERY_SLIDES}
+              layout="section"
+              intervalMs={5000}
+              objectFitFor={HERO_CONTAIN}
+              altPrefix="Gallery photo"
+            />
             {galleryPhotos.length > 0 ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16, marginTop: 28 }}>
                 {galleryPhotos.map((photo) => (
                   <figure key={photo.id} style={{
                     margin: 0,
@@ -1775,15 +1783,7 @@ export default function App() {
                   </figure>
                 ))}
               </div>
-            ) : (
-              <ImageSlider
-                images={GALLERY_SLIDES}
-                layout="section"
-                intervalMs={5000}
-                objectFitFor={HERO_CONTAIN}
-                altPrefix="Gallery photo"
-              />
-            )}
+            ) : null}
           </div>
         </div>
       </section>
